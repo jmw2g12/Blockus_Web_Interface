@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jack's page</title>
+    <style>
+    table.layout{
+    width:100%;
+    height:100%;
+    border: 1px solid black;
+    }
+    table.pieceViewer { /* the piece viewer table */
+    width:100%;
+    height:100%;
+    border: 1px solid black;
+    font-size:110%;
+    }
+	
+    
+    td.viewerblock { /* the cells in the piece viewer that represent blocks */
+    color:mediumpurple;
+    background-color:mediumpurple;
+    }
+    td.black {
+    color:black;
+    background-color:black;
+    }
+    td.viewerbackg { /* the cells in the piece viewer that represent blocks */
+    color:paleturquoise;
+    background-color:paleturquoise;
+    }
+    td.layoutborder {
+    width:40%;
+    height:100%;
+    background-color:lavender;
+    border: 1px solid black;
+    }
+    td.layoutcentre {
+    width:60%;
+    height:100%;
+    background-color:plum;
+    border: 1px solid black;
+    }
+    td.selectedBlock{
+    background-color:darkred;
+    color:darkred;
+    }
+    td.hoverBlock{
+    background-color:mediumpurple;
+    color:mediumpurple;
+    }
+    td.usedCellP1{
+    background-color:DodgerBlue;
+    color:DodgerBlue;
+    }
+    td.usedCellP2{
+    background-color:coral;
+    color:coral;
+    }
+
+
+    tr.pieceViewer{
+    width:1*;
+    height:1*;
+    border: 1px solid black;
+    }
+    tr.pieceTable{
+    width:1*;
+    height:1*;
+    border: 1px solid black;
+    }
+    th.pagetitle{
+    colspan:"2";
+    width:100%;
+    font-size:200%;
+    font-family: "Courier New", Courier, monospace;
+    border: 1px solid black;
+    }
+    tr.board{
+    width:100%;
+    height:80%;
+    border: 1px solid black;
+    }
+    td.board{
+    width:100%;
+    height:80%;
+    border: 1px solid black;
+    }
+    tr.controls{
+    width:100%;
+    height:20%;
+    border: 1px solid black;
+    }
+    table.playingboard{
+    width:100%;
+    height:100%;
+    border: 1px solid black;
+    background-color:plum;
+    }
+    tr.boardrow{
+    width:1*;
+    height:1*;
+    border: 1px solid black;
+    background-color:LemonChiffon;
+    color:LemonChiffon;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jackmw94/e48bed0dcd8ab37b7299d967ac8263ac/raw/90ce0ffdaa0b5e2eeac543a2010f323f0d7dbce7/pieceLoader.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jackmw94/1dbd425330a247579dfec97d27431957/raw/46768db1cfc73679ac8ad5d0b636353c1c4fd812/model.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jackmw94/117a9f9f5963f68c8394b6a84e345215/raw/763f76c68339b0b3a73889e76ecb85b05a6b62df/comms.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jackmw94/6a6795d952a10a14c8f6c0d5b0b0145d/raw/a661e07c3650436c4c489c8ec2a96e56fd0409ec/controller.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jackmw94/e18944dc366d772de8c9b5a61c68b24d/raw/039b46d0b7689f3b105c9d72562f8fd48cb0e330/view.js"></script>
+</head>
+<body onload="addAllPieces();boardData = getBoardData();go = selectGo();">
+    <table class="layout" id="borderlayout">
+        <tr>
+            <th colspan="6" class="pagetitle">BLOKUS</th>
+        </tr>
+        <tr style="height:100%;width:100%;">
+            <td class="layoutborder">
+                <table style="width:100%;height:100%">
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer1"
+                            onclick="selectPiece('pieceViewer1')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer2"
+                            onclick="selectPiece('pieceViewer2')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer3"
+                            onclick="selectPiece('pieceViewer3')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer4"
+                            onclick="selectPiece('pieceViewer4')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer5"
+                            onclick="selectPiece('pieceViewer5')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer6"
+                            onclick="selectPiece('pieceViewer6')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer7"
+                            onclick="selectPiece('pieceViewer7')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer8"
+                            onclick="selectPiece('pieceViewer8')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer9"
+                            onclick="selectPiece('pieceViewer9')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer10"
+                            onclick="selectPiece('pieceViewer10')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer11"
+                            onclick="selectPiece('pieceViewer11')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer12"
+                            onclick="selectPiece('pieceViewer12')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer13"
+                            onclick="selectPiece('pieceViewer13')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer14"
+                            onclick="selectPiece('pieceViewer14')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer15"
+                            onclick="selectPiece('pieceViewer15')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer16"
+                            onclick="selectPiece('pieceViewer16')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer17"
+                            onclick="selectPiece('pieceViewer17')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer18"
+                            onclick="selectPiece('pieceViewer18')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer19"
+                            onclick="selectPiece('pieceViewer19')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer20"
+                            onclick="selectPiece('pieceViewer20')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="pieceTable">
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer21"
+                            onclick="selectPiece('pieceViewer21')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer22"
+                            onclick="selectPiece('pieceViewer22')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer23"
+                            onclick="selectPiece('pieceViewer23')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="pieceViewer" id="pieceViewer24"
+                            onclick="selectPiece('pieceViewer24')">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="layoutcentre">
+                <table style="border: 1px solid black;height:100%;width:100%;">
+                    <tr class="board">
+                        <td colspan="6" class="board">
+                        
+                        <table class="playingboard">
+                        	<tr class="boardrow">
+								<td class="blankcell" id="cell1-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-2" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-3" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-4" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-5" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-6" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-7" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-8" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-9" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-10" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-11" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-12" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-13" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+							<tr class="boardrow">
+								<td class="blankcell" id="cell1-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell2-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell3-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell4-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell5-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell6-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell7-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell8-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell9-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell10-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell11-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell12-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell13-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell14-14" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
+							</tr>
+                        </table>
+                        </td>
+                    </tr>
+                    <tr class="controls">
+                    	<td style="width:25%;border: 1px solid black;">
+							<table style="width:100%;height:100%;">
+								<tr>
+									<td><button style="width:100%;height:100%;" id="rotateCWButton" onclick="rotateCW('pieceChoice')" type=
+									"button" disabled>Rotate CW</button></td>
+									<td>
+									<td><button style="width:100%;height:100%;" id="flipHorizButton" onclick="flipHoriz('pieceChoice')" type=
+									"button" disabled>Flip Horiz</button></td>
+								</tr>
+								<tr>
+									<td><button style="width:100%;height:100%;" id="rotateCCWButton" onclick="rotateCCW('pieceChoice')" type=
+									"button" disabled>Rotate CCW</button></td>
+									<td>
+									<td><button style="width:100%;height:100%;" id="flipVerticButton" onclick="flipVertic('pieceChoice')" type=
+									"button" disabled>Flip Vertic</button></td>
+								</tr>
+							</table>
+                        </td>
+                        <td style="height:100%;width:25%;">
+                            <table style="height:100%;width:100%;" class="pieceViewer" id="pieceChoice">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="height:100%;width:12%;">
+                        	<button style="height:100%;width:100%;" type="button" onclick="alert('not working yet')">New game</button>
+                        </td>
+                         <td style="height:100%;width:12%;">
+                        	<button style="height:100%;width:100%;" type="button" onclick="alert('not working yet')">Undo move</button>
+                        </td>
+                         <td style="height:100%;width:12%;">
+                        	<button style="height:100%;width:100%;" type="button" onclick="fetchBoard()">Refresh board</button>
+                        </td>
+                        <td style="height:100%;width:12%;">
+                        	<button style="height:100%;width:100%;" type="button" onclick="window.close();">Quit</button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
