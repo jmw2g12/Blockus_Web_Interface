@@ -83,7 +83,8 @@ function printBoard(){
 //port = 8080;
 //host = 'localhost';
 //server.listen(port, host);
-server.listen(process.env.PORT || 3000, function(){
+server.set('port', (process.env.PORT || 5000));
+server.listen(server.get('port'), function(){
   console.log("Express server listening on port %d in %s mode", this.address().port, server.settings.env);
 });
 //console.log('Listening at http://' + host + ':' + port);
