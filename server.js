@@ -80,7 +80,10 @@ function printBoard(){
 	}
 }
 
-port = Number(process.env.PORT || 8080);
-host = 'localhost';
-server.listen(port, host);
-console.log('Listening at http://' + host + ':' + port);
+//port = 8080;
+//host = 'localhost';
+//server.listen(port, host);
+server.listen(process.env.PORT || 3000, function(){
+  console.log("Express server listening on port %d in %s mode", this.address().port, server.settings.env);
+});
+//console.log('Listening at http://' + host + ':' + port);
