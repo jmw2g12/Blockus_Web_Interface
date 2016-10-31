@@ -1,3 +1,4 @@
+console.log("hello world, you're in the server.js file");
 http = require('http');
 fs = require('fs');
 var board = [];
