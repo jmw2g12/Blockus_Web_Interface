@@ -23,6 +23,9 @@ function initBoard(){
                 }
         }
         //console.log("init-ed board = " + board[0]);
+	
+	//***:
+	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8" );
 }
 function handleMsg(msg){
         //console.log("handleMsg:  JSON.parse(msg)[0] = " + JSON.parse(msg)[0]);
@@ -33,7 +36,10 @@ function handleMsg(msg){
         }
 }
 function boardToMsg(){
-        return JSON.stringify(board.concat(go));
+        //return JSON.stringify(board.concat(go));
+
+	//***:
+	return JSON.parse(require("./board_data.json");
 }
 function handlePieceMsg(msgJSON){
         var msg = JSON.parse(msgJSON);
@@ -50,6 +56,9 @@ function handlePieceMsg(msgJSON){
         console.log("blocks = " + blocks);
         addPieceToBoard(blocks);
         go = (msgGo === 1) ? 2 : 1;
+
+	//***:
+	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8" );
 }
 function addPieceToBoard(piece){
         for (i = 0; i < piece.length; i++){
