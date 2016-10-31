@@ -25,7 +25,7 @@ function initBoard(){
         //console.log("init-ed board = " + board[0]);
 	
 	//***:
-	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8" );
+	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8" , function(){});
 }
 function handleMsg(msg){
         //console.log("handleMsg:  JSON.parse(msg)[0] = " + JSON.parse(msg)[0]);
@@ -58,7 +58,7 @@ function handlePieceMsg(msgJSON){
         go = (msgGo === 1) ? 2 : 1;
 
 	//***:
-	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8" );
+	fs.writeFile( "board_data.json", JSON.stringify( board ), "utf8", function(){} );
 }
 function addPieceToBoard(piece){
         for (i = 0; i < piece.length; i++){
