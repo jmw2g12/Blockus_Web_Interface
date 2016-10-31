@@ -1,0 +1,26 @@
+{
+  "name": "web_interface",
+  "version": "1.0.0",
+  "description": "Web interface for blokus project",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "httpdispatcher": "^1.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmw2g12/Blockus_Web_Interface.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jmw2g12/Blockus_Web_Interface/issues"
+  },
+  "homepage": "https://github.com/jmw2g12/Blockus_Web_Interface#readme"
+}

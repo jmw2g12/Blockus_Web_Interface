@@ -79,7 +79,7 @@ function printBoard(){
 	}
 }
 
-port = 8080;
+port = Number(process.env.PORT || 8080);
 host = 'localhost';
 server.listen(port, host);
 console.log('Listening at http://' + host + ':' + port);
