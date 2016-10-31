@@ -66,7 +66,7 @@ function printBoard(){
 
 //Back to server logic
 
-app.get('/', function(request, response) {
+app.get('/', function(req, res) {
     console.dir(req.param);
 
     if (req.method == 'POST') {
