@@ -41,10 +41,11 @@ function handlePieceMsg(msgJSON){
                 blocks.push([x,y]);
         }
         console.log("blocks = " + blocks);
-        addPieceToBoard(blocks);
+        addPieceToBoard(blocks, );
         //go = (msgGo === 1) ? 2 : 1;
 }
 function addPieceToBoard(piece){
+		console.log("addPieceToBoard, turn = " + turn);
         for (i = 0; i < piece.length; i++){
                 board[(piece[i][1]-1)][(piece[i][0]-1)] = turn;
         }
@@ -54,6 +55,17 @@ function printBoard(){
         for (i = 0; i < board.length; i++){
                 console.log("  " + board[i]);
         }
+}
+function switchTurn(){
+		if (turn == 1){
+   		 	turn = 2;
+    		console.log("turn was 1, changing to " + turn);
+    	}else if (turn == 2){
+    		turn = 1;
+    		console.log("turn was 2, changing to " + turn);
+    	}else{
+    		console.log("TURN IS NOT 1 OR 2!!! ****");
+    	}
 }
 
 
@@ -67,30 +79,24 @@ app.get('/', function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(html);
 })
-
+var dataCount = 0;
 app.post('/', function(req, res) {
 	console.log("in post /");
 	console.log("current turn = " + turn);
 	var body = '';
 	req.on('data', function (data) {
+		console.log("body data count = " dataCount);
+		dataCount++;
         body += data;
     });
     req.on('end', function () {
     	console.log("Body: " + body);
         handlePieceMsg(body);
+        switchTurn();
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     reply = '';
     res.end(reply);
-    if (turn == 1){
-    	turn = 2;
-    	console.log("turn was 1, changing to " + turn);
-    }else if (turn == 2){
-    	turn = 1;
-    	console.log("turn was 2, changing to " + turn);
-    }else{
-    	console.log("TURN IS NOT 1 OR 2!!! ****");
-    }
 })
 
 app.post('/board', function(req, res) {
