@@ -111,7 +111,8 @@ app.post('/', function(req, res) {
 	console.log("body.length = " + body.length);
 	console.log("Object.keys(data) = " + Object.keys(body));
 	console.log("Object.keys(body)[0] = " + Object.keys(body)[0]);
-	console.log("Object.keys(body)[0][piece] = " + Object.keys(body)[0]["piece"]);
+	console.log("Object.keys(body)[0][0] = " + Object.keys(body)[0][0]);
+	console.log("Object.keys(body)[0].piece = " + Object.keys(body)[0].piece);
 	console.log("finished checks");
 	handlePieceMsg(body);
 	switchTurn();
