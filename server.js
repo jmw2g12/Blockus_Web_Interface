@@ -11,7 +11,7 @@ http = require('http');
 fs = require('fs');
 
 var board = [];
-var go = 1;
+var turn = 1;
 initBoard();
 var reply = "post-received";
 
@@ -33,13 +33,13 @@ function handleMsg(msg){
         }
 }
 function boardToMsg(){
-        return JSON.stringify(board.concat(go));
+        return JSON.stringify(board.concat(turn));
 }
 function handlePieceMsg(msgJSON){
         var msg = JSON.parse(msgJSON);
         var msgGo = parseInt(msg[0]);
         console.log("msg.length = " + msg.length);
-        console.log("go = " + msgGo);
+        console.log("turn = " + msgGo);
 
         var blocks = [];
         for (i = 1; i < msg.length; i++){
@@ -49,11 +49,11 @@ function handlePieceMsg(msgJSON){
         }
         console.log("blocks = " + blocks);
         addPieceToBoard(blocks);
-        go = (msgGo === 1) ? 2 : 1;
+        //go = (msgGo === 1) ? 2 : 1;
 }
 function addPieceToBoard(piece){
         for (i = 0; i < piece.length; i++){
-                board[(piece[i][1]-1)][(piece[i][0]-1)] = go;
+                board[(piece[i][1]-1)][(piece[i][0]-1)] = turn;
         }
         printBoard();
 }
@@ -68,26 +68,31 @@ function printBoard(){
 
 app.get('/', function(req, res) {
 	console.dir(req.param);
-        console.log("GET");
+    console.log("GET");
 
-        var html = fs.readFileSync('index.html');
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(html);
+    var html = fs.readFileSync('index.html');
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(html);
 })
 
 app.post('/', function(req, res) {
 	var body = '';
 	req.on('data', function (data) {
-            body += data;
-        });
-        req.on('end', function () {
-            console.log("Body: " + body);
-            handleMsg(body);
-        });
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        reply = boardToMsg();
-        console.log("reply = " + reply);
-        res.end(reply);
+		if (body === ''){
+			console.log("first datum = " + data);
+		}else{
+			console.log("consecutive data = " + data);
+		}
+        body += data;
+    });
+    req.on('end', function () {
+    	console.log("Body: " + body);
+        handleMsg(body);
+    });
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    reply = boardToMsg();
+    console.log("reply = " + reply);
+    res.end(reply);
 })
 
 app.listen(app.get('port'), function() {
