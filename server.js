@@ -24,14 +24,6 @@ function initBoard(){
         }
         //console.log("init-ed board = " + board[0]);
 }
-function handleMsg(msg){
-        //console.log("handleMsg:  JSON.parse(msg)[0] = " + JSON.parse(msg)[0]);
-        if (JSON.parse(msg)[0] === "board"){
-                console.log("returning board");
-        }else{
-                handlePieceMsg(msg);
-        }
-}
 function boardToMsg(){
         return JSON.stringify(board.concat(turn));
 }
@@ -84,10 +76,10 @@ app.post('/', function(req, res) {
     });
     req.on('end', function () {
     	console.log("Body: " + body);
-        handleMsg(body);
+        handlePieceMsg(body);
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
-    reply = boardToMsg();
+    reply = '';
     console.log("reply = " + reply);
     res.end(reply);
     if (turn == 1){
@@ -109,8 +101,7 @@ app.post('/board', function(req, res) {
         body += data;
     });
     req.on('end', function () {
-    	console.log("Body: " + body);
-        handleMsg(body);
+    	console.log("not handling piece. Body: " + body);
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     reply = boardToMsg();
