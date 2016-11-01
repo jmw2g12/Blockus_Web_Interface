@@ -77,7 +77,7 @@ app.get('/', function(req, res) {
 
 app.post('/', function(req, res) {
 	console.log("in post /");
-	console.log("turn = " + turn);
+	console.log("current turn = " + turn);
 	var body = '';
 	req.on('data', function (data) {
         body += data;
@@ -90,6 +90,15 @@ app.post('/', function(req, res) {
     reply = boardToMsg();
     console.log("reply = " + reply);
     res.end(reply);
+    if (turn == 1){
+    	turn = 2;
+    	console.log("turn was 1, changing to " + turn);
+    }else if (turn == 2){
+    	turn = 1;
+    	console.log("turn was 2, changing to " + turn);
+    }else{
+    	console.log("TURN IS NOT 1 OR 2!!! ****");
+    }
 })
 
 app.post('/board', function(req, res) {
