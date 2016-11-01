@@ -14,6 +14,7 @@ var board = [];
 var turn = 1;
 initBoard();
 var reply = "post-received";
+var dataCount = 0;
 
 function initBoard(){
         for (i = 0; i < 14; i++){
@@ -79,7 +80,6 @@ app.get('/', function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(html);
 })
-var dataCount = 0;
 app.post('/', function(req, res) {
 	console.log("in post /");
 	console.log("current turn = " + turn);
@@ -91,6 +91,7 @@ app.post('/', function(req, res) {
     });
     req.on('end', function () {
     	console.log("Body: " + body);
+    	dataCount = 0;
         handlePieceMsg(body);
         switchTurn();
     });
