@@ -42,7 +42,7 @@ function handlePieceMsg(msgJSON){
                 blocks.push([x,y]);
         }
         console.log("blocks = " + blocks);
-        addPieceToBoard(blocks, );
+        addPieceToBoard(blocks);
         //go = (msgGo === 1) ? 2 : 1;
 }
 function addPieceToBoard(piece){
