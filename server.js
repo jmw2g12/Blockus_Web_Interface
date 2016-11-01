@@ -102,8 +102,9 @@ app.get('/', function(req, res) {
 // })
 
 app.post('/', function(req, res) {
-	console.log("request = " + util.inspect(req, false, null));
-	console.log("request = " + util.inspect(res, false, null));
+	var body = req.body;
+	handlePieceMsg(body);
+	switchTurn();
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = boardToMsg();
     res.end(reply);
@@ -126,8 +127,8 @@ app.post('/', function(req, res) {
 // })
 
 app.post('/board', function(req, res) {
-	console.log("request = " + util.inspect(req, false, null));
-	console.log("request = " + util.inspect(res, false, null));
+	//console.log("request = " + util.inspect(req, false, null));
+	//console.log("request = " + util.inspect(res, false, null));
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = boardToMsg();
     res.end(reply);
