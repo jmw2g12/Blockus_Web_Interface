@@ -112,7 +112,8 @@ app.post('/', function(req, res) {
 	console.log("Object.keys(data) = " + Object.keys(body));
 	console.log("Object.keys(body)[0] = " + Object.keys(body)[0]);
 	console.log("JSON.parse(Object.keys(body)[0]) = " + JSON.parse(Object.keys(body)[0]));
-	console.log("JSON.parse(Object.keys(body)[0])[piece] = " + JSON.parse(Object.keys(body)[0])[piece]);
+	console.log("util.inspect(JSON.parse(Object.keys(body)[0])) = " + util.inspect(JSON.parse(Object.keys(body)[0])));
+	console.log("JSON.parse(Object.keys(body)[0]).piece = " + JSON.parse(Object.keys(body)[0]).piece);
 	console.log("finished checks");
 	handlePieceMsg(body);
 	switchTurn();
