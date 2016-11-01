@@ -106,7 +106,7 @@ app.get('/', function(req, res) {
 app.post('/', function(req, res) {
 	console.log("*** Placing piece: ***");
 	var body = req.body;
-	console.log("body = " + body);
+	console.log("body = " + util.inspect(body, false, null));
 	handlePieceMsg(body);
 	switchTurn();
 	res.writeHead(200, {'Content-Type': 'text/html'});
