@@ -5,6 +5,10 @@ var util = require('util')
 app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname + '/public'))
 
+app.configure(function(){
+  app.use(express.bodyParser());
+  app.use(app.router);
+});
 
 //Blokus logic
 console.log("hello world, you're in the server.js file");
