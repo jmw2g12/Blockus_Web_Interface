@@ -31,13 +31,14 @@ function initBoard(){
 function boardToMsg(){
         return JSON.stringify(board.concat(turn));
 }
-function handlePieceMsg(msgJSON){
-		console.log("msgJSON = " + msgJSON);
-        var msg = JSON.parse(msgJSON);
-        var msgGo = parseInt(msg[0]);
-        console.log("msg.length = " + msg.length);
-        console.log("turn = " + msgGo);
+function handlePieceMsg(piece,code){
+		//console.log("msgJSON = " + msgJSON);
+        //var msg = JSON.parse(msgJSON);
+        //var msgGo = parseInt(msg[0]);
+        //console.log("msg.length = " + msg.length);
+        //console.log("turn = " + msgGo);
 
+		/*
         var blocks = [];
         for (i = 1; i < msg.length; i++){
                 var x = msg[i][0];
@@ -45,15 +46,18 @@ function handlePieceMsg(msgJSON){
                 blocks.push([x,y]);
         }
         console.log("blocks = " + blocks);
-        addPieceToBoard(blocks);
+        */
+        addPieceToBoard(piece,code);
         //go = (msgGo === 1) ? 2 : 1;
 }
-function addPieceToBoard(piece){
-		console.log("addPieceToBoard, turn = " + turn);
+function addPieceToBoard(piece,code){
+		console.log("addPieceToBoard, code = " + code);
         for (i = 0; i < piece.length; i++){
-                board[(piece[i][1]-1)][(piece[i][0]-1)] = turn;
+                board[(piece[i][1]-1)][(piece[i][0]-1)] = code;
         }
+        console.log("addPieceToBoard, board:");
         printBoard();
+        console.log("end of board");
 }
 function printBoard(){
         for (i = 0; i < board.length; i++){
@@ -104,8 +108,9 @@ app.get('/', function(req, res) {
 // })
 
 app.post('/', function(req, res) {
-	console.log("*** Placing piece: ***");
 	var body = req.body;
+	/*
+	console.log("*** Placing piece: ***");
 	console.log("body = " + util.inspect(body, false, null));
 	console.log("starting checks");
 	console.log("body.length = " + body.length);
@@ -115,7 +120,11 @@ app.post('/', function(req, res) {
 	console.log("util.inspect(JSON.parse(Object.keys(body)[0])) = " + util.inspect(JSON.parse(Object.keys(body)[0])));
 	console.log("JSON.parse(Object.keys(body)[0]).piece = " + JSON.parse(Object.keys(body)[0]).piece);
 	console.log("finished checks");
-	handlePieceMsg(body);
+	*/
+	var piece = JSON.parse(Object.keys(body)[0]).piece;
+	var playerCode = JSON.parse(Object.keys(body)[0]).playerCode;
+	
+	handlePieceMsg(piece,code);
 	switchTurn();
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = boardToMsg();
