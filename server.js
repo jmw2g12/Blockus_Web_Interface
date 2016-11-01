@@ -102,8 +102,9 @@ app.get('/', function(req, res) {
 // })
 
 app.post('/', function(req, res) {
-	console.log("request = " + req);
-	console.log("request = " + req);
+	console.log("request = " + util.inspect(req, false, null));
+	console.log("request = " + util.inspect(res, false, null));
+	res.end('');
 })
 
 // app.post('/board', function(req, res) {
@@ -125,6 +126,7 @@ app.post('/', function(req, res) {
 app.post('/board', function(req, res) {
 	console.log("request = " + util.inspect(req, false, null));
 	console.log("request = " + util.inspect(res, false, null));
+	res.end('');
 })
 
 app.listen(app.get('port'), function() {
