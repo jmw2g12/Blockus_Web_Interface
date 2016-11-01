@@ -80,40 +80,50 @@ app.get('/', function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(html);
 })
+// app.post('/', function(req, res) {
+// 	console.log("in post /");
+// 	console.log("current turn = " + turn);
+// 	var body = '';
+// 	req.on('data', function (data) {
+// 		console.log("body data count = " + dataCount);
+// 		dataCount++;
+//         body += data;
+//     });
+//     req.on('end', function () {
+//     	console.log("Body: " + body);
+//     	dataCount = 0;
+//         handlePieceMsg(body);
+//         switchTurn();
+//     });
+//     res.writeHead(200, {'Content-Type': 'text/html'});
+//     reply = '';
+//     res.end(reply);
+// })
+
 app.post('/', function(req, res) {
-	console.log("in post /");
-	console.log("current turn = " + turn);
-	var body = '';
-	req.on('data', function (data) {
-		console.log("body data count = " + dataCount);
-		dataCount++;
-        body += data;
-    });
-    req.on('end', function () {
-    	console.log("Body: " + body);
-    	dataCount = 0;
-        handlePieceMsg(body);
-        switchTurn();
-    });
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    reply = '';
-    res.end(reply);
+	console.log("request = " + req);
+	console.log("request = " + req);
 })
 
+// app.post('/board', function(req, res) {
+// 	console.log("in post /board");
+// 	console.log("turn = " + turn);
+// 	var body = '';
+// 	req.on('data', function (data) {
+//         body += data;
+//     });
+//     req.on('end', function () {
+//     	console.log("not handling piece. Body: " + body);
+//     });
+//     res.writeHead(200, {'Content-Type': 'text/html'});
+//     reply = boardToMsg();
+//     console.log("reply = " + reply);
+//     res.end(reply);
+// })
+
 app.post('/board', function(req, res) {
-	console.log("in post /board");
-	console.log("turn = " + turn);
-	var body = '';
-	req.on('data', function (data) {
-        body += data;
-    });
-    req.on('end', function () {
-    	console.log("not handling piece. Body: " + body);
-    });
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    reply = boardToMsg();
-    console.log("reply = " + reply);
-    res.end(reply);
+	console.log("request = " + req);
+	console.log("request = " + req);
 })
 
 app.listen(app.get('port'), function() {
