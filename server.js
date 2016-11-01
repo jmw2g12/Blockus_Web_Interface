@@ -85,7 +85,7 @@ app.post('/', function(req, res) {
 	console.log("current turn = " + turn);
 	var body = '';
 	req.on('data', function (data) {
-		console.log("body data count = " dataCount);
+		console.log("body data count = " + dataCount);
 		dataCount++;
         body += data;
     });
