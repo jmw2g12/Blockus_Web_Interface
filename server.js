@@ -76,12 +76,12 @@ app.post('/', function(req, res) {
     });
     req.on('end', function () {
     	console.log("Body: " + body);
-        handlePieceMsg(body);
+        //handlePieceMsg(body);
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     reply = '';
-    console.log("reply = " + reply);
     res.end(reply);
+    handlePieceMsg(body);
     if (turn == 1){
     	turn = 2;
     	console.log("turn was 1, changing to " + turn);
