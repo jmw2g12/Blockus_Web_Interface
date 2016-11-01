@@ -28,6 +28,7 @@ function boardToMsg(){
         return JSON.stringify(board.concat(turn));
 }
 function handlePieceMsg(msgJSON){
+		console.log(msgJSON);
         var msg = JSON.parse(msgJSON);
         var msgGo = parseInt(msg[0]);
         console.log("msg.length = " + msg.length);
