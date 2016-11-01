@@ -123,8 +123,16 @@ function updateBoard(){
 	for (y = 0; y < boardSize; y++){
 		for (x = 0; x < boardSize; x++){
 			if (board[y][x] === 1){
+				if (boardCellAtCoords(x+1,y+1).className != "usedCellP1"){
+					p1CellCoords.push([x+1,y+1]);
+					usedCellCoords.push([x+1,y+1]);
+				}
 				boardCellAtCoords(x+1,y+1).className = "usedCellP1";
 			}else if(board[y][x] === 2){
+				if (boardCellAtCoords(x+1,y+1).className != "usedCellP2"){
+					p2CellCoords.push([x+1,y+1]);
+					usedCellCoords.push([x+1,y+1]);
+				}
 				boardCellAtCoords(x+1,y+1).className = "usedCellP2";
 			}
 		}

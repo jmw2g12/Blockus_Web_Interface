@@ -29,7 +29,6 @@ function fetchBoard(){
 			console.log("returned go = " + JSON.parse(http.responseText)[JSON.parse(http.responseText).length-1]);
 			turn = JSON.parse(http.responseText)[JSON.parse(http.responseText).length-1];
 			updateBoard();
-			alert("received board");
 		}
 	}
 
