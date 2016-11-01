@@ -122,8 +122,8 @@ app.post('/', function(req, res) {
 // })
 
 app.post('/board', function(req, res) {
-	console.log("request = " + req);
-	console.log("request = " + req);
+	console.log("request = " + util.inspect(req, false, null));
+	console.log("request = " + util.inspect(res, false, null));
 })
 
 app.listen(app.get('port'), function() {
