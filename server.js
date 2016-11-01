@@ -108,7 +108,7 @@ app.post('/', function(req, res) {
 	var body = req.body;
 	console.log("body = " + util.inspect(body, false, null));
 	console.log("starting check");
-	console.log(body[0]);
+	console.log(body[1]);
 	console.log("finished check");
 	handlePieceMsg(body);
 	switchTurn();
