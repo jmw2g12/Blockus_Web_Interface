@@ -123,8 +123,8 @@ app.post('/', function(req, res) {
 	*/
 	var piece = JSON.parse(Object.keys(body)[0]).piece;
 	var playerCode = JSON.parse(Object.keys(body)[0]).playerCode;
-	
-	handlePieceMsg(piece,code);
+	console.log("piece = " + piece + ",   playerCode = " + playerCode);
+	handlePieceMsg(piece,playerCode);
 	switchTurn();
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = boardToMsg();
