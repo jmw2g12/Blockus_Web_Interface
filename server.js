@@ -95,21 +95,3 @@ app.get('/', function(req, res) {
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
-
-
-/*
-//DB logic
-var MongoClient = require('mongodb').MongoClient
-  , assert = require('assert');
-
-//var url = 'mongodb://localhost:27017/gamedata';
-var url = 'mongodb://jack:password@ds139187.mlab.com:39187/heroku_5l1pksgk';
-
-
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
-
-  db.close();
-});
-*/
