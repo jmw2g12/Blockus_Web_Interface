@@ -107,9 +107,10 @@ app.post('/', function(req, res) {
 	console.log("*** Placing piece: ***");
 	var body = req.body;
 	console.log("body = " + util.inspect(body, false, null));
-	console.log("starting check");
-	console.log("body[piece] = " + body["piece"]);
-	console.log("finished check");
+	console.log("starting checks");
+	console.log("body.length = " + body.length);
+	console.log("Object.keys(data) = " + Object.keys(body));
+	console.log("finished checks");
 	handlePieceMsg(body);
 	switchTurn();
 	res.writeHead(200, {'Content-Type': 'text/html'});
