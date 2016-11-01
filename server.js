@@ -76,13 +76,27 @@ app.get('/', function(req, res) {
 })
 
 app.post('/', function(req, res) {
+	console.log("in post /");
+	console.log("turn = " + turn);
 	var body = '';
 	req.on('data', function (data) {
-		if (body === ''){
-			console.log("first datum = " + data);
-		}else{
-			console.log("consecutive data = " + data);
-		}
+        body += data;
+    });
+    req.on('end', function () {
+    	console.log("Body: " + body);
+        handleMsg(body);
+    });
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    reply = boardToMsg();
+    console.log("reply = " + reply);
+    res.end(reply);
+})
+
+app.post('/board', function(req, res) {
+	console.log("in post /board");
+	console.log("turn = " + turn);
+	var body = '';
+	req.on('data', function (data) {
         body += data;
     });
     req.on('end', function () {
