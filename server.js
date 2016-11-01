@@ -1,14 +1,12 @@
 var express = require('express')
+var bodyParser = require('body-parser')
 var app = express()
 var util = require('util')
 
 app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname + '/public'))
-
-app.configure(function(){
-  app.use(express.bodyParser());
-  app.use(app.router);
-});
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 //Blokus logic
 console.log("hello world, you're in the server.js file");
