@@ -28,7 +28,7 @@ function boardToMsg(){
         return JSON.stringify(board.concat(turn));
 }
 function handlePieceMsg(msgJSON){
-		console.log(msgJSON);
+		console.log("msgJSON = " + msgJSON);
         var msg = JSON.parse(msgJSON);
         var msgGo = parseInt(msg[0]);
         console.log("msg.length = " + msg.length);
@@ -77,12 +77,11 @@ app.post('/', function(req, res) {
     });
     req.on('end', function () {
     	console.log("Body: " + body);
-        //handlePieceMsg(body);
+        handlePieceMsg(body);
     });
     res.writeHead(200, {'Content-Type': 'text/html'});
     reply = '';
     res.end(reply);
-    handlePieceMsg(body);
     if (turn == 1){
     	turn = 2;
     	console.log("turn was 1, changing to " + turn);
