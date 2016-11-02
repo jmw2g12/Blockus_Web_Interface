@@ -112,7 +112,7 @@
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/7186c57c4a343e3a4c9c08ec2ac3c7513f55964c/controller.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/79b2399096d84333ad33d3741dbfc3326b2187e3/view.js"></script>
 </head>
-<body onload="addAllPieces();boardData = getBoardData();go = selectGo();fetchBoard();updateFirstMove();">
+<body onload="addAllPieces();boardData = getBoardData();go = selectGo();fetchBoard();updateFirstMove();window.setInterval(function(){fetchBoard()},5000);">
     <table class="layout" id="borderlayout">
         <tr>
             <th colspan="6" class="pagetitle">BLOKUS</th>
