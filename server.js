@@ -102,6 +102,8 @@ app.post('/', function(req, res) {
 
 app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
+	console.log("in the board request function, bodyObject = " + bodyObject);
+	console.log("in the board request function, util.inspect(bodyObject) = " + util.inspect(bodyObject));
 	var password = bodyObject.password;
 	//var password = "abc";
 	console.log("board from game " + password + " has been requested");
