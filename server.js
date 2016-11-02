@@ -96,6 +96,7 @@ app.post('/', function(req, res) {
 
 app.post('/board', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
+	var password = "abc";
 	reply = boardToMsg(password);
     res.end(reply);
 })
