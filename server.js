@@ -31,7 +31,7 @@ function initBoard(password){
         console.log(board[password]);
 }
 function boardToMsg(password){
-        return JSON.stringify(board[password].concat(turn));
+        return JSON.stringify(board[password].concat(turn[password]));
 }
 function addPieceToBoard(piece,code,password){
         for (i = 0; i < piece.length; i++){
@@ -90,13 +90,13 @@ app.post('/', function(req, res) {
 	switchTurn(password);
 	
 	res.writeHead(200, {'Content-Type': 'text/html'});
-	reply = boardToMsg();
+	reply = boardToMsg(password);
     res.end(reply);
 })
 
 app.post('/board', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
-	reply = boardToMsg();
+	reply = boardToMsg(password);
     res.end(reply);
 })
 
