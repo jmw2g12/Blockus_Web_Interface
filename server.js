@@ -86,7 +86,7 @@ app.post('/', function(req, res) {
 	var piece = bodyObject.piece;
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
-	password = "abc";
+	//password = "abc";
 	
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,playerCode,password);
@@ -98,10 +98,12 @@ app.post('/', function(req, res) {
 })
 
 app.post('/board', function(req, res) {
-	res.writeHead(200, {'Content-Type': 'text/html'});
-	var password = "abc";
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
+	var password = bodyObject.password;
+	//var password = "abc";
 	checkAndHandleNewPassword(password);
 	reply = boardToMsg(password);
+	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
 })
 
