@@ -61,6 +61,13 @@ function existsAsPassword(password){
 	}
 	return false;
 }
+function checkAndHandleNewPassword(password){
+	if (!existsAsPassword(password)){
+		passwordList.push(password);
+		turn[password] = 1;
+		initBoard(password);	
+	}
+}
 
 
 //Server code
@@ -81,11 +88,7 @@ app.post('/', function(req, res) {
 	var password = bodyObject.password;
 	password = "abc";
 	
-	if (!existsAsPassword(password)){
-		passwordList.push(password);
-		turn[password] = playerCode;
-		initBoard(password);	
-	}
+	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,playerCode,password);
 	switchTurn(password);
 	
@@ -97,6 +100,7 @@ app.post('/', function(req, res) {
 app.post('/board', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	var password = "abc";
+	checkAndHandleNewPassword(password);
 	reply = boardToMsg(password);
     res.end(reply);
 })
