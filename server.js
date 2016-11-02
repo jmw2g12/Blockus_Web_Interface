@@ -95,7 +95,7 @@ app.post('/', function(req, res) {
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
 	//password = "abc";
-	console.log("player " + playerCode + " on game " + password + " is placing a piece");
+	console.log("in /: player " + playerCode + " on game " + password + " is placing a piece");
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	
 	checkAndHandleNewPassword(password);
