@@ -63,6 +63,7 @@ function existsAsPassword(password){
 }
 function checkAndHandleNewPassword(password){
 	if (!existsAsPassword(password)){
+		console.log("Initialising a new game using password: " + password);
 		passwordList.push(password);
 		turn[password] = 1;
 		initBoard(password);	
@@ -87,6 +88,8 @@ app.post('/', function(req, res) {
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
 	//password = "abc";
+	console.log("player " + playerCode + " on game " + password + " is placing a piece");
+	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,playerCode,password);
@@ -101,6 +104,7 @@ app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	//var password = "abc";
+	console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
 	reply = boardToMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
