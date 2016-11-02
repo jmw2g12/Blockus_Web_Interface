@@ -107,6 +107,10 @@ app.post('/board', function(req, res) {
 
 	console.log("bodyObject.password = " + bodyObject.password);
 	console.log("bodyObject[password] = " + bodyObject["password"]);
+	console.log("bodyObject[0] = " + bodyObject[0]);
+	console.log("JSON.parse(bodyObject) = " + JSON.parse(bodyObject));
+	console.log("JSON.parse(bodyObject).password = " + JSON.parse(bodyObject).password);
+	console.log("JSON.parse(bodyObject)[password] = " + JSON.parse(bodyObject)["password"]);
 	//var password = bodyObject["password"];
 	//var password = "abc";
 	
