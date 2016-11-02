@@ -104,8 +104,13 @@ app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	console.log("in the board request function, bodyObject = " + bodyObject);
 	console.log("in the board request function, util.inspect(bodyObject) = " + util.inspect(bodyObject));
-	var password = bodyObject.password;
+
+	console.log("bodyObject.password = " + bodyObject.password);
+	console.log("bodyObject[password] = " + bodyObject["password"]);
+	//var password = bodyObject["password"];
 	//var password = "abc";
+	
+	var password = bodyObject["password"];
 	console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
 	reply = boardToMsg(password);
