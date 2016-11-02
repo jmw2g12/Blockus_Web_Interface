@@ -19,6 +19,7 @@ var board = [];
 var turn = [];
 var reply = "post-received";
 var passwordList = [];
+var pieceSet = [];
 
 function initBoard(password){
 		board[password] = [];
@@ -30,13 +31,14 @@ function initBoard(password){
         }
         console.log(board[password]);
 }
-function boardToMsg(password){
-        return JSON.stringify(board[password].concat(turn[password]));
+function replyMsg(password){
+        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]));
 }
-function addPieceToBoard(piece,code,password){
+function addPieceToBoard(piece,pieceID,code,password){
         for (i = 0; i < piece.length; i++){
                 board[password][(piece[i][1]-1)][(piece[i][0]-1)] = code;
         }
+        pieceSet[password][parseInt(code)-1][parseInt(pieceID)-1]=0;
         printBoard(password);
 }
 function printBoard(password){
@@ -66,7 +68,11 @@ function checkAndHandleNewPassword(password){
 		console.log("Initialising a new game using password: " + password);
 		passwordList.push(password);
 		turn[password] = 1;
-		initBoard(password);	
+		initBoard(password);
+		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
+		return true;
+	}else{
+		return false;
 	}
 }
 
@@ -85,6 +91,7 @@ app.get('/', function(req, res) {
 app.post('/', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
+	var pieceID = bodyObject.pieceID;
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
 	//password = "abc";
@@ -92,13 +99,33 @@ app.post('/', function(req, res) {
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	
 	checkAndHandleNewPassword(password);
-	addPieceToBoard(piece,playerCode,password);
+	addPieceToBoard(piece,pieceID,playerCode,password);
 	switchTurn(password);
 	
 	res.writeHead(200, {'Content-Type': 'text/html'});
-	reply = boardToMsg(password);
+	reply = replyMsg(password);
     res.end(reply);
 })
+
+app.post('/newGame', function(req, res) {
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
+	var password = bodyObject.password;
+	var index = passwordList.indexOf(password);
+	if (index > -1){
+		passwordList.splice(index, 1);
+		console.log("in /newGame: password = " + password + ", index = " + index + ". Removed this value from passwordList.");
+	}else{
+		console.log("in /newGame: password = " + password + ", index = " + index + ". Could not remove this value from passwordList.");
+	}
+	if (checkAndHandleNewPassword(password)){
+		console.log("renewed game");
+	}else{
+		console.log("did not renew game");
+	}
+	reply = replyMsg(password);
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(reply);
+}
 
 app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
@@ -106,7 +133,7 @@ app.post('/board', function(req, res) {
 	var password = JSON.parse(bodyObject)["password"];
 	console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
-	reply = boardToMsg(password);
+	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
 })
