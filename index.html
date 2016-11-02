@@ -109,7 +109,7 @@
     <script type='text/javascript' src="https://rawgit.com/jackmw94/e48bed0dcd8ab37b7299d967ac8263ac/raw/90ce0ffdaa0b5e2eeac543a2010f323f0d7dbce7/pieceLoader.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/bf372fbd07217f8c7179d667a3a157d4/raw/6bbf9332472948f1fda62664de8c95e7aa38b20a/model.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/70aa97f0f8f1ba32749325f680a8c5ab/raw/7f8a6f980348358a78cc8fabbaaf2bb7c7dd7b06/comms.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/32b0a7ae950c15aee80a8759dd07a2341a494e2f/controller.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/0d1e95472575a6b0d5b4026ee93c3a7fc8746e31/controller.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/1607edac88db65e9f08e82a87cfd3af153452130/view.js"></script>
 </head>
 <body onload="addAllPieces();boardData = getBoardData();gameCode = selectGameCode();go = selectGo();fetchBoard();window.setInterval(function(){fetchBoard()},5000);">
@@ -333,7 +333,7 @@
                         
                         <table class="playingboard">
                         	<tr class="boardrow">
-								<td class="blankcell" id="cell1-1" onmouseout="clearBoard()" onclick="console.log('clicked block');placePiece(this)" onmouseover="createDraggable(this)">#</td>
+								<td class="blankcell" id="cell1-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
 								<td class="blankcell" id="cell2-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
 								<td class="blankcell" id="cell3-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
 								<td class="blankcell" id="cell4-1" onmouseout="clearBoard()" onclick="placePiece(this)" onmouseover="createDraggable(this)">#</td>
