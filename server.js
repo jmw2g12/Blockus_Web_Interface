@@ -125,7 +125,7 @@ app.post('/newGame', function(req, res) {
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
-}
+})
 
 app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
