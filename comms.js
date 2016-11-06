@@ -41,6 +41,7 @@ function fetchBoard(){
 	http.onreadystatechange = function() {
 		console.log("fetchBoard cb");
 		if (http.readyState == 4 && http.status == 200) {
+			console.log("fetchBoard cb if");
 			//console.log(http.responseText);
 			var endOfBoard = boardSize - 1;
 			board = JSON.parse(http.responseText).slice(0,endOfBoard+1);
@@ -57,8 +58,9 @@ function fetchBoard(){
 			updateBoard();
 			updateFirstMove();
 			removePieceIDsFromSet(pieceList);
-			console.log(" /fetchBoard cb");
+			console.log("ended fetchBoard cb if");
 		}
+		console.log("ended fetchBoard cb");
 	}
 
 	http.send(params);
