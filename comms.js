@@ -39,6 +39,7 @@ function fetchBoard(){
 	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
 	http.onreadystatechange = function() {
+		console.log("fetchBoard cb");
 		if (http.readyState == 4 && http.status == 200) {
 			//console.log(http.responseText);
 			var endOfBoard = boardSize - 1;
@@ -56,6 +57,7 @@ function fetchBoard(){
 			updateBoard();
 			updateFirstMove();
 			removePieceIDsFromSet(pieceList);
+			console.log(" /fetchBoard cb");
 		}
 	}
 
