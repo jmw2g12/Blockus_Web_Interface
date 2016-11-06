@@ -35,7 +35,7 @@ function variableName(variable){
   return("");
 }
 function out(variable){
-	console.log(variableName(variable) + " = " + variable);
+	console.log(variable + " = " + window[variable]);
 }
 function selectGo(){
 	var playerNumber = prompt("Please enter player go: (1 or 2)");

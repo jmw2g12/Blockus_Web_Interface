@@ -31,7 +31,7 @@ function fetchBoard(){
 	
 	var http = new XMLHttpRequest();
 	var req = createBoardMsg();
-	console.log("fetchboard");
+	//console.log("fetchboard");
 	//console.log("fetchBoard:  params[fetch] = " + params["fetch"]);
 	var params = JSON.stringify(req);
 	http.open("POST", (document.URL + "board"), true);
@@ -39,10 +39,10 @@ function fetchBoard(){
 	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
 	http.onreadystatechange = function() {
-		console.log("fetchBoard cb");
+		//console.log("fetchBoard cb");
 		if (http.readyState == 4 && http.status == 200) {
-			console.log("fetchBoard cb if");
-			//console.log(http.responseText);
+			//console.log("fetchBoard cb if");
+			console.log(http.responseText);
 			var endOfBoard = boardSize - 1;
 			board = JSON.parse(http.responseText).slice(0,endOfBoard+1);
 			//console.log("board = " + board);
@@ -56,7 +56,7 @@ function fetchBoard(){
 			var scores = JSON.parse(http.responseText)[endOfBoard+3+parseInt(go)];
 			console.log("scores = " + scores);
 			console.log("testing out()");
-			out(scores);
+			out("scores");
 			console.log("finished testing out()");
 			updateScores(scores);
 			updateBoard();
