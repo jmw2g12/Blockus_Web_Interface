@@ -57,7 +57,7 @@ function fetchBoard(){
 			console.log("scores = " + scores);
 			console.log("testing out()");
 			out(scores);
-			console.log("fin testing out()");
+			console.log("finished testing out()");
 			updateScores(scores);
 			updateBoard();
 			updateFirstMove();
