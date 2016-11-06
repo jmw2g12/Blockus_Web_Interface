@@ -40,12 +40,6 @@ function selectGo(){
 function selectGameCode(){
 	return prompt("Please enter game code:");
 }
-function updateScores(scores){
-	//document.getElementById("p1score").innerHTML = "P1 : " + p1score;
-	//document.getElementById("p2score").innerHTML = "P2 : " + p2score;
-	document.getElementById("p1score").innerHTML = "P1 : " + scores[0];
-	document.getElementById("p2score").innerHTML = "P2 : " + scores[1];
-}
 function updateFirstMove(){
 	//console.log("within updateFirstMove()");
 	if (typeof board === 'undefined'){
