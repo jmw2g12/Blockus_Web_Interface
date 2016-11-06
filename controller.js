@@ -27,6 +27,16 @@ function printGameInfo(){
 	}
 	console.log("-----------------------------------------------------------------------------");
 }
+function variableName(variable){
+  for (var name in window){
+    if (window[name]==variable)
+    return(name);
+  }
+  return("");
+}
+function out(variable){
+	console.log(variableName(variable) + " = " + variable);
+}
 function selectGo(){
 	var playerNumber = prompt("Please enter player go: (1 or 2)");
 	while(true){

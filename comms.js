@@ -54,6 +54,10 @@ function fetchBoard(){
 			//console.log("player 2's list = " + JSON.parse(http.responseText)[endOfBoard+3]);
 			//console.log("this players's list = " + pieceList);
 			var scores = JSON.parse(http.responseText)[endOfBoard+3+parseInt(go)];
+			console.log("scores = " + scores);
+			console.log("testing out()");
+			out(scores);
+			console.log("fin testing out()");
 			updateScores(scores);
 			updateBoard();
 			updateFirstMove();
