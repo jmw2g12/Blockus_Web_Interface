@@ -32,7 +32,21 @@ function initBoard(password){
         console.log(board[password]);
 }
 function replyMsg(password){
-        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]));
+        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]).concat(getScores(password)));
+}
+function getScores(password){
+	var scores = [0,0];
+	for (y = 0; y < 14; y++){
+		for (x = 0; x < 14; x++){
+			var cell = board[password][y][x]
+			if (cell == 1){
+				scores[0]++;
+			}else if(cell == 2){
+				scores[1]++;
+			}
+		}
+	}
+	console.log("got scores : " + scores);
 }
 function addPieceToBoard(piece,pieceID,code,password){
         for (i = 0; i < piece.length; i++){

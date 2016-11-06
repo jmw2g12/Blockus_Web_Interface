@@ -51,6 +51,8 @@ function fetchBoard(){
 			//console.log("player 1's list = " + JSON.parse(http.responseText)[endOfBoard+2]);
 			//console.log("player 2's list = " + JSON.parse(http.responseText)[endOfBoard+3]);
 			//console.log("this players's list = " + pieceList);
+			var scores = JSON.parse(http.responseText)[endOfBoard+3+parseInt(go)];
+			updateScores(scores);
 			updateBoard();
 			updateFirstMove();
 			removePieceIDsFromSet(pieceList);

@@ -189,13 +189,13 @@ function selectedBlockCoords(){
 	console.log("No selected block - selectedBlockCoords()");
 }
 function addPieceToBoard(element){
-	console.log("addPieceToBoard: go = " + go);
+	//console.log("addPieceToBoard: go = " + go);
 	var cellClassName = "";
 
 	for (i = 0; i < hoveringBlocks.length; i++){
 		usedCellCoords.push(hoveringBlocks[i]);
 		boardCellAtCoords(hoveringBlocks[i][0],hoveringBlocks[i][1]).className = (go == 1) ? "usedCellP1" : "usedCellP2";
-		console.log("assigning class name as " + boardCellAtCoords(hoveringBlocks[i][0],hoveringBlocks[i][1]).className);
+		//console.log("assigning class name as " + boardCellAtCoords(hoveringBlocks[i][0],hoveringBlocks[i][1]).className);
 		if (go === 1){
 			p1CellCoords.push([hoveringBlocks[i][0],hoveringBlocks[i][1]]);
 		}else if (go === 2){
