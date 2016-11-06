@@ -28,7 +28,7 @@ function printGameInfo(){
 	console.log("-----------------------------------------------------------------------------");
 }
 function selectGo(){
-	var playerNumber = prompt("Please enter player number: (1 or 2)");
+	var playerNumber = prompt("Please enter player go: (1 or 2)");
 	while(true){
 		if (playerNumber == 1 || playerNumber == 2){
 			return playerNumber;	

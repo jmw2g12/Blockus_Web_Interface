@@ -31,7 +31,7 @@ function fetchBoard(){
 	
 	var http = new XMLHttpRequest();
 	var req = createBoardMsg();
-	//console.log("params = " + params);
+	console.log("fetchboard");
 	//console.log("fetchBoard:  params[fetch] = " + params["fetch"]);
 	var params = JSON.stringify(req);
 	http.open("POST", (document.URL + "board"), true);
