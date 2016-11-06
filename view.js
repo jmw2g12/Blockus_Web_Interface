@@ -175,6 +175,14 @@ function relativeBlockCoords(blockX, blockY){
 	return result;
 	//console.log(result);
 }
+function updateScores(scores){
+	//document.getElementById("p1score").innerHTML = "P1 : " + p1score;
+	//document.getElementById("p2score").innerHTML = "P2 : " + p2score;
+	document.getElementById("p1score").innerHTML = "P1 : " + scores[0];
+	document.getElementById("p2score").innerHTML = "P2 : " + scores[1];
+	console.log("document.getElementById(p1score) = " + document.getElementById("p1score"));
+	console.log("document.getElementById(p1score).innerHTML = " + document.getElementById("p1score").innerHTML);
+}
 function selectedBlockCoords(){
 	var table = document.getElementById("pieceChoice");
 	//console.log(table);
