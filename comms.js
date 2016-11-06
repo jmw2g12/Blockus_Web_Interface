@@ -59,7 +59,7 @@ function fetchBoard(){
 			updateBoard();
 			updateFirstMove();
 			removePieceIDsFromSet(pieceList);
-			console.log("ended fetchBoard cb if");
+			//console.log("ended fetchBoard cb if");
 		}
 		console.log("ended fetchBoard cb");
 	}
