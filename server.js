@@ -47,6 +47,7 @@ function getScores(password){
 		}
 	}
 	console.log("got scores : " + scores);
+	return scores;
 }
 function addPieceToBoard(piece,pieceID,code,password){
         for (i = 0; i < piece.length; i++){
