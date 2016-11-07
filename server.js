@@ -20,6 +20,7 @@ var turn = [];
 var reply = "post-received";
 var passwordList = [];
 var pieceSet = [];
+var resigned = [];
 
 function initBoard(password){
 		board[password] = [];
@@ -148,6 +149,19 @@ app.post('/board', function(req, res) {
 	var password = JSON.parse(bodyObject)["password"];
 	console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
+	reply = replyMsg(password);
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(reply);
+})
+
+app.post('/resign', function(req, res) {
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
+	
+	var password = JSON.parse(bodyObject)["password"];
+	console.log("player from game " + password + " has resigned");
+	
+	
+	
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
