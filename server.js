@@ -156,11 +156,14 @@ app.post('/board', function(req, res) {
 })
 
 app.post('/resign', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	
-	var password = JSON.parse(bodyObject)["password"];
-	var playerCode = bodyObject.playerCode;
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);c
 	console.log("player " + playerCode + " from game " + password + " has resigned");
+	console.log(req.body);
+	console.log(bodyObject);
+	console.log(JSON.parse(bodyObject));
+	var password = JSON.parse(bodyObject).password;
+	var playerCode = bodyObject.playerCode;
+	console.log("---");
 	
 	resigned[password][parseInt(playerCode)-1] = true;
 	
