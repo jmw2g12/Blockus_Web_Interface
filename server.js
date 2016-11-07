@@ -156,7 +156,7 @@ app.post('/board', function(req, res) {
 })
 
 app.post('/resign', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);c
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	console.log("player " + playerCode + " from game " + password + " has resigned");
 	console.log(req.body);
 	console.log(bodyObject);
