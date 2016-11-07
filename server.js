@@ -176,7 +176,7 @@ app.post('/isGameOver', function(req, res) {
 	console.log("is game " + password + " over?");
 	
 	if (resigned[password][0] == true && resigned[password][1] == true){
-		JSON.stringify(
+		JSON.stringify([true].concat(scores[password]));
 	}
 	
 	
