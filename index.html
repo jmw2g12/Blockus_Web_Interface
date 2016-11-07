@@ -107,10 +107,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jackmw94/e48bed0dcd8ab37b7299d967ac8263ac/raw/90ce0ffdaa0b5e2eeac543a2010f323f0d7dbce7/pieceLoader.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/bf372fbd07217f8c7179d667a3a157d4/raw/0e9ba2c5477525c09956d623c47a5bb24d46789b/model.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/70aa97f0f8f1ba32749325f680a8c5ab/raw/7c1ab496856676f14d8977224193fac30844b7dc/comms.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/6be88483198156c6d83f1e208ae4baac7e0290b0/controller.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/bcf0e0bfea09c75610b3fc4769a7368c591cf789/view.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/bf372fbd07217f8c7179d667a3a157d4/raw/5f17d4ed5da42c8e27ae324533fb78ba6a10d8da/model.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/70aa97f0f8f1ba32749325f680a8c5ab/raw/b8882b5d412de2ca3255c5198c88d413ebf661ae/comms.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/6252437a5a661898edcd2d044a6bc01b04e4f3a3/controller.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/bd6f784182e3ba954c40820045028899bfe06d49/view.js"></script>
 </head>
 <body onload="addAllPieces();boardData = getBoardData();gameCode = selectGameCode();go = selectGo();fetchBoard();window.setInterval(function(){fetchBoard()},500);">
     <table class="layout" id="borderlayout">
@@ -120,7 +120,7 @@
         <tr style="height:100%;width:100%;">
             <td class="layoutborder">
                 <table style="width:100%;height:100%">
-                    <tr class="pieceTable">
+                    <tr class="pieceTable" id="pieceTable">
                         <td>
                             <table class="pieceViewer" id="pieceViewer1"
                             onclick="selectPiece('pieceViewer1')">
@@ -602,8 +602,12 @@
                         	<button style="height:100%;width:100%;" type="button" onclick="printGameInfo()">Output variables to console</button>
                         </td>
                         <td style="height:100%;width:12%;">
+                        	<button style="height:100%;width:100%;" type="button" onclick="resignFromGame();">Resign</button>
+                        </td>
+                        <!--<td style="height:100%;width:12%;">
                         	<button style="height:100%;width:100%;" type="button" onclick="window.close();">Close game</button>
                         </td>
+                        -->
                     </tr>
                 </table>
             </td>

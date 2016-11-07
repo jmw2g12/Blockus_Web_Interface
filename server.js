@@ -33,7 +33,7 @@ function initBoard(password){
         console.log(board[password]);
 }
 function replyMsg(password){
-        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]).concat(getScores(password)));
+        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]).concat(getScores(password)).concat(resigned[password]));
 }
 function getScores(password){
 	var scores = [0,0];
@@ -84,6 +84,7 @@ function checkAndHandleNewPassword(password){
 		console.log("Initialising a new game using password: " + password);
 		passwordList.push(password);
 		turn[password] = 1;
+		resigned[password] = [false, false];
 		initBoard(password);
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
@@ -116,7 +117,7 @@ app.post('/', function(req, res) {
 	
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,pieceID,playerCode,password);
-	switchTurn(password);
+	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
 	
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
@@ -158,8 +159,25 @@ app.post('/resign', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	
 	var password = JSON.parse(bodyObject)["password"];
-	console.log("player from game " + password + " has resigned");
+	var playerCode = bodyObject.playerCode;
+	console.log("player " + playerCode + " from game " + password + " has resigned");
 	
+	resigned[password][parseInt(playerCode)-1] = true;
+	
+	reply = replyMsg(password);
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(reply);
+})
+
+app.post('/isGameOver', function(req, res) {
+	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
+	
+	var password = bodyObject.password;
+	console.log("is game " + password + " over?");
+	
+	if (resigned[password][0] == true && resigned[password][1] == true){
+		JSON.stringify(
+	}
 	
 	
 	reply = replyMsg(password);
