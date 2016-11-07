@@ -160,8 +160,8 @@ app.post('/resign', function(req, res) {
 	console.log("player " + playerCode + " from game " + password + " has resigned");
 	console.log(req.body);
 	console.log(bodyObject);
-	console.log(JSON.parse(bodyObject));
-	var password = JSON.parse(bodyObject).password;
+	console.log("bodyObject.password = " + bodyObject.password);
+	var password = bodyObject.password;
 	var playerCode = bodyObject.playerCode;
 	console.log("---");
 	
