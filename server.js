@@ -25,7 +25,7 @@ var fileCount = [];
 function fileToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
-	var contents = board[password];
+	var contents = JSON.stringify(board[password]);
 	var path = '/BlokusData/' + password + '/move_' + fileCount[password] + '.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
