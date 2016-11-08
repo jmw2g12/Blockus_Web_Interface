@@ -24,7 +24,7 @@ var resigned = [];
 var count = 0;
 function fileToDropbox(){
 	console.log("sending file to dropbox");
-	var dbx = new Dropbox({ accessToken: wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo });
+	var dbx = new dropbox({ accessToken: wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo });
 	var contents = "hello dropbox";
 	var path = 'test' + count + '.txt';
 	count++;
