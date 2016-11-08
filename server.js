@@ -13,11 +13,9 @@ console.log("Hello world, you're in the server.js file");
 http = require('http');
 fs = require('fs');
 
-
-//Blokus logic
 var board = [];
 var turn = [];
-var reply = "post-received";
+var reply = '';
 var passwordList = [];
 var pieceSet = [];
 var resigned = [];
@@ -30,7 +28,6 @@ function initBoard(password){
                         board[password][i][j] = 0;
                 }
         }
-        console.log(board[password]);
 }
 function replyMsg(password){
         return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]).concat(getScores(password)).concat(resigned[password]));
@@ -47,7 +44,6 @@ function getScores(password){
 			}
 		}
 	}
-	//console.log("got scores : " + scores);
 	return scores;
 }
 function addPieceToBoard(piece,pieceID,code,password){
@@ -55,7 +51,6 @@ function addPieceToBoard(piece,pieceID,code,password){
                 board[password][(piece[i][1]-1)][(piece[i][0]-1)] = code;
         }
         pieceSet[password][parseInt(code)-1][parseInt(pieceID)-1]=0;
-        //printBoard(password);
 }
 function printBoard(password){
         for (i = 0; i < board[password].length; i++){
@@ -65,12 +60,8 @@ function printBoard(password){
 function switchTurn(password){
 		if (turn[password] == 1){
    		 	turn[password] = 2;
-    		console.log("turn was 1, changing to " + turn[password]);
     	}else if (turn[password] == 2){
     		turn[password] = 1;
-    		console.log("turn was 2, changing to " + turn[password]);
-    	}else{
-    		console.log("TURN IS NOT 1 OR 2!!! ****");
     	}
 }
 function existsAsPassword(password){
@@ -81,7 +72,6 @@ function existsAsPassword(password){
 }
 function checkAndHandleNewPassword(password){
 	if (!existsAsPassword(password)){
-		//console.log("Initialising a new game using password: " + password);
 		passwordList.push(password);
 		turn[password] = 1;
 		resigned[password] = [false, false];
@@ -111,20 +101,16 @@ app.post('/', function(req, res) {
 	var pieceID = bodyObject.pieceID;
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
-	//password = "abc";
-	//console.log("in /: player " + playerCode + " on game " + password + " is placing a piece");
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
-	
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,pieceID,playerCode,password);
 	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
-	
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
 })
 
-app.post('/newGame', function(req, res) {
+app.post('/newGame', function(req, res) { // *** NOT USED YET ***
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	var index = passwordList.indexOf(password);
@@ -146,9 +132,7 @@ app.post('/newGame', function(req, res) {
 
 app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	
 	var password = JSON.parse(bodyObject)["password"];
-	//console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -157,22 +141,11 @@ app.post('/board', function(req, res) {
 
 app.post('/resign', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	console.log("player " + playerCode + " from game " + password + " has resigned");
-	console.log("bodyObject.password = " + bodyObject.password);
-	console.log("bodyObject.playerCode = " + bodyObject.playerCode);
 	var password = bodyObject.password;
 	var playerCode = bodyObject.playerCode;
-	if (playerCode == turn[password]){
-		switchTurn(password);
-		console.log("resigned during turn; switched turns");
-	}else{
-		console.log("resigned during opponent's turn; not switched turns");
-	}
+	if (playerCode == turn[password]) switchTurn(password);
 	var playerCode = bodyObject.playerCode;
-	console.log("---");
-	
 	resigned[password][parseInt(playerCode)-1] = true;
-	
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
@@ -180,18 +153,12 @@ app.post('/resign', function(req, res) {
 
 app.post('/isGameOver', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	
 	var password = bodyObject.password;
-	console.log("is game " + password + " over?");
-	
 	if (resigned[password][0] == true && resigned[password][1] == true){
-		console.log(JSON.stringify([true].concat(getScores(password))));
 		var reply = JSON.stringify([true].concat(getScores(password)));
 	}else{
-		console.log(JSON.stringify([false].concat(getScores(password))));
 		var reply = JSON.stringify([false].concat(getScores(password)));
 	}
-	
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
 })
