@@ -137,6 +137,15 @@ app.get('/blokus.html', function(req, res) {
     res.end(html);
 })
 
+app.get('/index.html', function(req, res) {
+	console.dir(req.param);
+    console.log("GET");
+
+    var html = fs.readFileSync('index.html');
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(html);
+})
+
 app.post('/', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
