@@ -28,7 +28,6 @@ function fileToDropbox(password){
 	var contents = board[password];
 	var path = '/BlokusData/' + password + '/move_' + fileCount[password] + '.txt';
 	console.log("path = " + path);
-	count++;
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
         console.log(response);
