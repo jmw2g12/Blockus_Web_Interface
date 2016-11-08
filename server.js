@@ -162,6 +162,7 @@ app.post('/resign', function(req, res) {
 	console.log(bodyObject);
 	console.log("bodyObject.password = " + bodyObject.password);
 	var password = bodyObject.password;
+	if (playerCode == turn[password]) switchTurn(password);
 	var playerCode = bodyObject.playerCode;
 	console.log("---");
 	
