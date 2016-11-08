@@ -20,13 +20,13 @@ var reply = '';
 var passwordList = [];
 var pieceSet = [];
 var resigned = [];
+var fileCount = [];
 
-var count = 0;
-function fileToDropbox(){
+function fileToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
-	var contents = "hello dropbox";
-	var path = '/BlokusInterface/test' + count + '.txt';
+	var contents = board[password];
+	var path = '/BlokusData/' + password + '/move_' + fileCount[password] + '.txt';
 	console.log("path = " + path);
 	count++;
 	dbx.filesUpload({ path: path, contents: contents })
@@ -39,7 +39,6 @@ function fileToDropbox(){
     console.log("leaving send file to dropbox function");
 }
 function initBoard(password){
-		fileToDropbox();
 		board[password] = [];
         for (i = 0; i < 14; i++){
                 board[password].push(new Array(14));
@@ -94,6 +93,7 @@ function checkAndHandleNewPassword(password){
 		passwordList.push(password);
 		turn[password] = 1;
 		resigned[password] = [false, false];
+		fileCount[password] = 0;
 		initBoard(password);
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
@@ -123,6 +123,8 @@ app.post('/', function(req, res) {
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,pieceID,playerCode,password);
+	fileToDropbox(password);
+	fileCount[password]++;
 	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
