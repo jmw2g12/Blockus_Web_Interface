@@ -47,7 +47,7 @@ function getScores(password){
 			}
 		}
 	}
-	console.log("got scores : " + scores);
+	//console.log("got scores : " + scores);
 	return scores;
 }
 function addPieceToBoard(piece,pieceID,code,password){
@@ -55,7 +55,7 @@ function addPieceToBoard(piece,pieceID,code,password){
                 board[password][(piece[i][1]-1)][(piece[i][0]-1)] = code;
         }
         pieceSet[password][parseInt(code)-1][parseInt(pieceID)-1]=0;
-        printBoard(password);
+        //printBoard(password);
 }
 function printBoard(password){
         for (i = 0; i < board[password].length; i++){
@@ -81,7 +81,7 @@ function existsAsPassword(password){
 }
 function checkAndHandleNewPassword(password){
 	if (!existsAsPassword(password)){
-		console.log("Initialising a new game using password: " + password);
+		//console.log("Initialising a new game using password: " + password);
 		passwordList.push(password);
 		turn[password] = 1;
 		resigned[password] = [false, false];
@@ -112,7 +112,7 @@ app.post('/', function(req, res) {
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
 	//password = "abc";
-	console.log("in /: player " + playerCode + " on game " + password + " is placing a piece");
+	//console.log("in /: player " + playerCode + " on game " + password + " is placing a piece");
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	
 	checkAndHandleNewPassword(password);
@@ -148,7 +148,7 @@ app.post('/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	
 	var password = JSON.parse(bodyObject)["password"];
-	console.log("board from game " + password + " has been requested");
+	//console.log("board from game " + password + " has been requested");
 	checkAndHandleNewPassword(password);
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -158,11 +158,16 @@ app.post('/board', function(req, res) {
 app.post('/resign', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	console.log("player " + playerCode + " from game " + password + " has resigned");
-	console.log(req.body);
-	console.log(bodyObject);
 	console.log("bodyObject.password = " + bodyObject.password);
+	console.log("bodyObject.playerCode = " + bodyObject.playerCode);
 	var password = bodyObject.password;
-	if (playerCode == turn[password]) switchTurn(password);
+	var playerCode = bodyObject.playerCode;
+	if (playerCode == turn[password]){
+		switchTurn(password);
+		console.log("resigned during turn; switched turns");
+	}else{
+		console.log("resigned during opponent's turn; not switched turns");
+	}
 	var playerCode = bodyObject.playerCode;
 	console.log("---");
 	
