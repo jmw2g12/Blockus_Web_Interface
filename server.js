@@ -137,7 +137,7 @@ app.get('/blokus', function(req, res) {
     res.end(html);
 })
 
-app.post('/blokus', function(req, res) {
+app.post('/blokus/piece', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
 	var pieceID = bodyObject.pieceID;
@@ -146,7 +146,7 @@ app.post('/blokus', function(req, res) {
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	checkAndHandleNewPassword(password);
 	addPieceToBoard(piece,pieceID,playerCode,password);
-	fileToDropbox(password);
+	pieceToDropbox(password);
 	fileCount[password]++;
 	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
