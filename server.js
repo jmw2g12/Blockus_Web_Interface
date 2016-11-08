@@ -12,6 +12,7 @@ console.log("Hello world, you're in the server.js file");
 
 http = require('http');
 fs = require('fs');
+dropbox = require('dropbox');
 
 var board = [];
 var turn = [];
@@ -20,7 +21,24 @@ var passwordList = [];
 var pieceSet = [];
 var resigned = [];
 
+var count = 0;
+function fileToDropbox(){
+	console.log("sending file to dropbox");
+	var dbx = new Dropbox({ accessToken: wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo });
+	var contents = "hello dropbox";
+	var path = 'test' + count + '.txt';
+	count++;
+	dbx.filesUpload({ path: path, contents: contents })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+    console.log("leaving send file to dropbox function");
+}
 function initBoard(password){
+		fileToDropbox();
 		board[password] = [];
         for (i = 0; i < 14; i++){
                 board[password].push(new Array(14));
