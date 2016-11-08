@@ -188,7 +188,7 @@ app.post('/isGameOver', function(req, res) {
 		console.log(JSON.stringify([true].concat(getScores(password))));
 		var reply = JSON.stringify([true].concat(getScores(password)));
 	}else{
-		console.log(JSON.stringify([true].concat(getScores(password))));
+		console.log(JSON.stringify([false].concat(getScores(password))));
 		var reply = JSON.stringify([false].concat(getScores(password)));
 	}
 	

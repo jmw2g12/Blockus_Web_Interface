@@ -107,12 +107,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jackmw94/e48bed0dcd8ab37b7299d967ac8263ac/raw/90ce0ffdaa0b5e2eeac543a2010f323f0d7dbce7/pieceLoader.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/bf372fbd07217f8c7179d667a3a157d4/raw/5f17d4ed5da42c8e27ae324533fb78ba6a10d8da/model.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/70aa97f0f8f1ba32749325f680a8c5ab/raw/26af1f0b3d462edd1d19ca9bc60e5fd4ea473069/comms.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/bf372fbd07217f8c7179d667a3a157d4/raw/ca778ccb3ecafc3c52ac968159c7bf4a432c583d/model.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/70aa97f0f8f1ba32749325f680a8c5ab/raw/8b48600c895bd9a35de79f0378e4a7efaa03b776/comms.js"></script>
     <script type='text/javascript' src="https://rawgit.com/jmw2g12/255ffe8ffd50360c2bc16bcbcd61f466/raw/2496986f2959e30902e48c02b331b3a4afd9f23b/controller.js"></script>
-    <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/5f226133152dfceecaa5d223addfb4b9fa6e1603/view.js"></script>
+    <script type='text/javascript' src="https://rawgit.com/jmw2g12/7498268576c56e4c8800844958e2b621/raw/10ea10e2b48d064ee34844b3b24040cf247cd64a/view.js"></script>
 </head>
-<body onload="addAllPieces();boardData = getBoardData();gameCode = selectGameCode();go = selectGo();fetchBoard();window.setInterval(function(){fetchBoard()},5000);console.log('Tue  8 Nov 2016 02:56:46 GMT');">
+<body onload="addAllPieces();boardData = getBoardData();gameCode = selectGameCode();go = selectGo();fetchBoard();window.setInterval(function(){fetchBoard()},5000);console.log('Tue  8 Nov 2016 03:09:06 GMT');">
     <table class="layout" id="borderlayout">
         <tr>
             <th id="pageTitle" colspan="6" class="pagetitle">BLOKUS</th>
@@ -596,13 +596,13 @@
                         	</table>
                         </td>
                          <td style="height:100%;width:12%;">
-                        	<button style="height:100%;width:100%;" type="button" onclick="alert('not working yet')">New game</button>
+                        	<button style="height:100%;width:100%;" type="button" onclick="window.location.reload();">New game</button>
                         </td>
                          <td style="height:100%;width:12%;">
                         	<button style="height:100%;width:100%;" type="button" onclick="printGameInfo()">Output variables to console</button>
                         </td>
                         <td style="height:100%;width:12%;">
-                        	<button style="height:100%;width:100%;" type="button" onclick="resignFromGame();">Resign</button>
+                        	<button id="resignbutton" style="height:100%;width:100%;" type="button" onclick="resignFromGame();">Resign</button>
                         </td>
                         <!--<td style="height:100%;width:12%;">
                         	<button style="height:100%;width:100%;" type="button" onclick="window.close();">Close game</button>
