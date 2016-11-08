@@ -22,11 +22,26 @@ var pieceSet = [];
 var resigned = [];
 var fileCount = [];
 
-function fileToDropbox(password){
+function pieceToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = JSON.stringify(board[password]);
 	var path = '/BlokusData/' + password + '/move_' + fileCount[password] + '.txt';
+	console.log("path = " + path);
+	dbx.filesUpload({ path: path, contents: contents })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+    console.log("leaving send file to dropbox function");
+}
+function gameToDropbox(password){
+	console.log("sending file to dropbox");
+	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
+	var contents = JSON.stringify(board[password]);
+	var path = '/BlokusData/' + password + '/game_finished.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
@@ -92,7 +107,7 @@ function checkAndHandleNewPassword(password){
 		passwordList.push(password);
 		turn[password] = 1;
 		resigned[password] = [false, false];
-		fileCount[password] = 0;
+		fileCount[password] = 1;
 		initBoard(password);
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
