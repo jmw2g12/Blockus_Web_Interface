@@ -179,11 +179,13 @@ app.post('/isGameOver', function(req, res) {
 	console.log("is game " + password + " over?");
 	
 	if (resigned[password][0] == true && resigned[password][1] == true){
-		JSON.stringify([true].concat(scores[password]));
+		console.log(JSON.stringify([true].concat(getScores(password))));
+		var reply = JSON.stringify([true].concat(getScores(password)));
+	}else{
+		console.log(JSON.stringify([true].concat(getScores(password))));
+		var reply = JSON.stringify([false].concat(getScores(password)));
 	}
 	
-	
-	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
 })
