@@ -27,7 +27,7 @@ function fileToDropbox(){
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = "hello dropbox";
 	var path = '/BlokusInterface/test' + count + '.txt';
-	console.log("path = " + path;
+	console.log("path = " + path);
 	count++;
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
