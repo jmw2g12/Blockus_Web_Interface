@@ -27,7 +27,7 @@ function pieceToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + "__" + gameStartTime[password] + '/move_' + fileCount[password] + '.txt';
+	var path = '/BlokusData/' + password + '/' + gameStartTime[password] + '/move_' + fileCount[password] + '.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
@@ -42,7 +42,7 @@ function gameToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + "__" + gameStartTime[password] + '/game_finished.txt';
+	var path = '/BlokusData/' + password + '/' + gameStartTime[password] + '/game_finished.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
