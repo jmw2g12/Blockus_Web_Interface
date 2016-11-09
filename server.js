@@ -8,7 +8,7 @@ app.use(express.static(__dirname + '/public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-console.log("Hello world, you're in the server.js file");
+console.log("Hello world, this is the server.js file");
 
 http = require('http');
 fs = require('fs');
@@ -21,12 +21,13 @@ var passwordList = [];
 var pieceSet = [];
 var resigned = [];
 var fileCount = [];
+var gameStartTime = [];
 
 function pieceToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + '/move_' + fileCount[password] + '.txt';
+	var path = '/BlokusData/' + password + "__" + gameStartTime[password] + '/move_' + fileCount[password] + '.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
@@ -41,7 +42,7 @@ function gameToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + '/game_finished.txt';
+	var path = '/BlokusData/' + password + "__" + gameStartTime[password] + '/game_finished.txt';
 	console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
@@ -109,6 +110,11 @@ function checkAndHandleNewPassword(password){
 		resigned[password] = [false, false];
 		fileCount[password] = 1;
 		initBoard(password);
+		
+		var date = new Date().toISOString();
+		date = date.split(".");
+		gameStartTime[password] = date;
+		
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
 	}else{
@@ -199,6 +205,7 @@ app.post('/blokus/isGameOver', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	if (resigned[password][0] == true && resigned[password][1] == true){
+		gameToDropbox(password);
 		var reply = JSON.stringify([true].concat(getScores(password)));
 	}else{
 		var reply = JSON.stringify([false].concat(getScores(password)));
