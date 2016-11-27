@@ -127,6 +127,39 @@ public class Piece{
 		}
 		System.out.println();
 	}
+	public String[] getPieceArray(){
+		//bare minimum representation of a piece, just X and O for block and blank cells resp.
+		int max_x = -0xFF;
+		int max_y = -0xFF;
+		String line = new String("");
+		ArrayList<Coord> coordinates = new ArrayList<Coord>();
+		for (Block b : blocks){
+			if (b.coordinate.x > max_x) max_x = b.coordinate.x;
+			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
+			coordinates.add(b.coordinate);
+		}
+		String[] result = new String[max_y];
+		int counter = 0;
+		for (int j = max_y; j >= 0; j--){
+			for (int i = 0; i <= max_x; i++){
+				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "O");
+			}
+			result[counter] = line;
+			counter++;
+			line = new String("");
+		}
+		return result;
+	}
+	public boolean comparePieceArray(String[] otherArray){
+		//checks piece array with this piece, true if same
+		String[] thisArray = this.getPieceArray();
+		
+		if (otherArray.length != thisArray.length) return false;
+		for (int i = 0; i < thisArray.length; i++){
+			if (!thisArray[i].equals(otherArray[i])) return false;
+		}
+		return true;
+	}
 	public boolean comparePieceRepresentations(Piece p){
 		ArrayList<String> rep1 = getPieceRepresentation("-",Character.toString((char)248),false);
 		ArrayList<String> rep2 = p.getPieceRepresentation("-",Character.toString((char)248),false);

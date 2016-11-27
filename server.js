@@ -117,12 +117,14 @@ function checkAndHandleNewPassword(password){
 		gameStartTime[password] = date;
 		
 		//mirror the game on the java app
+		/*
 		var blokusConstructor = java.import("Blokus");
 		javaGame[password] = new blokusConstructor();
 		javaPlayer[password][0] = javaGame[password].getP1Sync();
 		javaPlayer[password][1] = javaGame[password].getP2Sync();
 		console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
 		console.log('p2 strategy = ' + javaPlayer[password][0].getStrategySync());
+		*/
 
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
@@ -137,6 +139,12 @@ function checkAndHandleNewPassword(password){
 app.get('/', function(req, res) {
 	console.dir(req.param);
     console.log("GET");
+    
+    var querier = java.newInstanceSync("ServerInterface");
+
+	console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
+	console.log('querier.printHiWorldSync():');
+	querier.printHiWorldSync();
 
     var html = fs.readFileSync('index.html');
     res.writeHead(200, {'Content-Type': 'text/html'});
