@@ -1,5 +1,6 @@
 var express = require('express')
 var bodyParser = require('body-parser')
+var java = require('java')
 var app = express()
 var util = require('util')
 
@@ -115,6 +116,13 @@ function checkAndHandleNewPassword(password){
 		date = date.split(".");
 		gameStartTime[password] = date;
 		
+		//mirror the game on the java app
+		var blokusConstructor = java.import("Blokus");
+		javaGame[password] = new blokusConstructor();
+		javaPlayer[password][0] = javaGame[password].getP1Sync();
+		javaPlayer[password][1] = javaGame[password].getP2Sync();
+		
+
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
 	}else{
@@ -217,3 +225,22 @@ app.post('/blokus/isGameOver', function(req, res) {
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
+
+
+
+//Java app interfacing:
+
+java.classpath.push("commons-lang3-3.1.jar");
+java.classpath.push("commons-io.jar");
+java.classpath.push("src");
+
+function getComputerMove(password){
+	var explConstructor = java.import("ExplorerPlayer");
+	
+	var boardConstructor = java.import("Board");
+	var board = new boardConstructor();
+	
+	//(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner)
+	var explorer = new explConstructor();
+	
+}
