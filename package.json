@@ -15,7 +15,9 @@
     "express": "^4.14.0",
     "httpdispatcher": "^1.0.0",
     "java": "^0.7.2",
-    "mongodb": "^2.2.11"
+    "maven": "^4.0.3",
+    "mongodb": "^2.2.11",
+    "node-gyp": "^3.4.0"
   },
   "devDependencies": {},
   "repository": {
