@@ -156,7 +156,7 @@ app.get('/', function(req, res) {
     res.end(html);
 })
 
-app.get('/blokus(.*)/', function(req, res) {
+app.get('/blokus', function(req, res) {
 	console.dir(req.param);
     console.log("GET");
 
@@ -165,7 +165,7 @@ app.get('/blokus(.*)/', function(req, res) {
     res.end(html);
 })
 
-app.post('/blokus(.*)\/piece/', function(req, res) {
+app.post('/blokus/piece', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
 	var pieceID = bodyObject.pieceID;
@@ -183,7 +183,7 @@ app.post('/blokus(.*)\/piece/', function(req, res) {
     res.end(reply);
 })
 
-app.post('/blokus(.*)\/newGame/', function(req, res) { // *** NOT USED YET ***
+app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	var index = passwordList.indexOf(password);
@@ -203,7 +203,7 @@ app.post('/blokus(.*)\/newGame/', function(req, res) { // *** NOT USED YET ***
     res.end(reply);
 })
 
-app.post('/blokus(.*)\/board/', function(req, res) {
+app.post('/blokus/board', function(req, res) {
 	console.log('in this one');
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = JSON.parse(bodyObject)["password"];
@@ -214,18 +214,7 @@ app.post('/blokus(.*)\/board/', function(req, res) {
     res.end(reply);
 })
 
-app.post('/blokus(.*)board/', function(req, res) {
-	console.log('in the other one');
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var password = JSON.parse(bodyObject)["password"];
-	var opponent = JSON.parse(bodyObject)["opponent"];
-	checkAndHandleNewPassword(password, opponent);
-	reply = replyMsg(password);
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(reply);
-})
-
-app.post(/blokus(.*)\/resign/, function(req, res) {
+app.post('/blokus/resign', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	var playerCode = bodyObject.playerCode;
@@ -237,7 +226,7 @@ app.post(/blokus(.*)\/resign/, function(req, res) {
     res.end(reply);
 })
 
-app.post(/blokus(.*)\/isGameOver/, function(req, res) {
+app.post('/blokus/isGameOver', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	if (resigned[password][0] == true && resigned[password][1] == true){
@@ -250,16 +239,6 @@ app.post(/blokus(.*)\/isGameOver/, function(req, res) {
     res.end(reply);
 })
 
-app.post('/blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/board' ,function(req, res) {
-	console.log('this accepts the exact url 1');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/board' ,function(req, res) {
-	console.log('this accepts the exact url 2');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
 
 
 
