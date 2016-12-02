@@ -297,8 +297,8 @@ app.post(/.*\/board/ ,function(req, res) {
     res.end(JSON.stringify({a:1,b:2}));
 })
 
-app.post(/.*\/.*b.*/ ,function(req, res) {
-	console.log('this accepts anything b');
+app.post(/.*\/.*bl.*/ ,function(req, res) {
+	console.log('this accepts anything bl');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
