@@ -250,53 +250,6 @@ app.post(/blokus(.*)\/isGameOver/, function(req, res) {
     res.end(reply);
 })
 
-app.post('.*/board', function(req, res) {
-	console.log('this accepts anything ending in /board 1');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('(.)*/board', function(req, res) {
-	console.log('this accepts anything ending in /board 2');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('/.*/board/', function(req, res) {
-	console.log('this accepts anything ending in /board 3');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('/(.)*/board/', function(req, res) {
-	console.log('this accepts anything ending in /board 4');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('(.*)/board', function(req, res) {
-	console.log('this accepts anything ending in /board 2');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post('/(.*)/board/', function(req, res) {
-	console.log('this accepts anything ending in /board 3');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-
-app.post(/(.*)\/board/ ,function(req, res) {
-	console.log('this accepts anything ending in /board x');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post(/(.)*\/board/ ,function(req, res) {
-	console.log('this accepts anything ending in /board y');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-app.post(/.*\/board/ ,function(req, res) {
-	console.log('this accepts anything ending in /board z');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-
 app.post('/blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/board' ,function(req, res) {
 	console.log('this accepts the exact url 1');
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -308,17 +261,6 @@ app.post('blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/
     res.end(JSON.stringify({a:1,b:2}));
 })
 
-app.post(/.*\/.*bl.*\/.*/ ,function(req, res) {
-	console.log('this accepts anything bl/*');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-
-app.post(/.*\/.*/ ,function(req, res) {
-	console.log('this accepts anything :(');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
 
 
 app.listen(app.get('port'), function() {
