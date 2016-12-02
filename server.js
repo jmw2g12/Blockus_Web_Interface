@@ -250,6 +250,12 @@ app.post(/blokus(.*)\/isGameOver/, function(req, res) {
     res.end(reply);
 })
 
+app.post('*', function(req, res) {
+	console.log('this accepts anything');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
