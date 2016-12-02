@@ -165,7 +165,7 @@ app.get(/blokus(.+)/, function(req, res) {
     res.end(html);
 })
 
-app.post(/blokus(.+)\/piece, function(req, res) {
+app.post(/blokus(.+)\/piece/, function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
 	var pieceID = bodyObject.pieceID;
@@ -183,7 +183,7 @@ app.post(/blokus(.+)\/piece, function(req, res) {
     res.end(reply);
 })
 
-app.post(/blokus(.+)\/newGame, function(req, res) { // *** NOT USED YET ***
+app.post(/blokus(.+)\/newGame/, function(req, res) { // *** NOT USED YET ***
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	var index = passwordList.indexOf(password);
@@ -203,7 +203,7 @@ app.post(/blokus(.+)\/newGame, function(req, res) { // *** NOT USED YET ***
     res.end(reply);
 })
 
-app.post(/blokus(.+)\/board, function(req, res) {
+app.post(/blokus(.+)\/board/, function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = JSON.parse(bodyObject)["password"];
 	var opponent = JSON.parse(bodyObject)["opponent"];
@@ -213,7 +213,7 @@ app.post(/blokus(.+)\/board, function(req, res) {
     res.end(reply);
 })
 
-app.post('/blokus/resign/(.*)', function(req, res) {
+app.post(/blokus(.+)\/resign/, function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	var playerCode = bodyObject.playerCode;
@@ -225,7 +225,7 @@ app.post('/blokus/resign/(.*)', function(req, res) {
     res.end(reply);
 })
 
-app.post(/blokus(.+)\/isGameOver', function(req, res) {
+app.post(/blokus(.+)\/isGameOver/, function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = bodyObject.password;
 	if (resigned[password][0] == true && resigned[password][1] == true){
