@@ -142,9 +142,10 @@ app.get('/', function(req, res) {
     
     var querier = java.newInstanceSync("ServerInterface");
 
-	console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
+	//console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
 	console.log('querier.printHiWorldSync():');
 	querier.printHiWorldSync();
+
 
     var html = fs.readFileSync('index.html');
     res.writeHead(200, {'Content-Type': 'text/html'});
