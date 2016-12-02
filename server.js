@@ -297,8 +297,13 @@ app.post(/.*\/board/ ,function(req, res) {
     res.end(JSON.stringify({a:1,b:2}));
 })
 
-app.post('/.*\/.*bl.*\/.*/' ,function(req, res) {
-	console.log('this accepts anything bl/*');
+app.post('/blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/board' ,function(req, res) {
+	console.log('this accepts the exact url 1');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post('blokus.html?fname=abc&player=p1&opponent=human&loc_go=Let%27s+play%21/board' ,function(req, res) {
+	console.log('this accepts the exact url 2');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
