@@ -214,7 +214,7 @@ app.post('/blokus(.*)\/board/', function(req, res) {
     res.end(reply);
 })
 
-app.post('/blokus.*\/board/', function(req, res) {
+app.post('/blokus(.*)board/', function(req, res) {
 	console.log('in the other one');
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = JSON.parse(bodyObject)["password"];
