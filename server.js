@@ -156,7 +156,7 @@ app.get('/', function(req, res) {
     res.end(html);
 })
 
-app.get('/blokus', function(req, res) {
+app.get('/blokus.*', function(req, res) {
 	console.dir(req.param);
     console.log("GET");
 
