@@ -204,7 +204,6 @@ app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
 })
 
 app.post('/blokus/board', function(req, res) {
-	console.log('in this one');
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = JSON.parse(bodyObject)["password"];
 	var opponent = JSON.parse(bodyObject)["opponent"];
