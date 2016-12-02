@@ -23,7 +23,8 @@ var pieceSet = [];
 var resigned = [];
 var fileCount = [];
 var gameStartTime = [];
-
+var opponents = [];
+var javaGame = [];
 
 function pieceToDropbox(password){
 	console.log("sending file to dropbox");
@@ -105,7 +106,7 @@ function existsAsPassword(password){
 	}
 	return false;
 }
-function checkAndHandleNewPassword(password){
+function checkAndHandleNewPassword(password, opponent){
 	if (!existsAsPassword(password)){
 		passwordList.push(password);
 		turn[password] = 1;
@@ -117,6 +118,8 @@ function checkAndHandleNewPassword(password){
 		date = date.split(".");
 		gameStartTime[password] = date;
 		
+		opponents[password] = opponent;
+
 		//mirror the game on the java app
 		/*
 		var blokusConstructor = java.import("Blokus");
@@ -168,7 +171,7 @@ app.post('/blokus/piece', function(req, res) {
 	var pieceID = bodyObject.pieceID;
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
-	var opponent bodyObject.opponent;
+	var opponent = bodyObject.opponent;
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
 	checkAndHandleNewPassword(password,opponent);
 	addPieceToBoard(piece,pieceID,playerCode,password);
@@ -190,7 +193,7 @@ app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
 	}else{
 		console.log("in /newGame: password = " + password + ", index = " + index + ". Could not remove this value from passwordList.");
 	}
-	if (checkAndHandleNewPassword(password)){
+	if (checkAndHandleNewPassword(password,'human')){
 		console.log("renewed game");
 	}else{
 		console.log("did not renew game");
