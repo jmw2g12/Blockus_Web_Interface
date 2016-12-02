@@ -254,3 +254,5 @@ function getComputerMove(password){
 	var explorer = new explConstructor();
 	
 }
+
+console.log("got to here!");
