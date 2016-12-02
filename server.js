@@ -120,15 +120,18 @@ function checkAndHandleNewPassword(password, opponent){
 		
 		opponents[password] = opponent;
 
-		//mirror the game on the java app
-		/*
-		var blokusConstructor = java.import("Blokus");
-		javaGame[password] = new blokusConstructor();
-		javaPlayer[password][0] = javaGame[password].getP1Sync();
-		javaPlayer[password][1] = javaGame[password].getP2Sync();
-		console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
-		console.log('p2 strategy = ' + javaPlayer[password][0].getStrategySync());
-		*/
+		if (opponent !== 'human'){
+			//mirror the game on the java app
+			var blokusConstructor = java.import("Blokus");
+			javaGame[password] = new blokusConstructor();
+			javaPlayer[password][0] = javaGame[password].getP1Sync();
+			javaPlayer[password][1] = javaGame[password].getP2Sync();
+			console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
+			console.log('p2 strategy = ' + javaPlayer[password][0].getStrategySync());
+		}else{
+			console.log('opponent is human');
+		}
+		
 
 		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
 		return true;
@@ -181,6 +184,7 @@ app.post('/blokus/piece', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
+    getComputerMove(password);
 })
 
 app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
