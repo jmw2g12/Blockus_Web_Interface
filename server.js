@@ -140,7 +140,7 @@ app.get('/', function(req, res) {
 	console.dir(req.param);
     console.log("GET");
     
-    //var querier = java.newInstanceSync("ServerInterface");
+    var querier = java.newInstanceSync("ServerInterface");
 
 	//console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
 	//console.log('querier.printHiWorldSync():');
