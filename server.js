@@ -281,6 +281,22 @@ app.post('/(.*)/board/', function(req, res) {
     res.end(JSON.stringify({a:1,b:2}));
 })
 
+app.post(/(.*)\/board/ ,function(req, res) {
+	console.log('this accepts anything ending in /board x');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post(/(.)*\/board/ ,function(req, res) {
+	console.log('this accepts anything ending in /board y');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post(/.*\/board/ ,function(req, res) {
+	console.log('this accepts anything ending in /board z');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
