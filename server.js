@@ -250,8 +250,23 @@ app.post(/blokus(.*)\/isGameOver/, function(req, res) {
     res.end(reply);
 })
 
-app.post('*/board', function(req, res) {
-	console.log('this accepts anything ending in /board');
+app.post('.*/board', function(req, res) {
+	console.log('this accepts anything ending in /board 1');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post('(.)*/board', function(req, res) {
+	console.log('this accepts anything ending in /board 2');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post('/.*/board/', function(req, res) {
+	console.log('this accepts anything ending in /board 3');
+	res.writeHead(200, {'Content-Type': 'text/html'});
+    res.end(JSON.stringify({a:1,b:2}));
+})
+app.post('/(.)*/board/', function(req, res) {
+	console.log('this accepts anything ending in /board 4');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
