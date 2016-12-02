@@ -250,8 +250,8 @@ app.post(/blokus(.*)\/isGameOver/, function(req, res) {
     res.end(reply);
 })
 
-app.post('*board', function(req, res) {
-	console.log('this accepts anything ending in board');
+app.post('*/board', function(req, res) {
+	console.log('this accepts anything ending in /board');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
