@@ -297,26 +297,14 @@ app.post(/.*\/board/ ,function(req, res) {
     res.end(JSON.stringify({a:1,b:2}));
 })
 
-app.post(/.*\/.*bc.*/ ,function(req, res) {
-	console.log('this accepts anything bc');
+app.post(/.*\/.*bo.*/ ,function(req, res) {
+	console.log('this accepts anything bo');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
 
 app.post(/.*\/.*/ ,function(req, res) {
-	console.log('this accepts anything ending in /board a');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-
-app.post(/.*/ ,function(req, res) { // this one
-	console.log('this accepts anything ending in /board 3');
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(JSON.stringify({a:1,b:2}));
-})
-
-app.post('/blokus(.*)/', function(req, res) {
-	console.log('got to here');
+	console.log('this accepts anything :(');
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(JSON.stringify({a:1,b:2}));
 })
