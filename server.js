@@ -184,7 +184,7 @@ app.post('/blokus/piece', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
-    getComputerMove(password);
+    //getComputerMove(password);
 })
 
 app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
