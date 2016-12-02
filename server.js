@@ -24,6 +24,7 @@ var resigned = [];
 var fileCount = [];
 var gameStartTime = [];
 
+
 function pieceToDropbox(password){
 	console.log("sending file to dropbox");
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
@@ -140,12 +141,12 @@ app.get('/', function(req, res) {
 	console.dir(req.param);
     console.log("GET");
     
+/*
     var querier = java.newInstanceSync("ServerInterface");
-
 	console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
 	console.log('querier.printHiWorldSync():');
 	querier.printHiWorldSync();
-
+*/
 
     var html = fs.readFileSync('index.html');
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -167,8 +168,9 @@ app.post('/blokus/piece', function(req, res) {
 	var pieceID = bodyObject.pieceID;
 	var playerCode = bodyObject.playerCode;
 	var password = bodyObject.password;
+	var opponent bodyObject.opponent;
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
-	checkAndHandleNewPassword(password);
+	checkAndHandleNewPassword(password,opponent);
 	addPieceToBoard(piece,pieceID,playerCode,password);
 	pieceToDropbox(password);
 	fileCount[password]++;
@@ -201,7 +203,8 @@ app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
 app.post('/blokus/board', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var password = JSON.parse(bodyObject)["password"];
-	checkAndHandleNewPassword(password);
+	var opponent = JSON.parse(bodyObject)["opponent"];
+	checkAndHandleNewPassword(password, opponent);
 	reply = replyMsg(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
     res.end(reply);
