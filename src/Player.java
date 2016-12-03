@@ -82,6 +82,22 @@ public abstract class Player{
 				
 		return true;
 	}
+	public getPieceFromBoard(int[][] newBoard){
+		for (int i = 0; i < board.size; i++){
+			for (int j = 0; j < board.size; j++){
+				System.out.print(board.getFromCoordinate(j,i) + " ");
+			}
+			System.out.print("");
+		}
+		System.out.print("");
+		System.out.print("");
+		for (int i = 0; i < board.size; i++){
+			for (int j = 0; j < board.size; j++){
+				System.out.print(newBoard[i][j] + " ");
+			}
+			System.out.print("");
+		}
+	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
 		connectableBlocks = board.getConnectableBlocks(cornerBlocks,pieceCode);
