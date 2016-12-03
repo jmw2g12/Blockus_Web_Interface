@@ -25,6 +25,7 @@ var fileCount = [];
 var gameStartTime = [];
 var opponents = [];
 var javaGame = [];
+var javaPlayer = [];
 
 function pieceToDropbox(password){
 	console.log("sending file to dropbox");
@@ -122,6 +123,7 @@ function checkAndHandleNewPassword(password, opponent){
 
 		if (opponent !== 'human'){
 			//mirror the game on the java app
+			console.log('opponent is computer');
 			var blokusConstructor = java.import("Blokus");
 			javaGame[password] = new blokusConstructor();
 			javaPlayer[password][0] = javaGame[password].getP1Sync();
@@ -184,7 +186,7 @@ app.post('/blokus/piece', function(req, res) {
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
-    //getComputerMove(password);
+    getComputerMove(password);
 })
 
 app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
@@ -259,13 +261,16 @@ java.classpath.push("commons-io.jar");
 java.classpath.push("src");
 
 function getComputerMove(password){
+	/*
 	var explConstructor = java.import("ExplorerPlayer");
 	
-	var boardConstructor = java.import("Board");
 	var board = new boardConstructor();
 	
 	//(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner)
 	var explorer = new explConstructor();
+	*/
+	
+	javaPlayer[password][0].getPieceFromBoard(board[password]);
 	
 }
 

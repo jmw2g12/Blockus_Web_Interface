@@ -82,6 +82,7 @@ public abstract class Player{
 				
 		return true;
 	}
+	/*
 	public void getPieceFromBoard(int[][] newBoard){
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
@@ -98,6 +99,7 @@ public abstract class Player{
 			System.out.print("");
 		}
 	}
+	*/
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
 		connectableBlocks = board.getConnectableBlocks(cornerBlocks,pieceCode);
