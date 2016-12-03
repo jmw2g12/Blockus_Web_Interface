@@ -112,7 +112,7 @@ public abstract class Player{
 	public String nodeBoardVal(Object[] board, int x, int y){
 		return Integer.toString(((Integer[])board[y])[x]);
 	}
-	public boolean compBoardVals(jsBoard, board, x, y){
+	public boolean compBoardVals(Object[] jsBoard, Board board, int x, int y){
 		String jsVal = nodeBoardVal(jsBoard,x,y);
 		String val = board.getFromCoordinate(x,y);
 		if (jsVal.equals("0") && val == null){
