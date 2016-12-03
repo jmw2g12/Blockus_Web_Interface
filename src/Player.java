@@ -109,6 +109,7 @@ public abstract class Player{
 			}
 			System.out.println("");
 		}
+		System.out.println("differences.size() = " + differences.size());
 		for (Coord c : normaliseCoords(differences)){
 			System.out.println("c.x = " + c.x + ", c.y = " + c.y);
 		}
