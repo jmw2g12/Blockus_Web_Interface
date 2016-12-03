@@ -123,7 +123,7 @@ public abstract class Player{
 		}
 		int width = maxX - minX + 1;
 		int height = maxY - minY + 1;
-		String[height] newPieceArray;
+		String[] newPieceArray = new String[height];
 		String line = "";
 		for (int i = 0; i < height; i++){
 			for (int j = 0; j < height; j++){
