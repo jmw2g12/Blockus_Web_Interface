@@ -98,10 +98,12 @@ public abstract class Player{
 		
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
+				System.out.print(nodeBoardVal(newBoard,j,i));
+				System.out.print(board.getFromCoordinate(j,i) + "   ");
 				if (nodeBoardVal(newBoard,j,i).equals(board.getFromCoordinate(j,i))){
-					System.out.print(nodeBoardVal(newBoard,j,i));
+					//System.out.print(nodeBoardVal(newBoard,j,i));
 				}else{
-					System.out.print("#");
+					//System.out.print("#");
 				}
 			}
 			System.out.println("");
