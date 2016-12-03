@@ -126,6 +126,7 @@ function checkAndHandleNewPassword(password, opponent){
 			console.log('opponent is computer');
 			var blokusConstructor = java.import("Blokus");
 			javaGame[password] = new blokusConstructor();
+			javaPlayer[password] = [];
 			javaPlayer[password][0] = javaGame[password].getP1Sync();
 			javaPlayer[password][1] = javaGame[password].getP2Sync();
 			console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
