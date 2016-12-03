@@ -127,11 +127,11 @@ public abstract class Player{
 		String line = "";
 		for (int i = 0; i < height; i++){
 			for (int j = 0; j < height; j++){
-				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "O");
+				line = line + ((normalCoords.contains(new Coord(i,j))) ? "X" : "O");
 			}
 			newPieceArray[i] = new String(line);
 		}
-		
+		System.out.println("newPieceArray:");
 		for (String s : newPieceArray){
 			System.out.println(s);
 		}
