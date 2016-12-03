@@ -98,20 +98,42 @@ public abstract class Player{
 		
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
-				System.out.print(nodeBoardVal(newBoard,j,i));
-				System.out.print(board.getFromCoordinate(j,i));
+				//System.out.print(nodeBoardVal(newBoard,j,i));
+				//System.out.print(board.getFromCoordinate(j,i));
 				if (compBoardVals(newBoard,board,j,i)){
-					System.out.print("t   ");
+					//System.out.print("t   ");
 				}else{
-					System.out.print("f   ");
+					//System.out.print("f   ");
 					differences.add(new Coord(j,i));
 				}
 			}
-			System.out.println("");
+			//System.out.println("");
 		}
-		System.out.println("differences.size() = " + differences.size());
-		for (Coord c : normaliseCoords(differences)){
-			System.out.println("c.x = " + c.x + ", c.y = " + c.y);
+		//System.out.println("differences.size() = " + differences.size());
+		ArrayList<Coord> normalCoords = normaliseCoords(differences);
+		int maxX = -0xFF;
+		int minX = 0xFF;
+		int maxY = -0xFF;
+		int minY = 0xFF;
+		for (int i = 0; i < normalCoords.size(); i++){
+			if (normalCoords.get(i).x > maxX) maxX = normalCoords.get(i).x;
+			if (normalCoords.get(i).y > maxY) maxY = normalCoords.get(i).y;
+			if (normalCoords.get(i).x < minX) minX = normalCoords.get(i).x;
+			if (normalCoords.get(i).y < minY) minY = normalCoords.get(i).y;
+		}
+		int width = maxX - minX + 1;
+		int height = maxY - minY + 1;
+		String[height] newPieceArray;
+		String line = "";
+		for (int i = 0; i < height; i++){
+			for (int j = 0; j < height; j++){
+				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "O");
+			}
+			newPieceArray[i] = new String(line);
+		}
+		
+		for (String s : newPieceArray){
+			System.out.println(s);
 		}
 	}
 	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
@@ -126,11 +148,11 @@ public abstract class Player{
 			if (initial.get(i).x < minX) minX = initial.get(i).x;
 			if (initial.get(i).y < minY) minY = initial.get(i).y;
 		}
-		System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
+		//System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
 		for (int i = 0; i < initial.size(); i++){
 			Coord prev = initial.get(i);
 			result.add(new Coord(prev.x-minX, prev.y-minY));
-			System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
+			//System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
 		}
 		return result;
 	}
