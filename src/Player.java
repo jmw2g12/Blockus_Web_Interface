@@ -95,7 +95,7 @@ public abstract class Player{
 	
 	public void getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
-		/
+		
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
 				if (nodeBoardVal(newBoard,j,i).equals(board.getFromCoordinate(j,i))){
