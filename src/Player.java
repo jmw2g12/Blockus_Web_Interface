@@ -99,11 +99,11 @@ public abstract class Player{
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
 				System.out.print(nodeBoardVal(newBoard,j,i));
-				System.out.print(board.getFromCoordinate(j,i) + "   ");
-				if (nodeBoardVal(newBoard,j,i).equals(board.getFromCoordinate(j,i))){
-					//System.out.print(nodeBoardVal(newBoard,j,i));
+				System.out.print(board.getFromCoordinate(j,i));
+				if (compBoardVals(newBoard,board,j,i)){
+					System.out.print("t   ");
 				}else{
-					//System.out.print("#");
+					System.out.print("f   ");
 				}
 			}
 			System.out.println("");
@@ -111,6 +111,17 @@ public abstract class Player{
 	}
 	public String nodeBoardVal(Object[] board, int x, int y){
 		return Integer.toString(((Integer[])board[y])[x]);
+	}
+	public boolean compBoardVals(jsBoard, board, x, y){
+		String jsVal = nodeBoardVal(jsBoard,x,y);
+		String val = board.getFromCoordinate(x,y);
+		if (jsVal.equals("0") && val == null){
+			return true;
+		}else if(jsVal.equals(val)){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
