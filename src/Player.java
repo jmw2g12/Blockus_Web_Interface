@@ -107,8 +107,8 @@ public abstract class Player{
 			System.out.println("");
 		}
 	}
-	public int nodeBoardVal(Object[] board, int x, int y){
-		return Integer.toString(((Integer[])newBoard[y])[x]);
+	public String nodeBoardVal(Object[] board, int x, int y){
+		return Integer.toString(((Integer[])board[y])[x]);
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
