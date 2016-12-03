@@ -94,8 +94,8 @@ public abstract class Player{
 	}
 	
 	public void getPieceFromBoard(Object[] newBoard){
-		console.log(newBoard.getClass());
-		console.log(newBoard[0].getClass());
+		System.out.println(newBoard.getClass());
+		System.out.println(newBoard[0].getClass());
 		return;
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
@@ -107,7 +107,7 @@ public abstract class Player{
 		System.out.print("");
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
-				System.out.print(newBoard[i][j] + " ");
+				//System.out.print(newBoard[i][j] + " ");
 			}
 			System.out.print("");
 		}
