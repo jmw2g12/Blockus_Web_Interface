@@ -96,6 +96,11 @@ public abstract class Player{
 	public void getPieceFromBoard(Object[] newBoard){
 		System.out.println(newBoard.getClass());
 		System.out.println(newBoard[0].getClass());
+		System.out.println(newBoard[0]);
+		
+		for (int i = 0; i < newBoard.length; i++){
+			System.out.println(newBoard[i]);
+		}
 		/*
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
