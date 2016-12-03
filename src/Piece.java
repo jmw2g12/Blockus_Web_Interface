@@ -139,7 +139,7 @@ public class Piece{
 			coordinates.add(b.coordinate);
 		}
 		System.out.println("max_y = " + max_y);
-		String[] result = new String[max_y];
+		String[] result = new String[max_y+1];
 		int counter = 0;
 		for (int j = max_y; j >= 0; j--){
 			for (int i = 0; i <= max_x; i++){
