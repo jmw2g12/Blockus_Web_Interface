@@ -130,7 +130,7 @@ function checkAndHandleNewPassword(password, opponent){
 			javaPlayer[password][0] = javaGame[password].getP1Sync();
 			javaPlayer[password][1] = javaGame[password].getP2Sync();
 			console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
-			console.log('p2 strategy = ' + javaPlayer[password][0].getStrategySync());
+			console.log('p2 strategy = ' + javaPlayer[password][1].getStrategySync());
 		}else{
 			console.log('opponent is human');
 		}
