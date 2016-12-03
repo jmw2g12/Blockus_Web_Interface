@@ -91,8 +91,8 @@ public abstract class Player{
 		}
 		System.out.print("");
 		System.out.print("");
-		for (int i = 0; i < board.size; i++){
-			for (int j = 0; j < board.size; j++){
+		for (int i = 0; i < board.boardSize; i++){
+			for (int j = 0; j < board.boardSize; j++){
 				System.out.print(newBoard[i][j] + " ");
 			}
 			System.out.print("");
