@@ -96,7 +96,7 @@ public abstract class Player{
 	public void getPieceFromBoard(Object[] newBoard){
 		System.out.println(newBoard.getClass());
 		System.out.println(newBoard[0].getClass());
-		return;
+		/*
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
 				System.out.print(board.getFromCoordinate(j,i) + " ");
@@ -111,6 +111,7 @@ public abstract class Player{
 			}
 			System.out.print("");
 		}
+		*/
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
