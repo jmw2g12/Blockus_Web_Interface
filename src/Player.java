@@ -93,32 +93,22 @@ public abstract class Player{
 		return true;
 	}
 	
-	public void getPieceFromBoard(Object[] newBoard){
-		System.out.println(newBoard.getClass());
-		System.out.println(newBoard[0].getClass());
-		System.out.println(newBoard[0]);
-		
-		for (int i = 0; i < newBoard.length; i++){
-			for (int j = 0; j < ((Integer[])newBoard[i]).length; j ++){
-				System.out.println(((Integer[])newBoard[i])[j]);
-			}
-		}
-		/*
+	public void getPieceFromNewBoard(Object[] newBoard){
+		ArrayList<Coord> differences = new ArrayList<Coord>();
+		/
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
-				System.out.print(board.getFromCoordinate(j,i) + " ");
+				if (nodeBoardVal(newBoard,j,i).equals(board.getFromCoordinate(j,i))){
+					System.out.print(nodeBoardVal(newBoard,j,i));
+				}else{
+					System.out.print("#");
+				}
 			}
-			System.out.print("");
+			System.out.println("");
 		}
-		System.out.print("");
-		System.out.print("");
-		for (int i = 0; i < board.boardSize; i++){
-			for (int j = 0; j < board.boardSize; j++){
-				//System.out.print(newBoard[i][j] + " ");
-			}
-			System.out.print("");
-		}
-		*/
+	}
+	public int nodeBoardVal(Object[] board, int x, int y){
+		return Integer.toString(((Integer[])newBoard[y])[x]);
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
 		cornerBlocks = board.getCornerBlocks(pieceCode);
