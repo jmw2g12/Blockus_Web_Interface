@@ -127,7 +127,7 @@ public abstract class Player{
 			if (initial.get(i).y < minY) minY = initial.get(i).y;
 		}
 		System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
-		for (int i = 0; i < result.size(); i++){
+		for (int i = 0; i < initial.size(); i++){
 			Coord prev = initial.get(i);
 			result.add(new Coord(prev.x-maxX, prev.y-maxY));
 			System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
