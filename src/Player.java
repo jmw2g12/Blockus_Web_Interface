@@ -93,7 +93,7 @@ public abstract class Player{
 		return true;
 	}
 	
-	public void getPieceFromNewBoard(Object[] newBoard){
+	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
 		
 		for (int i = 0; i < board.boardSize; i++){
@@ -132,10 +132,20 @@ public abstract class Player{
 			newPieceArray[i] = new String(line);
 			line = "";
 		}
-		System.out.println("newPieceArray:");
-		for (String s : newPieceArray){
-			System.out.println(s);
+		for (Piece p : pieces){
+			String[] pieceArray = p.getPieceArray();
+			if (pieceArraysEqual(pieceArray,newPieceArray)){
+				pieceArray.printPieceDiagram();
+				return p;
+			}
 		}
+	}
+	public boolean pieceArraysEquals(String[] a, String[] b){
+		if (a.length != b.length) return false;
+		for (int i = 0; i < a.length; i++){
+			if (!(a[i].equals(b[i]))) return false;
+		}
+		return true;
 	}
 	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
 		ArrayList<Coord> result = new ArrayList<Coord>();
