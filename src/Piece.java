@@ -138,6 +138,7 @@ public class Piece{
 			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
 			coordinates.add(b.coordinate);
 		}
+		System.out.println("max_y = " + max_y);
 		String[] result = new String[max_y];
 		int counter = 0;
 		for (int j = max_y; j >= 0; j--){
