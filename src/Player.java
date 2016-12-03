@@ -129,8 +129,8 @@ public abstract class Player{
 			for (int j = 0; j < height; j++){
 				line = line + ((normalCoords.contains(new Coord(j,i))) ? "X" : "O");
 			}
-			line = "";
 			newPieceArray[i] = new String(line);
+			line = "";
 		}
 		System.out.println("newPieceArray:");
 		for (String s : newPieceArray){
