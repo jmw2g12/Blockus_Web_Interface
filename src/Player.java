@@ -104,10 +104,33 @@ public abstract class Player{
 					System.out.print("t   ");
 				}else{
 					System.out.print("f   ");
+					differences.add(new Coord(j,i));
 				}
 			}
 			System.out.println("");
 		}
+		for (Coord c : normaliseCoords(differences)){
+			System.out.println("c.x = " + c.x + ", c.y = " + c.y);
+		}
+	}
+	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
+		ArrayList<Coord> result = new ArrayList<Coord>();
+		int maxX = -0xFF;
+		int minX = 0xFF;
+		int maxY = -0xFF;
+		int minY = 0xFF;
+		for (int i = 0; i < result.size(); i++){
+			if (initial.get(i).x > maxX) maxX = initial.get(i).x;
+			if (initial.get(i).y > maxY) maxY = initial.get(i).y;
+			if (initial.get(i).x < minX) minX = initial.get(i).x;
+			if (initial.get(i).y < minY) minY = initial.get(i).y;
+		}
+		System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
+		for (int i = 0; i < result.size(); i++){
+			Coord prev = initial.get(i);
+			result.add(new Coord(prev.x-maxX, prev.y-maxY));
+		}
+		return result;
 	}
 	public String nodeBoardVal(Object[] board, int x, int y){
 		return Integer.toString(((Integer[])board[y])[x]);
