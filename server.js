@@ -271,7 +271,7 @@ function getComputerMove(password){
 	var explorer = new explConstructor();
 	*/
 	
-	javaPlayer[password][0].getPieceFromBoard(board[password]);
+	javaPlayer[password][0].getPieceFromBoardSync(board[password]);
 	
 }
 

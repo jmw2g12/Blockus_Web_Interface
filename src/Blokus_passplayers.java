@@ -12,15 +12,14 @@ public class Blokus{
 	Random rand = new Random();
 	Board board = new Board(boardSize);
 	
-	public Blokus(){
+	public Blokus(Player p1, Player p2){
 	
 		initPieces();
 		
 		rand = new Random(System.currentTimeMillis());
-		Player p1,p2;
 		
-		p1 = generatePlayer("web","1",1);
-		p2 = generatePlayer("explorer","2",3);
+		generatePlayer(p1, "web","1",1);
+		generatePlayer(p2,"explorer","2",3);
 		
 		players.add(p1);
 		players.add(p2);
@@ -38,20 +37,8 @@ public class Blokus{
 			super(msg);
 		}
 	}
-	public Player generatePlayer(String strategy, String pieceCode, int corner){
-		Player p;
-		if (strategy.equals("human")){
-			return new HumanPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("random")){
-			return new RandomPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("web")){
-			return new WebPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("explorer")){
-			return new ExplorerPlayer(board,rand,pieces,pieceCode,players,corner);
-		}
-		System.out.println("*** Invalid player strategy given! ***");
-		System.exit(0);
-		return null;
+	public Player generatePlayer(Player p, String strategy, String pieceCode, int corner){
+		p.setConstructorValues(board,rand,pieces,pieceCode,players,corner);
 	}
 	public void printAllPieces(){
 		int counter = 0;

@@ -31,6 +31,16 @@ public abstract class Player{
 		this.rand = rand;
 		this.startingCorner = startingCorner;
 	}
+	public void setConstructorValues(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner){
+		this.board = board;
+		this.pieces = pieces;
+		this.piecesRemaining = new ArrayList<Piece>(pieces);
+		this.piecesOnBoard = new ArrayList<Piece>();
+		this.pieceCode = pieceCode;
+		this.allPlayers = allPlayers;
+		this.rand = rand;
+		this.startingCorner = startingCorner;
+	}
 	public void placeStarterBlock(){
 		switch (startingCorner){
 			case 1 :
