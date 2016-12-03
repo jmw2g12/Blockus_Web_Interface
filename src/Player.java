@@ -129,7 +129,7 @@ public abstract class Player{
 		System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
 		for (int i = 0; i < initial.size(); i++){
 			Coord prev = initial.get(i);
-			result.add(new Coord(prev.x-maxX, prev.y-maxY));
+			result.add(new Coord(prev.x-minX, prev.y-minY));
 			System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
 		}
 		return result;
