@@ -135,12 +135,12 @@ public abstract class Player{
 		for (Piece p : pieces){
 			String[] pieceArray = p.getPieceArray();
 			if (pieceArraysEqual(pieceArray,newPieceArray)){
-				pieceArray.printPieceDiagram();
+				p.printPieceDiagram();
 				return p;
 			}
 		}
 	}
-	public boolean pieceArraysEquals(String[] a, String[] b){
+	public boolean pieceArraysEqual(String[] a, String[] b){
 		if (a.length != b.length) return false;
 		for (int i = 0; i < a.length; i++){
 			if (!(a[i].equals(b[i]))) return false;
