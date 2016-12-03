@@ -139,6 +139,7 @@ public abstract class Player{
 				return p;
 			}
 		}
+		return null;
 	}
 	public boolean pieceArraysEqual(String[] a, String[] b){
 		if (a.length != b.length) return false;
