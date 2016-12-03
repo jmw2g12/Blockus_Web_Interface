@@ -93,8 +93,9 @@ public abstract class Player{
 		return true;
 	}
 	
-	public void getPieceFromBoard(Object newBoard){
+	public void getPieceFromBoard(Object[] newBoard){
 		console.log(newBoard.getClass());
+		console.log(newBoard[0].getClass());
 		return;
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
