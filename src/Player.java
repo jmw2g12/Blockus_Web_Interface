@@ -133,6 +133,8 @@ public abstract class Player{
 			line = "";
 		}
 		for (Piece p : pieces){
+			System.out.println("# " + pieces.indexOf(p) + " :");
+			p.print_piece();
 			String[] pieceArray = p.getPieceArray();
 			if (pieceArraysEqual(pieceArray,newPieceArray)){
 				p.printPieceDiagram();
