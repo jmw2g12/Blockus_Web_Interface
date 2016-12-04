@@ -26,7 +26,7 @@ public class WebPlayer extends Player{
 			return false;
 		}
 		p = getPieceFromNewBoard(newBoard);
-		System.out.println("pieceCode = " + pieceCode);
+		//System.out.println("pieceCode = " + pieceCode);
 		p.print_piece();
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
@@ -79,16 +79,54 @@ public class WebPlayer extends Player{
 			line = "";
 		}
 		for (Piece p : piecesRemaining){
+		System.out.println("--------------starting for piece---------------");
+		System.out.println("");
 			//System.out.println("# " + pieces.indexOf(p) + " :");
 			//p.print_piece();
 			String[] pieceArray = p.getPieceArray();
+			System.out.println("piece coords:");
+			p.print_coordinates();
+			System.out.println("new piece coords:");
+			printCoordArrayList(normalCoords);
+			System.out.println("");
+			System.out.println("piece array");
+			printStringArray(pieceArray);
+			System.out.println("new piece array");
+			printStringArray(newPieceArray);
 			if (pieceArraysEqual(pieceArray,newPieceArray)){
+			//if (coordArraysEqual
+				System.out.println("found match");
 				p.printPieceDiagram();
 				return p;
 			}
+			System.out.println("");
+			System.out.println("-------------------------------------------");
 		}
+		System.out.println("NO PIECE MATCHES!");
 		return null;
 	}
+	public void printStringArray(String[] ar){
+		for (int i = 0; i < ar.length; i++){
+			System.out.println(ar[i]);
+		}
+	}
+	public void printCoordArrayList(ArrayList<Coord> al){
+		for (Coord c : al){
+			System.out.println("x=" + c.x + ", y=" + c.y);
+		}
+	}
+	/*
+	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
+
+		List<Coord> sourceList = new ArrayList<Coord>(p1);
+		List<Coord> destinationList = new ArrayList<Coord>(p2);
+
+		sourceList.removeAll( p1 );
+		destinationList.removeAll( p2 );
+
+		System.out.println( sourceList );
+		System.out.println( destinationList );
+	}*/
 	public boolean pieceArraysEqual(String[] a, String[] b){
 		if (a.length != b.length) return false;
 		for (int i = 0; i < a.length; i++){

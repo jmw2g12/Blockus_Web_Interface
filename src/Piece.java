@@ -138,7 +138,7 @@ public class Piece{
 			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
 			coordinates.add(b.coordinate);
 		}
-		System.out.println("max_y = " + max_y);
+		//System.out.println("max_y = " + max_y);
 		String[] result = new String[max_y+1];
 		int counter = 0;
 		for (int j = max_y; j >= 0; j--){
@@ -151,6 +151,29 @@ public class Piece{
 		}
 		return result;
 	}
+	/*
+	public String[] getPieceArrayFromCoords(ArrayList<Coord> coords){ //********
+		int max_x = -0xFF;
+		int max_y = -0xFF;
+		String line = new String("");
+		for (Block b : blocks){
+			if (b.coordinate.x > max_x) max_x = b.coordinate.x;
+			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
+			coordinates.add(b.coordinate);
+		}
+		//System.out.println("max_y = " + max_y);
+		String[] result = new String[max_y+1];
+		int counter = 0;
+		for (int j = max_y; j >= 0; j--){
+			for (int i = 0; i <= max_x; i++){
+				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "O");
+			}
+			result[counter] = line;
+			counter++;
+			line = new String("");
+		}
+		return result;
+	}*/
 	public boolean comparePieceArray(String[] otherArray){
 		//checks piece array with this piece, true if same
 		String[] thisArray = this.getPieceArray();
