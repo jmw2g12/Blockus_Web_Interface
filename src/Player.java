@@ -79,9 +79,7 @@ public abstract class Player{
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
 		Piece p;
-		System.out.println("here before");
 		possibleMoves = possibleMovesForPlayer();
-		System.out.println("here after");
 		if (possibleMoves.size() == 0){
 			finished = true;
 			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
@@ -95,10 +93,8 @@ public abstract class Player{
 		return true;
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){
-		System.out.println("here in possibleMoves, before");
 		cornerBlocks = board.getCornerBlocks(pieceCode);
 		connectableBlocks = board.getConnectableBlocks(cornerBlocks,pieceCode);
-		System.out.println("here in possibleMoves, almost done");
 		return getPossibleMoves(startingCorner,connectableBlocks,false);
 	}
 	public abstract Piece choosePiece();
@@ -119,19 +115,11 @@ public abstract class Player{
 		}
 	}
 	public ArrayList<Piece> getPossibleMoves(int startingCorner, ArrayList<Pair<Block,Integer>> connectables, Boolean printPieces){
-		System.out.println("here in getPossibleMoves, before");
-		System.out.println("piecesRemaining.size() = " +  piecesRemaining.size());
-		System.out.println("pieces.size() = " +  pieces.size());
-		System.out.println("board.blocksOnBoard('1') = " +  board.blocksOnBoard("1"));
-		System.out.println("connectables.size() = " + connectables.size());
 		ArrayList<Piece> result = new ArrayList<Piece>();
 		Piece pieceToTest;
 		Block block_of_piece;
-		System.out.println("here before loop");
 		for (Pair<Block,Integer> c : connectables){	
-			System.out.println("starting loop iteration #" + connectables.indexOf(c));
 			for (Pair<Piece,Block> pcs : findPiecesToConnect(c.getR(),allPlayers.get(indexFromStartCorner(startingCorner)).getPiecesRemaining())){
-				System.out.println("starting inner loop");
 				pieceToTest = pcs.getL().clone();
 				block_of_piece = pieceToTest.blocks.get(pcs.getL().blocks.indexOf(pcs.getR())); //gets equivalent cloned block in new piece
 				pieceToTest.place_piece(block_of_piece, c.getL(), c.getR());
@@ -142,11 +130,8 @@ public abstract class Player{
 						System.out.println("");
 					}
 				}
-				System.out.println("finishing inner loop");
 			}
-			System.out.println("finishing loop iteration #" + connectables.indexOf(c));
 		}
-		System.out.println("here in getPossibleMoves, after");
 		return result;
 	}
 	public Integer indexFromStartCorner(int start){

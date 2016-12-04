@@ -271,6 +271,10 @@ function sendJavaSingleMove(password){
 
 function getJavaMove(password){
 	javaPlayer[password][1].takeMoveSync();
-	console.log("java board");
-	console.log(javaGame[password].getBoardSync());
+	console.log("java board:");
+	console.log(javaGame[password].printBoardSync());
+	console.log("java board data:");
+	var boardData = javaGame[password].getBoardArraySync();
+	console.log(boardData);
+	console.log('boardData.length = ' + boardData.length);
 }
