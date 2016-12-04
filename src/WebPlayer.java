@@ -72,8 +72,8 @@ public class WebPlayer extends Player{
 		String[] newPieceArray = new String[height];
 		String line = "";
 		for (int i = 0; i < height; i++){
-			for (int j = 0; j < height; j++){
-				line = line + ((normalCoords.contains(new Coord(j,i))) ? "X" : "O");
+			for (int j = 0; j < width; j++){
+				line = line + ((normalCoords.contains(new Coord(j,i))) ? "X" : "-");
 			}
 			newPieceArray[i] = new String(line);
 			line = "";
