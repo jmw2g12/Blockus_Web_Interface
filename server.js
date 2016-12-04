@@ -271,10 +271,22 @@ function sendJavaSingleMove(password){
 
 function getJavaMove(password){
 	javaPlayer[password][1].takeMoveSync();
-	console.log("java board:");
-	console.log(javaGame[password].printBoardSync());
-	console.log("java board data:");
+	//console.log("java board:");
+	//console.log(javaGame[password].printBoardSync());
+	//console.log("java board data:");
 	var boardData = javaGame[password].getBoardArraySync();
-	console.log(boardData);
-	console.log('boardData.length = ' + boardData.length);
+	setBoardAfterJavaMove(password,boardData);
+	//console.log(boardData);
+	//console.log('boardData.length = ' + boardData.length);
+}
+
+function setBoardAfterJavaMove(password, newBoard){
+	for (y = 0; y < newBoard.length; y++){
+		for (x = 0; x < newBoard.length; x++){
+			if (newBoard[y][x] != null && board[password][y][x] == 0){
+				board[password][y][x] = newBoard[y][x];
+				console.log('updated board at ' + x + ', ' + y);
+			}
+		}
+	}
 }
