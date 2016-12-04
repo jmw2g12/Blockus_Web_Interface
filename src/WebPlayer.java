@@ -37,20 +37,22 @@ public class WebPlayer extends Player{
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
-		
+		System.out.println("java board");
+		board.print();
+		System.out.println("");
+		System.out.println("differences board");
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
-				//System.out.print(nodeBoardVal(newBoard,j,i));
-				//System.out.print(board.getFromCoordinate(j,i));
+				System.out.print(nodeBoardVal(newBoard,j,i));
+				System.out.print(board.getFromCoordinate(j,i));
 				if (compBoardVals(newBoard,board,j,i)){
-					//System.out.print("t   ");
+					System.out.print("t   ");
 				}else{
-					//System.out.print("f   ");
+					System.out.print("f   ");
 					differences.add(new Coord(j,i));
-					System.out.println("adding coord " + j + ", " + i);
 				}
 			}
-			//System.out.println("");
+			System.out.println("");
 		}
 		//System.out.println("differences.size() = " + differences.size());
 		ArrayList<Coord> normalCoords = normaliseCoords(differences);
