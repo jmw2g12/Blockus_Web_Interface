@@ -106,6 +106,7 @@ public abstract class Player{
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
+		board.print();
 				
 		return true;
 	}
