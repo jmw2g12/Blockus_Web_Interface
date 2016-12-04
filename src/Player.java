@@ -92,7 +92,23 @@ public abstract class Player{
 				
 		return true;
 	}
-	
+	public boolean takeWebMove(Object[] newBoard){	
+		if (firstMove) placeStarterBlock();
+		updatePieceIDs();
+		Piece p;
+		possibleMoves = possibleMovesForPlayer();
+		if (possibleMoves.size() == 0){
+			finished = true;
+			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
+			return false;
+		}
+		p = getPieceFromNewBoard(newBoard);
+		board.putPieceOnBoard(p,pieceCode);
+		removePiece(piecesRemaining.get(p.ID),true);
+		piecesOnBoard.add(p);
+				
+		return true;
+	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
 		
