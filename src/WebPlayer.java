@@ -114,8 +114,8 @@ public class WebPlayer extends Player{
 	public String nodeBoardVal(Object[] board, int x, int y){
 		System.out.println("board.class = " + board.getClass());
 		System.out.println("board[5].class = " + board[5].getClass());
-		System.out.println("board[5][5].class = " + board[5][5].getClass());
 		Integer[] rowojb = (Integer[])board[y];
+		System.out.println("rowojb[5].class = " + rowojb[5].getClass());
 		System.out.println("here");
 		return Integer.toString(((Integer[])board[y])[x]);
 	}
