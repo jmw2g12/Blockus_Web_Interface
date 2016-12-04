@@ -235,6 +235,7 @@ public abstract class Player{
 		System.out.println("piecesRemaining.size() = " +  piecesRemaining.size());
 		System.out.println("pieces.size() = " +  pieces.size());
 		System.out.println("board.blocksOnBoard('1') = " +  board.blocksOnBoard("1"));
+		System.out.println("connectables.size() = " + connectables.size());
 		ArrayList<Piece> result = new ArrayList<Piece>();
 		Piece pieceToTest;
 		Block block_of_piece;
