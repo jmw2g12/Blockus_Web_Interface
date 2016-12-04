@@ -188,7 +188,7 @@ app.post('/blokus/piece', function(req, res) {
 		sendJavaSingleMove(password);
 		getJavaMove(password);
 	}
-	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
+	if (resigned[password][2-parseInt(playerCode)] == false && opponents[password] == 'human') switchTurn(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
@@ -283,8 +283,8 @@ function getJavaMove(password){
 function setBoardAfterJavaMove(password, newBoard){
 	for (y = 0; y < newBoard.length; y++){
 		for (x = 0; x < newBoard.length; x++){
-			if (newBoard[y][x] != null && board[password][y][x] == 0){
-				board[password][y][x] = newBoard[y][x];
+			if (newBoard[13-y][x] != null && board[password][y][x] == 0){
+				board[password][y][x] = newBoard[13-y][x];
 				console.log('updated board at ' + x + ', ' + y);
 			}
 		}
