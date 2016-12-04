@@ -86,7 +86,7 @@ public class WebPlayer extends Player{
 	public boolean pieceArraysEqual(String[] a, String[] b){
 		if (a.length != b.length) return false;
 		for (int i = 0; i < a.length; i++){
-			if (!(a[i].length == b[i].length)) return false;
+			if (!(a[i].length() == b[i].length())) return false;
 			if (!(a[i].equals(b[i]))) return false;
 		}
 		return true;
