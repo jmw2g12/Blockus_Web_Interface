@@ -14,6 +14,7 @@ public class ExplorerPlayer extends Player{
 		strategy = "explorer";
 	}
 	public Piece choosePiece(){ //should have no side effects, simply return player's chosen piece.
+		System.out.println("choosing piece");
 		scoredMoves = getHighestExplorationScores(possibleMoves);
 		int n = rand.nextInt(scoredMoves.size());
 		return scoredMoves.get(n).getL();

@@ -72,7 +72,7 @@ public class WebPlayer extends Player{
 			newPieceArray[i] = new String(line);
 			line = "";
 		}
-		for (Piece p : pieces){
+		for (Piece p : piecesRemaining){
 			System.out.println("# " + pieces.indexOf(p) + " :");
 			p.print_piece();
 			String[] pieceArray = p.getPieceArray();

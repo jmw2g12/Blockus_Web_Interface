@@ -183,8 +183,11 @@ app.post('/blokus/piece', function(req, res) {
 	addPieceToBoard(piece,pieceID,playerCode,password);
 	pieceToDropbox(password);
 	fileCount[password]++;
-	sendJavaSingleMove(password);
-	getJavaMove(password);
+	if (opponents[password] !== 'human'){
+		console.log('opponent is not human; interfacing with cmd-line app');
+		sendJavaSingleMove(password);
+		getJavaMove(password);
+	}
 	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
