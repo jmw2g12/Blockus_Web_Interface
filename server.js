@@ -285,7 +285,7 @@ function setBoardAfterJavaMove(password, newBoard){
 		for (x = 0; x < newBoard.length; x++){
 			if (newBoard[13-y][x] != null && board[password][y][x] == 0){
 				board[password][y][x] = newBoard[13-y][x];
-				console.log('updated board at ' + x + ', ' + y);
+				//console.log('updated board at ' + x + ', ' + y);
 			}
 		}
 	}

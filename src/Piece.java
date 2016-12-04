@@ -128,7 +128,7 @@ public class Piece{
 		System.out.println();
 	}
 	public String[] getPieceArray(){
-		//bare minimum representation of a piece, just X and O for block and blank cells resp.
+		//bare minimum representation of a piece, just X and - for block and blank cells resp.
 		int max_x = -0xFF;
 		int max_y = -0xFF;
 		String line = new String("");
@@ -143,7 +143,7 @@ public class Piece{
 		int counter = 0;
 		for (int j = max_y; j >= 0; j--){
 			for (int i = 0; i <= max_x; i++){
-				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "O");
+				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "-");
 			}
 			result[counter] = line;
 			counter++;

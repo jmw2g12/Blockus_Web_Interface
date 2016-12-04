@@ -95,7 +95,7 @@ public class WebPlayer extends Player{
 			printStringArray(newPieceArray);
 			if (pieceArraysEqual(pieceArray,newPieceArray)){
 			//if (coordArraysEqual
-				System.out.println("found match");
+				System.out.println("*** found match ***");
 				p.printPieceDiagram();
 				return p;
 			}
