@@ -79,7 +79,9 @@ public abstract class Player{
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
 		Piece p;
+		System.out.println("here before");
 		possibleMoves = possibleMovesForPlayer();
+		System.out.println("here after");
 		if (possibleMoves.size() == 0){
 			finished = true;
 			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
@@ -111,7 +113,7 @@ public abstract class Player{
 				
 		return true;
 	}
-	*/
+	
 	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
 		
@@ -203,9 +205,12 @@ public abstract class Player{
 			return false;
 		}
 	}
+	*/
 	public ArrayList<Piece> possibleMovesForPlayer(){
+		System.out.println("here in possibleMoves, before");
 		cornerBlocks = board.getCornerBlocks(pieceCode);
 		connectableBlocks = board.getConnectableBlocks(cornerBlocks,pieceCode);
+		System.out.println("here in possibleMoves, almost done");
 		return getPossibleMoves(startingCorner,connectableBlocks,false);
 	}
 	public abstract Piece choosePiece();
