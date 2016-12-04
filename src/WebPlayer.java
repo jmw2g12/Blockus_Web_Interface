@@ -123,7 +123,7 @@ public class WebPlayer extends Player{
 	}
 	public void printObjValues(Object[] board){
 		for (int i = 0; i < 14; i++){
-			Object[] row = (Object[])board[y];
+			Object[] row = (Object[])board[i];
 			for (int j = 0; j < 14; j++){
 				System.out.print(row[j] + ":" + row[j].getClass() + "      ");
 			}
