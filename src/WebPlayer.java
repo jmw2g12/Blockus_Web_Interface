@@ -115,6 +115,7 @@ public class WebPlayer extends Player{
 		Object[] rowobj = (Object[])nodeBoard[y];
 		return String.valueOf(rowobj[x]);
 	}
+	/*
 	public Integer[][] nodeBoardArray(Object[] nodeBoard){
 		int boardSize = board.getBoardSize();
 		Integer[][] result = new Integer[boardSize][boardSize];
@@ -135,6 +136,7 @@ public class WebPlayer extends Player{
 			System.out.println("");
 		}
 	}
+	*/
 	public boolean compBoardVals(Object[] jsBoard, Board board, int x, int y){
 		String jsVal = nodeBoardVal(jsBoard,x,y);
 		String val = board.getFromCoordinate(x,y);
