@@ -26,6 +26,8 @@ public class WebPlayer extends Player{
 			return false;
 		}
 		p = getPieceFromNewBoard(newBoard);
+		System.out.println("pieceCode = " + pieceCode);
+		p.print_piece();
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);

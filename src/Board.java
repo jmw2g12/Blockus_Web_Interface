@@ -245,6 +245,7 @@ public class Board{
 		return false;
 	}
 	public void putPieceOnBoard(Piece p, String pieceCode){
+		System.out.println("here");
 		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
 		//pieces_left.remove(p);
 		for (Block b : p.blocks){
