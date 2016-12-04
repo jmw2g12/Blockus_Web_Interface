@@ -25,6 +25,9 @@ public class Board{
 		b.piecesDown = new ArrayList<Pair<Piece,String>>(piecesDown);
 		return b;
 	}
+	public Integer getBoardSize(){
+		return boardSize;
+	}
 	public String[][] getArray(){
 		return board;
 	}

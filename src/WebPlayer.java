@@ -112,14 +112,15 @@ public class WebPlayer extends Player{
 		return result;
 	}
 	public String nodeBoardVal(Object[] board, int x, int y){
-		printObjValues(board);
-		System.out.println("board.class = " + board.getClass());
-		System.out.println("board[5].class = " + board[5].getClass());
-		
-		Integer[] rowojb = (Integer[])board[y];
-		System.out.println("rowojb[5].class = " + rowojb[5].getClass());
-		System.out.println("here");
-		return Integer.toString(((Integer[])board[y])[x]);
+		int boardSize = board.getBoardSize();
+		Integer[][] result = new Integer[boardSize][boardSize];
+		for (int y = 0; y < boardSize; y++){
+			Object[] rowojb = (Object[])board[y];
+			for (int x = 0; x < boardSize; x++){
+				result[y][x] = Integer.parseInt(rowobj[x]);
+			}
+		}
+		return result;
 	}
 	public void printObjValues(Object[] board){
 		for (int i = 0; i < 14; i++){
