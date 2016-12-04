@@ -175,7 +175,7 @@ app.post('/blokus/piece', function(req, res) {
 	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
 	var piece = bodyObject.piece;
 	var pieceID = bodyObject.pieceID;
-	var playerCode = bodyObject.playerCode;
+	var playerCode = parseInt(bodyObject.playerCode);
 	var password = bodyObject.password;
 	var opponent = bodyObject.opponent;
 	if (!existsAsPassword(password)) console.log("placing this piece has created the game");

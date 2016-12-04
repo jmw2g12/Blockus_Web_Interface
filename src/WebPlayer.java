@@ -112,6 +112,10 @@ public class WebPlayer extends Player{
 		return result;
 	}
 	public String nodeBoardVal(Object[] board, int x, int y){
+		System.out.println("board.class = " + board.class);
+		int[] row = (int[])board[y];
+		System.out.println("here");
+		Integer[] row = (Integer[])board[y];
 		return Integer.toString(((Integer[])board[y])[x]);
 	}
 	public boolean compBoardVals(Object[] jsBoard, Board board, int x, int y){
