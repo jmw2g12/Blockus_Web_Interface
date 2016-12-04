@@ -149,7 +149,7 @@ public abstract class Player{
 		System.out.println("here in getPossibleMoves, after");
 		return result;
 	}
-	public Integer indexFromStartCorner(start){
+	public Integer indexFromStartCorner(int start){
 		if (start == 1) return 0;
 		if (start == 3) return 1;
 		return null;
