@@ -33,6 +33,9 @@ public class Blokus{
 	public Player getP2(){
 		return players.get(1);
 	}
+	public Board getBoard(){
+		return board;
+	}
 	public class InvalidPlayerException extends Exception{
 		public InvalidPlayerException (String msg){
 			super(msg);

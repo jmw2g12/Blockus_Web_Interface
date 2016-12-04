@@ -92,6 +92,7 @@ public abstract class Player{
 				
 		return true;
 	}
+	/*
 	public boolean takeWebMove(Object[] newBoard){	
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
@@ -110,6 +111,7 @@ public abstract class Player{
 				
 		return true;
 	}
+	*/
 	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
 		

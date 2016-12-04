@@ -25,6 +25,9 @@ public class Board{
 		b.piecesDown = new ArrayList<Pair<Piece,String>>(piecesDown);
 		return b;
 	}
+	public String[][] getArray(){
+		return board;
+	}
 	public String cloneString(String s){
 		return (s == null ? null : new String(s));
 	}

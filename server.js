@@ -183,11 +183,12 @@ app.post('/blokus/piece', function(req, res) {
 	addPieceToBoard(piece,pieceID,playerCode,password);
 	pieceToDropbox(password);
 	fileCount[password]++;
+	sendJavaSingleMove(password);
+	getJavaMove(password);
 	if (resigned[password][2-parseInt(playerCode)] == false) switchTurn(password);
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	reply = replyMsg(password);
     res.end(reply);
-    getComputerMove(password);
 })
 
 app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
@@ -261,18 +262,12 @@ java.classpath.push("commons-lang3-3.1.jar");
 java.classpath.push("commons-io.jar");
 java.classpath.push("src");
 
-function getComputerMove(password){
-	/*
-	var explConstructor = java.import("ExplorerPlayer");
-	
-	var board = new boardConstructor();
-	
-	//(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner)
-	var explorer = new explConstructor();
-	*/
-	
-	javaPlayer[password][0].takeWebMove(board[password]);
-	
+function sendJavaSingleMove(password){	
+	return javaPlayer[password][0].takeWebMove(board[password]);
 }
 
-console.log("got to here!");
+function getJavaMove(password){
+	javaPlayer[password][1].takeMove();
+	console.log("java board");
+	console.log(javaGame[password].getBoard());
+}
