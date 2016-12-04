@@ -113,7 +113,7 @@ public class WebPlayer extends Player{
 	}
 	public String nodeBoardVal(Object[] nodeBoard, int x, int y){
 		Object[] rowobj = (Object[])nodeBoard[y];
-		return new String(rowobj[x]);
+		return String.valueOf(rowobj[x]);
 	}
 	public Integer[][] nodeBoardArray(Object[] nodeBoard){
 		int boardSize = board.getBoardSize();
