@@ -231,6 +231,10 @@ public abstract class Player{
 		}
 	}
 	public ArrayList<Piece> getPossibleMoves(int startingCorner, ArrayList<Pair<Block,Integer>> connectables, Boolean printPieces){
+		System.out.println("here in getPossibleMoves, before");
+		System.out.println("piecesRemaining.size() = " +  piecesRemaining.size());
+		System.out.println("pieces.size() = " +  pieces.size());
+		System.out.println("board.blocksOnBoard('1') = " +  board.blocksOnBoard('1'));
 		ArrayList<Piece> result = new ArrayList<Piece>();
 		Piece pieceToTest;
 		Block block_of_piece;
@@ -248,6 +252,7 @@ public abstract class Player{
 				}
 			}
 		}
+		System.out.println("here in getPossibleMoves, after");
 		return result;
 	}
 	public ArrayList<Pair<Piece,Block>> findPiecesToConnect(int connectorDirection, ArrayList<Piece> piecesRemaining){
