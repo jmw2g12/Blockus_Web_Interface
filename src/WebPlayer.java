@@ -47,6 +47,7 @@ public class WebPlayer extends Player{
 				}else{
 					//System.out.print("f   ");
 					differences.add(new Coord(j,i));
+					System.out.println("adding coord " + j + ", " + i);
 				}
 			}
 			//System.out.println("");
