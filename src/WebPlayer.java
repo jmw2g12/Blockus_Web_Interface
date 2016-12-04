@@ -37,6 +37,7 @@ public class WebPlayer extends Player{
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
+		int boardSize = board.getBoardSize();
 		System.out.println("java board");
 		board.print();
 		System.out.println("");
@@ -44,7 +45,7 @@ public class WebPlayer extends Player{
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
 				System.out.print(nodeBoardVal(newBoard,j,i));
-				System.out.print(board.getFromCoordinate(j,i));
+				System.out.print(board.getFromCoordinate(j,boardSize-i-1));
 				if (compBoardVals(newBoard,board,j,i)){
 					System.out.print("t   ");
 				}else{
@@ -78,8 +79,8 @@ public class WebPlayer extends Player{
 			line = "";
 		}
 		for (Piece p : piecesRemaining){
-			System.out.println("# " + pieces.indexOf(p) + " :");
-			p.print_piece();
+			//System.out.println("# " + pieces.indexOf(p) + " :");
+			//p.print_piece();
 			String[] pieceArray = p.getPieceArray();
 			if (pieceArraysEqual(pieceArray,newPieceArray)){
 				p.printPieceDiagram();
