@@ -143,8 +143,9 @@ public class WebPlayer extends Player{
 	}
 	*/
 	public boolean compBoardVals(Object[] jsBoard, Board board, int x, int y){
+		int boardSize = board.getBoardSize();
 		String jsVal = nodeBoardVal(jsBoard,x,y);
-		String val = board.getFromCoordinate(x,y);
+		String val = board.getFromCoordinate(x,boardSize-y-1);
 		if (jsVal.equals("0") && val == null){
 			return true;
 		}else if(jsVal.equals(val)){
