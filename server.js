@@ -263,11 +263,11 @@ java.classpath.push("commons-io.jar");
 java.classpath.push("src");
 
 function sendJavaSingleMove(password){	
-	return javaPlayer[password][0].takeWebMove(board[password]);
+	return javaPlayer[password][0].takeMoveSync(board[password]);
 }
 
 function getJavaMove(password){
-	javaPlayer[password][1].takeMove();
+	javaPlayer[password][1].takeMoveSync();
 	console.log("java board");
-	console.log(javaGame[password].getBoard());
+	console.log(javaGame[password].getBoardSync());
 }
