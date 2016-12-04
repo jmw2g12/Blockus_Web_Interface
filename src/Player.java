@@ -130,7 +130,7 @@ public abstract class Player{
 		System.out.println("here before loop");
 		for (Pair<Block,Integer> c : connectables){	
 			System.out.println("starting loop iteration #" + connectables.indexOf(c));
-			for (Pair<Piece,Block> pcs : findPiecesToConnect(c.getR(),allPlayers.get(startingCorner-1).getPiecesRemaining())){
+			for (Pair<Piece,Block> pcs : findPiecesToConnect(c.getR(),allPlayers.get(indexFromStartCorner(startingCorner)).getPiecesRemaining())){
 				System.out.println("starting inner loop");
 				pieceToTest = pcs.getL().clone();
 				block_of_piece = pieceToTest.blocks.get(pcs.getL().blocks.indexOf(pcs.getR())); //gets equivalent cloned block in new piece
@@ -148,6 +148,11 @@ public abstract class Player{
 		}
 		System.out.println("here in getPossibleMoves, after");
 		return result;
+	}
+	public Integer indexFromStartCorner(start){
+		if (start == 1) return 0;
+		if (start == 3) return 1;
+		return null;
 	}
 	public ArrayList<Pair<Piece,Block>> findPiecesToConnect(int connectorDirection, ArrayList<Piece> piecesRemaining){
 		int direction = (connectorDirection + 2) % 4;
