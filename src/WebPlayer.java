@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -45,13 +47,13 @@ public class WebPlayer extends Player{
 		ArrayList<Coord> ar1 = new ArrayList<Coord>();
 		ArrayList<Coord> ar2 = new ArrayList<Coord>();
 		ArrayList<Coord> ar3 = new ArrayList<Coord>();
-		ar1.add(new Coord(5, 5));
+		ar1.add(new Coord(10, 10));
 		ar2.add(new Coord(5, 5));
 		ar3.add(new Coord(5, 5));
 		ar1.add(new Coord(3, 5));
 		ar2.add(new Coord(5, 3));
 		ar3.add(new Coord(3, 5));
-		ar1.add(new Coord(10, 10));
+		ar1.add(new Coord(5, 5));
 		ar2.add(new Coord(10, 10));
 		ar3.add(new Coord(10, 10));
 		System.out.println("coordArraysEqual(ar1,ar2) : ");
@@ -76,24 +78,31 @@ public class WebPlayer extends Player{
 		return null;
 	}
 	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
-
-		ArrayList<Coord> sourceList = new ArrayList<Coord>(p1);
-		ArrayList<Coord> destinationList = new ArrayList<Coord>(p2);
-
-		System.out.println(sourceList);
-		System.out.println(destinationList);
-		
-		sourceList.removeAll(p1);
-		destinationList.removeAll(p2);
-
-		System.out.println(sourceList);
-		System.out.println(destinationList);
-		
-		if (sourceList.size() == 0 && destinationList.size() == 0){
-			return true;
-		}else{
-			return false;
+		System.out.println("coordArraysEqual:");
+		Comparator<Coord> coordComp = new Comparator<Coord>(){
+			public int compare(Coord c1, Coord c2){
+				int c1Val = c1.x*100+c1.y;
+				int c2Val = c2.x*100+c2.y;
+				return c1Val-c2Val;
+			}        
+		};
+		System.out.println(p1);
+		System.out.println(p2);
+		Collections.sort(p1,coordComp);
+		Collections.sort(p2,coordComp);
+		System.out.println(p1);
+		System.out.println(p2);
+		if (p1.size() != p2.size()) return false;
+		for (int i = 0; i < p1.size(); i++){
+			System.out.println("does " + p1.get(i).x + ", " + p1.get(i).y + "  ==  " + p2.get(i).x + ", " + p2.get(i).y);
+			if (p1.get(i).equals(p2.get(i))){
+				System.out.println("are equal");
+			}else{
+				System.out.println("are not equal");
+				return false;
+			}
 		}
+		return true;
 	}
 	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
 		ArrayList<Coord> result = new ArrayList<Coord>();
