@@ -78,7 +78,7 @@ public class WebPlayer extends Player{
 		String line = "";
 		if (invertY){
 			for (int y = maxY-1; y >= 0; y++){
-				for (int x = 0; x < maxY; x++){
+				for (int x = 0; x < ar[y].length; x++){
 					line = line + ar[y][x];
 				}
 				System.out.println(line);
@@ -86,7 +86,7 @@ public class WebPlayer extends Player{
 			}
 		}else{
 			for (int y = 0; y < maxY; y++){
-				for (int x = 0; x < maxY; x++){
+				for (int x = 0; x < ar[y].length; x++){
 					line = line + ar[y][x];
 				}
 				System.out.println(line);
