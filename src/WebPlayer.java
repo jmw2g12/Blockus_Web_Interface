@@ -74,19 +74,19 @@ public class WebPlayer extends Player{
 		return result;
 	}
 	public void print2DStringArray(String[][] ar, boolean invertY){
-		int boardSize = board.getBoardSize();
+		int maxY = ar.length;
 		String line = "";
 		if (invertY){
-			for (int y = boardSize-1; y >= 0; y++){
-				for (int x = 0; x < boardSize; x++){
+			for (int y = maxY-1; y >= 0; y++){
+				for (int x = 0; x < maxY; x++){
 					line = line + ar[y][x];
 				}
 				System.out.println(line);
 				line = "";
 			}
 		}else{
-			for (int y = 0; y < boardSize; y++){
-				for (int x = 0; x < boardSize; x++){
+			for (int y = 0; y < maxY; y++){
+				for (int x = 0; x < maxY; x++){
 					line = line + ar[y][x];
 				}
 				System.out.println(line);
