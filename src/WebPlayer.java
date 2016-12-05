@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -39,16 +40,79 @@ public class WebPlayer extends Player{
 		reformattedBoard = reformatBoard(newBoard);
 		javaBoard = board.getArray();
 		ArrayList<Coord> differences = getDifferences(javaBoard,reformattedBoard);
-		System.out.println("testing coords:");
-		for (Coord c : differences){
-			System.out.println("coord " + differences.indexOf(c) + " = " + c.x + ", " + c.y);
+		ArrayList<Coord> normalCoord = normaliseCoords(differences);
+		System.out.println("testing coord arrays equal:");
+		ArrayList<Coord> ar1 = new ArrayList<Coord>();
+		ArrayList<Coord> ar2 = new ArrayList<Coord>();
+		ArrayList<Coord> ar3 = new ArrayList<Coord>();
+		ar1.add(new Coord(5, 5));
+		ar2.add(new Coord(5, 5));
+		ar3.add(new Coord(5, 5));
+		ar1.add(new Coord(3, 5));
+		ar2.add(new Coord(5, 3));
+		ar3.add(new Coord(3, 5));
+		ar1.add(new Coord(10, 10));
+		ar2.add(new Coord(10, 10));
+		ar3.add(new Coord(10, 10));
+		System.out.println("coordArraysEqual(ar1,ar2) : ");
+		System.out.println(coordArraysEqual(ar1, ar2));
+		System.out.println("coordArraysEqual(ar1,ar3) : ");
+		System.out.println(coordArraysEqual(ar1, ar3));
+		System.out.println("coordArraysEqual(ar2,ar3) : ");
+		System.out.println(coordArraysEqual(ar2, ar3));
+		System.out.println("");
+		for (Coord c : piecesRemaining.get(20).getCoordinates()){
+			System.out.println("piece 20, coordinate " + piecesRemaining.indexOf(c) + " = " + c.x + ", " + c.y);
 		}
+		System.out.println("leaving getPieceFromNewBoard");
 		return piecesRemaining.get(20);
+	}
+	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
+		for (Piece p : pieces){
+			if (coordArraysEqual(coords,p.getCoordinates())){
+				return p;
+			}
+		}
+		return null;
+	}
+	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
+
+		List<Coord> sourceList = new ArrayList<Coord>(p1);
+		List<Coord> destinationList = new ArrayList<Coord>(p2);
+
+		sourceList.removeAll( p1 );
+		destinationList.removeAll( p2 );
+
+		System.out.println( sourceList );
+		System.out.println( destinationList );
+		
+		if (sourceList.size() == 0 && destinationList.size() == 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
+		ArrayList<Coord> result = new ArrayList<Coord>();
+		int maxX = -0xFF;
+		int minX = 0xFF;
+		int maxY = -0xFF;
+		int minY = 0xFF;
+		for (int i = 0; i < initial.size(); i++){
+			if (initial.get(i).x > maxX) maxX = initial.get(i).x;
+			if (initial.get(i).y > maxY) maxY = initial.get(i).y;
+			if (initial.get(i).x < minX) minX = initial.get(i).x;
+			if (initial.get(i).y < minY) minY = initial.get(i).y;
+		}
+		for (int i = 0; i < initial.size(); i++){
+			Coord prev = initial.get(i);
+			result.add(new Coord(prev.x-minX, prev.y-minY));
+		}
+		return result;
 	}
 	public ArrayList<Coord> getDifferences(String[][] b1, String[][] b2){
 		int boardSize = board.getBoardSize();
 		ArrayList<Coord> result = new ArrayList<Coord>();
-		
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
 				if (!testCellEquality(b1[i][j],b2[i][j])){
@@ -205,18 +269,6 @@ public class WebPlayer extends Player{
 			System.out.println("x=" + c.x + ", y=" + c.y);
 		}
 	}
-	/*
-	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
-
-		List<Coord> sourceList = new ArrayList<Coord>(p1);
-		List<Coord> destinationList = new ArrayList<Coord>(p2);
-
-		sourceList.removeAll( p1 );
-		destinationList.removeAll( p2 );
-
-		System.out.println( sourceList );
-		System.out.println( destinationList );
-	}*/
 	public boolean pieceArraysEqual(String[] a, String[] b){
 		if (a.length != b.length) return false;
 		for (int i = 0; i < a.length; i++){
@@ -224,26 +276,6 @@ public class WebPlayer extends Player{
 			if (!(a[i].equals(b[i]))) return false;
 		}
 		return true;
-	}
-	public ArrayList<Coord> normaliseCoords(ArrayList<Coord> initial){
-		ArrayList<Coord> result = new ArrayList<Coord>();
-		int maxX = -0xFF;
-		int minX = 0xFF;
-		int maxY = -0xFF;
-		int minY = 0xFF;
-		for (int i = 0; i < initial.size(); i++){
-			if (initial.get(i).x > maxX) maxX = initial.get(i).x;
-			if (initial.get(i).y > maxY) maxY = initial.get(i).y;
-			if (initial.get(i).x < minX) minX = initial.get(i).x;
-			if (initial.get(i).y < minY) minY = initial.get(i).y;
-		}
-		//System.out.println("minX = " + minX + ", minY = " + minY + ", maxX = " + maxX + ", maxY = " + maxY);
-		for (int i = 0; i < initial.size(); i++){
-			Coord prev = initial.get(i);
-			result.add(new Coord(prev.x-minX, prev.y-minY));
-			//System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
-		}
-		return result;
 	}
 	/*
 	public Integer[][] nodeBoardArray(Object[] nodeBoard){

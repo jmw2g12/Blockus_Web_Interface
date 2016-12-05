@@ -61,6 +61,13 @@ public class Piece{
 			System.out.println("");
 		}
 	}
+	public ArrayList<Coord> getCoordinates(){
+		ArrayList<Coord> result = new ArrayList<Coord>();
+		for (Block b : blocks){
+			result.add(b.coordinate);
+		}
+		return result;
+	}
 	public ArrayList<String> getPieceDiagram(String blank){
 		int max_x = -0xFF;
 		int max_y = -0xFF;
