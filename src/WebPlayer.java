@@ -27,21 +27,88 @@ public class WebPlayer extends Player{
 		}
 		p = getPieceFromNewBoard(newBoard);
 		//System.out.println("pieceCode = " + pieceCode);
-		p.print_piece();
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
 		
-		board.print();
+		//board.print();
 		return true;
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
+		String[][] reformattedBoard;
+		reformattedBoard = reformatBoard(newBoard);
+		return piecesRemaining.get(30);
+	}
+	public String[][] reformatBoard(Object[] board){
+		int boardSize = this.board.getBoardSize();
+		String[][] result = new String[boardSize][boardSize];
+		for (int y = 0; y < boardSize; y++){
+			for (int x = 0; x < boardSize; x++){
+				result[y][x] = nodeBoardVal(board,x,boardSize-y-1);
+			}
+		}
+		System.out.println("testing nodeBoardVal:");
+		System.out.println("at 0,0 (js oriented)" + nodeBoardVal(board,0,0));
+		System.out.println("at 0,13 (js oriented)" + nodeBoardVal(board,0,13));
+		System.out.println("");
+		System.out.println("testing print2DStringArray:");
+		print2DStringArray(new String[][]{
+			{ "ab", "ab", "ab", "ab", "ab", "ab", "4f", "ab", "ab", "ab" },
+			{ "ab", "dz", "ab", "ab", "ab", "gf", "ab", "ab", "ab", "ab" },
+			{ "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab" },
+			{ "ab", "ab", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" },
+			{ "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" }
+		},false);
+		System.out.println("---");
+		print2DStringArray(new String[][]{
+			{ "ab", "ab", "ab", "ab", "ab", "ab", "4f", "ab", "ab", "ab" },
+			{ "ab", "dz", "ab", "ab", "ab", "gf", "ab", "ab", "ab", "ab" },
+			{ "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab" },
+			{ "ab", "ab", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" },
+			{ "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" }
+		},true);
+		System.out.println("");
+		System.out.println("new board with 0,0 at bottom left corner:");
+		print2DStringArray(result,true);
+		
+		return result;
+	}
+	public void print2DStringArray(String[][] ar, boolean invertY){
+		int boardSize = board.getBoardSize();
+		String line = "";
+		if (invertY){
+			for (int y = boardSize-1; y >= 0; y++){
+				for (int x = 0; x < boardSize; x++){
+					line = line + ar[y][x];
+				}
+				System.out.println(line);
+				line = "";
+			}
+		}else{
+			for (int y = 0; y < boardSize; y++){
+				for (int x = 0; x < boardSize; x++){
+					line = line + ar[y][x];
+				}
+				System.out.println(line);
+				line = "";
+			}
+		}
+	}
+	public String nodeBoardVal(Object[] nodeBoard, int x, int y){
+		Object[] rowobj = (Object[])nodeBoard[y];
+		return String.valueOf(rowobj[x]);
+	}
+	/*
+	public Piece getPieceFromNewBoard(Object[] newBoard){
 		ArrayList<Coord> differences = new ArrayList<Coord>();
+		ArrayList<Coord> pieceMatchingCoords = new ArrayList<Coord>();
 		int boardSize = board.getBoardSize();
 		System.out.println("java board");
 		board.print();
 		System.out.println("");
 		System.out.println("differences board");
+		int containingBoxTopLeftX = 0xFF;
+		int containingBoxTopLeftY = 0xFF;
 		for (int i = 0; i < board.boardSize; i++){
 			for (int j = 0; j < board.boardSize; j++){
 				System.out.print(nodeBoardVal(newBoard,j,i));
@@ -51,6 +118,8 @@ public class WebPlayer extends Player{
 				}else{
 					System.out.print("f   ");
 					differences.add(new Coord(j,i));
+					if (j < containingBoxTopLeftX) containingBoxTopLeftX = j;
+					if (i < containingBoxTopLeftY) containingBoxTopLeftY = i;
 				}
 			}
 			System.out.println("");
@@ -69,6 +138,9 @@ public class WebPlayer extends Player{
 		}
 		int width = maxX - minX + 1;
 		int height = maxY - minY + 1;
+		for (Coord c : normalCoords){
+			pieceMatchingCoords.add(new Coord(c.x,height-c.y-1));
+		}
 		String[] newPieceArray = new String[height];
 		String line = "";
 		for (int i = 0; i < height; i++){
@@ -97,6 +169,8 @@ public class WebPlayer extends Player{
 			//if (coordArraysEqual
 				System.out.println("*** found match ***");
 				p.printPieceDiagram();
+				
+				p.place_piece(bl,c);
 				return p;
 			}
 			System.out.println("");
@@ -104,7 +178,7 @@ public class WebPlayer extends Player{
 		}
 		System.out.println("NO PIECE MATCHES!");
 		return null;
-	}
+	}*/
 	public void printStringArray(String[] ar){
 		for (int i = 0; i < ar.length; i++){
 			System.out.println(ar[i]);
@@ -154,10 +228,6 @@ public class WebPlayer extends Player{
 			//System.out.println("i:" + i + "    x = " + result.get(i).x + ", y = " + result.get(i).y);
 		}
 		return result;
-	}
-	public String nodeBoardVal(Object[] nodeBoard, int x, int y){
-		Object[] rowobj = (Object[])nodeBoard[y];
-		return String.valueOf(rowobj[x]);
 	}
 	/*
 	public Integer[][] nodeBoardArray(Object[] nodeBoard){
