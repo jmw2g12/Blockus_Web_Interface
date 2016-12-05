@@ -34,7 +34,7 @@ public class WebPlayer extends Player{
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
 		
-		//board.print();
+		board.print();
 		return true;
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
@@ -44,7 +44,25 @@ public class WebPlayer extends Player{
 		ArrayList<Coord> differences = getDifferences(javaBoard,reformattedBoard);
 		ArrayList<Coord> normalCoords = normaliseCoords(differences);
 		
-		return findPieceFromCoords(normalCoords, piecesRemaining);
+		Piece p = findPieceFromCoords(normalCoords, piecesRemaining);
+		if (p == null) return null;
+		return repositionPiece(differences,p);
+	}
+	public Piece repositionPiece(ArrayList<Coord> differences, Piece p){
+		Coord bottomLeftCoord = getBottomLeft(differences);
+		Block block = p.blocks.get(0);
+		p.place_piece(block,new Coord(block.coordinate.x + bottomLeftCoord.x, block.coordinate.y + bottomLeftCoord.y));
+		return p;
+	}
+	public Coord getBottomLeft(ArrayList<Coord> coords){
+		int minX = 0xFF;
+		int minY = 0xFF;
+		for (Coord c : coords){
+			if (c.x < minX) minX = c.x;
+			if (c.y < minY) minY = c.y;
+		}
+		System.out.println("returning " + minX + ", " + minY);
+		return new Coord(minX,minY);
 	}
 	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
 		for (Piece p : pieces){
