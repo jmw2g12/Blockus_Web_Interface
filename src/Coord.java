@@ -16,6 +16,10 @@ public class Coord{
 		return result;
 	}
 	@Override
+	public String toString(){
+		return x + "," + y;
+	}
+	@Override
 	public boolean equals(Object obj){
 		if (obj instanceof Coord && ((Coord)obj).x == x && ((Coord)obj).y == y) return true;
 		return false;

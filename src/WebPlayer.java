@@ -62,7 +62,7 @@ public class WebPlayer extends Player{
 		System.out.println(coordArraysEqual(ar2, ar3));
 		System.out.println("");
 		for (Coord c : piecesRemaining.get(20).getCoordinates()){
-			System.out.println("piece 20, coordinate " + piecesRemaining.indexOf(c) + " = " + c.x + ", " + c.y);
+			System.out.println("piece 20, coordinate = " + c.x + ", " + c.y);
 		}
 		System.out.println("leaving getPieceFromNewBoard");
 		return piecesRemaining.get(20);
@@ -77,14 +77,17 @@ public class WebPlayer extends Player{
 	}
 	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
 
-		List<Coord> sourceList = new ArrayList<Coord>(p1);
-		List<Coord> destinationList = new ArrayList<Coord>(p2);
+		ArrayList<Coord> sourceList = new ArrayList<Coord>(p1);
+		ArrayList<Coord> destinationList = new ArrayList<Coord>(p2);
 
-		sourceList.removeAll( p1 );
-		destinationList.removeAll( p2 );
+		System.out.println(sourceList);
+		System.out.println(destinationList);
+		
+		sourceList.removeAll(p1);
+		destinationList.removeAll(p2);
 
-		System.out.println( sourceList );
-		System.out.println( destinationList );
+		System.out.println(sourceList);
+		System.out.println(destinationList);
 		
 		if (sourceList.size() == 0 && destinationList.size() == 0){
 			return true;
