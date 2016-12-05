@@ -48,7 +48,19 @@ public class WebPlayer extends Player{
 	}
 	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
 		for (Piece p : pieces){
+			System.out.println("testing:");
+			p.print_piece();
+			System.out.println("are:");
+			for (Coord c : p.getCoordinates()){
+				System.out.println(c);
+			}
+			System.out.println("equal to:");
+			for (Coord c : coords){
+				System.out.println(c);
+			}
+			System.out.println("");
 			if (coordArraysEqual(coords,p.getCoordinates())){
+				System.out.println("found piece:");
 				p.print_piece();
 				return p;
 			}
