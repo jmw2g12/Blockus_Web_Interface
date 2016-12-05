@@ -51,7 +51,7 @@ public class WebPlayer extends Player{
 		
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
-				if (testCellEquality(b1[i][j],b2[i][j])){
+				if (!testCellEquality(b1[i][j],b2[i][j])){
 					result.add(new Coord(j,i));
 				}
 			}
