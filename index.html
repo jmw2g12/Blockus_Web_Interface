@@ -66,24 +66,33 @@
 					<br>
 					<br>
 					<form class="basic" action="blokus.html">
-                                                Game code: <input type="text" name="fname" required><br><br>
+                        Game code: <input type="text" name="fname" required><br><br>
                                                 
 						Player number:
-                                                P1 <input type="radio" id="p1" name="player" value="p1" checked>
-                                                P2 <input type="radio" id="p2" name="player" value="p2"><br>
+                        P1 <input type="radio" id="p1" name="player" value="p1" checked>
+                        P2 <input type="radio" id="p2" name="player" value="p2"><br>
 						<br>
 						Opponent:
-                                                Human <input type="radio" id="human" name="opponent" value="human" checked>
-                                                Computer <input type="radio" id="computer" name="opponent" value="computer"><br>
+                        Human <input type="radio" id="human" name="opponent" value="human" onclick="choseHuman()" checked>
+                        Computer <input type="radio" id="computer" name="opponent" value="computer" onclick="choseComp()"><br>
 						<br>
 						<input name="loc_go" type="submit" value="Let's play!">
 						
-                                        </form>
+                    </form>
 					<br>
 					<br>
 				</td>
 			</tr>
 			
 		</table>
+		<script>
+			function choseComp(){
+				document.getElementById("p1").checked = true;
+				document.getElementById("p2").disabled = true;
+			}
+			function choseHuman(){
+				document.getElementById("p2").disabled = false;
+			}
+		</script>
 	</body>
 </html>
