@@ -35,9 +35,28 @@ public class WebPlayer extends Player{
 		return true;
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
-		String[][] reformattedBoard;
+		String[][] reformattedBoard, javaBoard;
 		reformattedBoard = reformatBoard(newBoard);
-		return piecesRemaining.get(30);
+		javaBoard = board.getArray();
+		ArrayList<Coord> differences = getDifferences(javaBoard,reformattedBoard);
+		System.out.println("testing coords:");
+		for (Coord c : differences){
+			System.out.println("coord " + differences.indexOf(c) + " = " + c.x + ", " + c.y);
+		}
+		return piecesRemaining.get(20);
+	}
+	public ArrayList<Coord> getDifferences(String[][] b1, String[][] b2){
+		int boardSize = board.getBoardSize();
+		ArrayList<Coord> result = new ArrayList<Coord>();
+		
+		for (int i = 0; i < boardSize; i++){
+			for (int j = 0; j < boardSize; j++){
+				if (!b1[i][j].equals(b2[i][j])){
+					result.add(new Coord(j,i));
+				}
+			}
+		}
+		return result;
 	}
 	public String[][] reformatBoard(Object[] board){
 		int boardSize = this.board.getBoardSize();
@@ -47,30 +66,6 @@ public class WebPlayer extends Player{
 				result[y][x] = nodeBoardVal(board,x,boardSize-y-1);
 			}
 		}
-		System.out.println("testing nodeBoardVal:");
-		System.out.println("at 0,0 (js oriented)" + nodeBoardVal(board,0,0));
-		System.out.println("at 0,13 (js oriented)" + nodeBoardVal(board,0,13));
-		System.out.println("");
-		System.out.println("testing print2DStringArray:");
-		print2DStringArray(new String[][]{
-			{ "ab", "ab", "ab", "ab", "ab", "ab", "4f", "ab", "ab", "ab" },
-			{ "ab", "dz", "ab", "ab", "ab", "gf", "ab", "ab", "ab", "ab" },
-			{ "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab" },
-			{ "ab", "ab", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" },
-			{ "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" }
-		},false);
-		System.out.println("---");
-		print2DStringArray(new String[][]{
-			{ "ab", "ab", "ab", "ab", "ab", "ab", "4f", "ab", "ab", "ab" },
-			{ "ab", "dz", "ab", "ab", "ab", "gf", "ab", "ab", "ab", "ab" },
-			{ "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab", "ab" },
-			{ "ab", "ab", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" },
-			{ "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz", "xz" }
-		},true);
-		System.out.println("");
-		System.out.println("new board with 0,0 at bottom left corner:");
-		print2DStringArray(result,true);
-		
 		return result;
 	}
 	public void print2DStringArray(String[][] ar, boolean invertY){
