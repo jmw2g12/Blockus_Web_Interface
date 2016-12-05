@@ -271,13 +271,14 @@ function sendJavaSingleMove(password){
 
 function getJavaMove(password){
 	javaPlayer[password][1].takeMoveSync();
-	//console.log("java board:");
-	//console.log(javaGame[password].printBoardSync());
-	//console.log("java board data:");
-	var boardData = javaGame[password].getBoardArraySync();
-	setBoardAfterJavaMove(password,boardData);
-	//console.log(boardData);
-	//console.log('boardData.length = ' + boardData.length);
+	if (javaPlayer[password][1].isFinishedSync()){
+		console.log('ai finished');
+		resigned[password][1] = true;
+	}else{
+		console.log('ai NOT finished');
+		var boardData = javaGame[password].getBoardArraySync();
+		setBoardAfterJavaMove(password,boardData);
+	}
 }
 
 function setBoardAfterJavaMove(password, newBoard){

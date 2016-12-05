@@ -73,7 +73,10 @@ public abstract class Player{
 	public String getStrategy(){ return strategy; }
 	public String getPieceCode(){ return pieceCode; }
 	public boolean isNumeric(String str){ return str.matches("[+-]?\\d*(\\.\\d+)?"); }
-	public boolean isFinished(){ return finished; }
+	public boolean isFinished(){
+		System.out.println("checking if finished : " + finished);
+		return finished;
+	}
 	public ArrayList<Piece> getPiecesRemaining(){ return piecesRemaining; }
 	public boolean takeMove(){	
 		if (firstMove) placeStarterBlock();
