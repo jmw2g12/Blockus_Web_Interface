@@ -42,43 +42,20 @@ public class WebPlayer extends Player{
 		reformattedBoard = reformatBoard(newBoard);
 		javaBoard = board.getArray();
 		ArrayList<Coord> differences = getDifferences(javaBoard,reformattedBoard);
-		ArrayList<Coord> normalCoord = normaliseCoords(differences);
-		System.out.println("testing coord arrays equal:");
-		ArrayList<Coord> ar1 = new ArrayList<Coord>();
-		ArrayList<Coord> ar2 = new ArrayList<Coord>();
-		ArrayList<Coord> ar3 = new ArrayList<Coord>();
-		ar1.add(new Coord(10, 10));
-		ar2.add(new Coord(5, 5));
-		ar3.add(new Coord(5, 5));
-		ar1.add(new Coord(3, 5));
-		ar2.add(new Coord(5, 3));
-		ar3.add(new Coord(3, 5));
-		ar1.add(new Coord(5, 5));
-		ar2.add(new Coord(10, 10));
-		ar3.add(new Coord(10, 10));
-		System.out.println("coordArraysEqual(ar1,ar2) : ");
-		System.out.println(coordArraysEqual(ar1, ar2));
-		System.out.println("coordArraysEqual(ar1,ar3) : ");
-		System.out.println(coordArraysEqual(ar1, ar3));
-		System.out.println("coordArraysEqual(ar2,ar3) : ");
-		System.out.println(coordArraysEqual(ar2, ar3));
-		System.out.println("");
-		for (Coord c : piecesRemaining.get(20).getCoordinates()){
-			System.out.println("piece 20, coordinate = " + c.x + ", " + c.y);
-		}
-		System.out.println("leaving getPieceFromNewBoard");
-		return piecesRemaining.get(20);
+		ArrayList<Coord> normalCoords = normaliseCoords(differences);
+		
+		return findPieceFromCoords(normalCoords, piecesRemaining);
 	}
 	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
 		for (Piece p : pieces){
 			if (coordArraysEqual(coords,p.getCoordinates())){
+				p.print_piece();
 				return p;
 			}
 		}
 		return null;
 	}
 	public boolean coordArraysEqual(ArrayList<Coord> p1, ArrayList<Coord> p2){
-		System.out.println("coordArraysEqual:");
 		Comparator<Coord> coordComp = new Comparator<Coord>(){
 			public int compare(Coord c1, Coord c2){
 				int c1Val = c1.x*100+c1.y;
@@ -86,21 +63,11 @@ public class WebPlayer extends Player{
 				return c1Val-c2Val;
 			}        
 		};
-		System.out.println(p1);
-		System.out.println(p2);
 		Collections.sort(p1,coordComp);
 		Collections.sort(p2,coordComp);
-		System.out.println(p1);
-		System.out.println(p2);
 		if (p1.size() != p2.size()) return false;
 		for (int i = 0; i < p1.size(); i++){
-			System.out.println("does " + p1.get(i).x + ", " + p1.get(i).y + "  ==  " + p2.get(i).x + ", " + p2.get(i).y);
-			if (p1.get(i).equals(p2.get(i))){
-				System.out.println("are equal");
-			}else{
-				System.out.println("are not equal");
-				return false;
-			}
+			if (!p1.get(i).equals(p2.get(i))) return false;
 		}
 		return true;
 	}
