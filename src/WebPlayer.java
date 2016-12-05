@@ -51,12 +51,33 @@ public class WebPlayer extends Player{
 		
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
-				if (!b1[i][j].equals(b2[i][j])){
+				if (testCellEquality(b1[i][j],b2[i][j])){
 					result.add(new Coord(j,i));
 				}
 			}
 		}
 		return result;
+	}
+	public boolean testCellEquality(String s1, String s2){
+		if (s1 == null){
+			if (s2 == null){
+				return true;
+			}else if(s2.equals("0")){
+				return true;
+			}else{
+				return false;
+			}
+		}else if (s2 == null){
+			if (s1 == null){
+				return true;
+			}else if(s1.equals("0")){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return s1.equals(s2);
+		}
 	}
 	public String[][] reformatBoard(Object[] board){
 		int boardSize = this.board.getBoardSize();
