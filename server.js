@@ -272,10 +272,8 @@ function sendJavaSingleMove(password){
 function getJavaMove(password){
 	javaPlayer[password][1].takeMoveSync();
 	if (javaPlayer[password][1].isFinishedSync()){
-		console.log('ai finished');
 		resigned[password][1] = true;
 	}else{
-		console.log('ai NOT finished');
 		var boardData = javaGame[password].getBoardArraySync();
 		setBoardAfterJavaMove(password,boardData);
 	}
