@@ -1,98 +1,95 @@
-<!DOCTYPE html>
 <html>
 	<head>
-		<title>Blokus IP</title>
-		<style>
-		th.basic{
-			width:100%;
-    			font-size:200%;
-    			text-align: center;
-    			font-family: "Courier New", Courier, monospace;
-    		}
-
-    		a.basic{
-    			font-size:100%;
-    			text-align: center;
-    			font-family: "Courier New", Courier, monospace;
-    		}
-    		p.basic{
-    			font-size:100%;
-    			text-align: center;
-    			font-family: "Courier New", Courier, monospace;
-    		}
-		form.basic{
-			font-size:100%;
-			text-align: center;
-			font-family: "Courier New", Courier, monospace;
-		}
-    		table.layout{
-    			width:100%;
-    			height:100%;
-    			align="center"
-    			//border: 1px solid black;
-    		}
-		label, input {
-			font-size:100%;
-			text-align: center;
-			font-family: "Courier New", Courier, monospace;
-		}
-		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script type='text/javascript' src="scripts/comms.js"></script>
+		<script type='text/javascript' src="scripts/view.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/splash.css" />
+		<link rel="stylesheet" type="text/css" href="css/blokus.css" />
 	</head>
 	<body>
-		<table class="layout">
-			<th class="basic">Welcome to Blokus</th>
-			<tr>
-				<td>
-					<br>
-					<br>
-					<p class="basic">
-					Thank you for helping pave the way for the eventual robot uprising. Your contribution will not be forgotten.
-					</p>
-					<p class="basic">
-					When you click go you'll be asked for a game code and player number, both should be agreed with your opponent before you start.
-					</p>
-					<p class="basic">
-					If you're player 1 then start with a piece in the bottom-left corner, if you're player 2 then top-right.
-					</p>
-					<p class="basic">
-					To place a piece click on a piece on the left, rotate or flip using the buttons and then click a cell on the board to place.
-					</p>
-					<p class="basic">
-					If you load the game and the board is not blank, please choose a new code and click "New game".
-					</p>
-					<p class="basic">
-					Also, don't quit the tab mid-game. Going back into it doesn't work properly yet, it's a known bug. sorry
-					</p>
-					<br>
-					<br>
-					<form class="basic" action="blokus.html">
-                        Game code: <input type="text" name="fname" required><br><br>
-                                                
-						Player number:
-                        P1 <input type="radio" id="p1" name="player" value="p1" checked>
-                        P2 <input type="radio" id="p2" name="player" value="p2"><br>
-						<br>
-						Opponent:
-                        Human <input type="radio" id="human" name="opponent" value="human" onclick="choseHuman()" checked>
-                        Computer <input type="radio" id="computer" name="opponent" value="computer" onclick="choseComp()"><br>
-						<br>
-						<input name="loc_go" type="submit" value="Let's play!">
-						
-                    </form>
-					<br>
-					<br>
-				</td>
-			</tr>
+		<div id="title-container">
+			<h1 id="page-title">
+				Welcome to Blokus
+			</h1>
+		</div>
+		<div id="splash">
+			<p id="splash-text">
+			Thank you for taking part!
+			</p>
+			<br>
+			<div id="splash-login">
+				<div class="splash-login-elem">
+					Username: <input id="splash-username" type="text" value="a">
+				</div>
+				<div class="splash-login-elem">
+					Password: <input id="splash-password" type="password" value="a">
+				</div>
+				<div class="splash-login-elem">
+					<input class="button" name="login-submit" value="Login / Create user" type="button" onclick="requestLogin($('#splash-username').val(),$('#splash-password').val())">
+				</div>
+			</div>
 			
-		</table>
-		<script>
-			function choseComp(){
-				document.getElementById("p1").checked = true;
-				document.getElementById("p2").disabled = true;
-			}
-			function choseHuman(){
-				document.getElementById("p2").disabled = false;
-			}
-		</script>
+			
+			<div id="splash-input-container" hidden>
+				<div class="splash-input-column">
+					<h4>New 1-Player Game</h4>
+					<!--div class="splash-choice-elem" -->
+					<input class="button" type="button" value="Go" onclick="start1pGame()">
+				</div>
+				<div class="splash-input-column" style="border-left: 1px dotted grey;border-right: 1px dotted grey;">
+					<h4>New 2-Player Game</h4>
+					<input class="button" name="loc_go" type="button" value="Go" onclick="start2pGame()">
+				</div>
+				<div class="splash-input-column">
+					<h4>Join a Game</h4>
+					<div id="joinable-games-list" hidden>
+					</div>
+					<input id="join-1p" type="text" style="margin:5px;"><input class="button" type="button" value="Go" onclick="joinGame($('#join-1p').val())">
+				</div>
+			</div>
+		</div>
+		
+		<div id='blokus-game' hidden>
+			<div class="game">
+				<div class="piece-set" id="piece-set">
+				
+				</div>
+				<div class="board-controls">
+					<div id="board" class="board">
+					
+					</div>
+					<div class="controls">
+						<div id="piece-controls">
+							<div id="top-piece-controls" class="piece-controls-row">
+								<input type="button" class="button" value="Rotate &#x21bb" style="width:47%; height:47%" />
+								<input type="button" class="button" value="Rotate &#x21ba" style="width:47%; height:47%" />
+							</div>
+							<div id="bottom-piece-controls" class="piece-controls-row">
+								<input type="button" class="button" value="Flip &#x2194" style="width:47%; height:47%" />
+								<input type="button" class="button" value="Flip &#x2195" style="width:47%; height:47%" />
+							</div>
+						</div>
+						<div id="main-viewer">
+							
+						</div>
+						<div id="options">
+							<input type="button" class="button" value="New game" style="width:100%; height:30%" />
+							<input type="button" class="button" value="Can't go" style="width:100%; height:30%" />
+							<input type="button" class="button" value="Message player" style="width:100%; height:30%" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="message-view" hidden>
+			<div id="message-box" style="padding:5px;">
+				<b id="message-from"></b>
+				<p id="message-text"></p>
+			</div>
+			<div id="close-message-view">
+				<input type="button" value="X" onclick="$('#message-view').slideToggle()" />
+			</div>
+		</div>
 	</body>
 </html>

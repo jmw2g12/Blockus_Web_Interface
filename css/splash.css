@@ -1,0 +1,73 @@
+.button {
+	background-color: #555555;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+}
+.button:hover{
+	background-color: #999999;
+}
+#splash {
+	width:100%;
+	text-align: center;
+	font-family: "Courier New", Courier, monospace;
+}
+#title-container{
+	display:block;
+	overflow: hidden;
+	width:100%;
+	height:10%;
+	text-align: center;
+	font-family: "Courier New", Courier, monospace;
+}
+#splash-text {
+	margin-bottom: 30px;
+}
+.splash-login-elem{
+	display:block;
+	padding: 5px;
+	margin: 5px 0px;
+}
+#splash-input-container{
+	padding: 10px 0px;
+	width: 100%;
+	table-layout: fixed;
+}
+.splash-input-column{
+	display:table-cell;
+}
+.joinable-game{
+	color: blue;
+}
+.joinable-game:hover{
+	text-decoration: underline;
+}
+#message-view{
+	font-family: "Courier New", Courier, monospace;
+	padding: 5px;
+	width: 100%;
+	height: 10%;
+	margin: 0 auto; 
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	border-top: 1px;
+	border-top-style: groove;
+	display: hidden;
+}
+#message-box{
+	width: 70%;
+	height: 70%;
+	margin: 0 auto; 
+	bottom: 0;
+	right: 0;
+}
+#close-message-view{
+	float: right;
+	top:0;
+}

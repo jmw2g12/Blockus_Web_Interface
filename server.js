@@ -1,291 +1,354 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var java = require('java')
-var app = express()
-var util = require('util')
+"use strict";
 
-app.set('port', (process.env.PORT || 5000))
-app.use(express.static(__dirname + '/public'))
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+const express = require('express')
+const path = require('path')
+const bodyParser = require('body-parser')
+const java = require('java')
+const util = require('util')
+const SocketServer = require('ws').Server;
+const url = require("url");
 
-console.log("Hello world, this is the server.js file");
+const port = process.env.PORT || 3000;
+const index = path.join(__dirname, 'index.html');
+const comms = path.join(__dirname, 'scripts/comms.js');
+const view = path.join(__dirname, 'scripts/view.js');
+const splash = path.join(__dirname, 'css/splash.css');
+const blokus = path.join(__dirname, 'css/blokus.css');
 
-http = require('http');
-fs = require('fs');
-dropbox = require('dropbox');
+const http = require('http');
+const fs = require('fs');
+const dropbox = require('dropbox');
 
-var board = [];
-var turn = [];
-var reply = '';
-var passwordList = [];
-var pieceSet = [];
-var resigned = [];
-var fileCount = [];
-var gameStartTime = [];
-var opponents = [];
-var javaGame = [];
-var javaPlayer = [];
+const app = express()
+  .use(function(req, res){
+  	var pathname = url.parse(req.url).pathname;
+  	//console.log(pathname);
+  	if (pathname === '/'){
+  		res.sendFile(index);
+	}else if(pathname == '/scripts/comms.js'){
+		res.sendFile(comms);
+	}else if(pathname == '/scripts/view.js'){
+		res.sendFile(view);
+	}else if(pathname == '/css/splash.css'){
+		res.sendFile(splash);
+	}else if(pathname == '/css/blokus.css'){
+		res.sendFile(blokus);
+	}else{
+		res.sendFile(index);
+	}
+  })
+  .listen(port, () => console.log('Listening on ' + port + '..'));
 
-function pieceToDropbox(password){
-	console.log("sending file to dropbox");
-	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
-	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + '/' + gameStartTime[password] + '/move_' + fileCount[password] + '.txt';
-	console.log("path = " + path);
-	dbx.filesUpload({ path: path, contents: contents })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-    console.log("leaving send file to dropbox function");
-}
-function gameToDropbox(password){
-	console.log("sending file to dropbox");
-	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
-	var contents = JSON.stringify(board[password]);
-	var path = '/BlokusData/' + password + '/' + gameStartTime[password] + '/game_finished.txt';
-	console.log("path = " + path);
-	dbx.filesUpload({ path: path, contents: contents })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-    console.log("leaving send file to dropbox function");
-}
-function initBoard(password){
-		board[password] = [];
-        for (i = 0; i < 14; i++){
-                board[password].push(new Array(14));
-                for (j = 0; j < 14; j++){
-                        board[password][i][j] = 0;
-                }
-        }
-}
-function replyMsg(password){
-        return JSON.stringify(board[password].concat(turn[password]).concat(pieceSet[password]).concat(getScores(password)).concat(resigned[password]));
-}
-function getScores(password){
-	var scores = [0,0];
-	for (y = 0; y < 14; y++){
-		for (x = 0; x < 14; x++){
-			var cell = board[password][y][x]
-			if (cell == 1){
-				scores[0]++;
-			}else if(cell == 2){
-				scores[1]++;
+var board_size = 14;
+var piece_count = 21;
+var game_list = [];
+var user_list = [];
+var piece_reference = [
+[[0,0,0,0,0],[0,0,0,0,0],[0,0,2,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,0,0,0],[0,2,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,0,0,0],[0,2,1,1,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,0,0,0],[0,2,1,0,0],[0,1,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,0,0,0],[2,1,1,1,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,2,1,0],[0,1,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,0,0],[0,1,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,0,0,0],[2,1,1,1,1],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[2,1,1,1,0],[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[2,1,1,1,0],[0,1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[1,1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,1,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,1,0,1,0],[0,0,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,2,1,1,0],[0,1,0,0,0],[0,1,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,2,1,0],[0,1,1,0,0],[0,1,0,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,2,1,0],[0,0,1,0,0],[0,1,1,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,2,1,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,0,0,0]],
+[[0,0,0,0,0],[0,0,2,0,0],[0,1,1,1,0],[0,0,1,0,0],[0,0,0,0,0]]];
+
+class user {
+	constructor(username, password, ws){
+		this.username = username;
+		this.password = password;
+		this.games = [];
+		this.ws_clients = [ws];
+	}
+	add_game(game){
+		this.games.push(game);
+	}
+	add_ws_client(ws){
+		this.ws_clients.push(ws);
+	}
+	message_user(from,text){
+		//console.log('in message_user function, list size is ' + this.ws_clients.length);
+		for (var i = 0; i < this.ws_clients.length; i++){
+			if (this.ws_clients[i].readyState == 1){
+				console.log('messaging user');
+				this.ws_clients[i].send(JSON.stringify({
+					response: 'receive_message',
+					data: {
+						from_user: from,
+						text: text
+					}
+				}));
+				
 			}
 		}
 	}
-	return scores;
 }
-function addPieceToBoard(piece,pieceID,code,password){
-        for (i = 0; i < piece.length; i++){
-                board[password][(piece[i][1]-1)][(piece[i][0]-1)] = code;
-        }
-        pieceSet[password][parseInt(code)-1][parseInt(pieceID)-1]=0;
-}
-function printBoard(password){
-        for (i = 0; i < board[password].length; i++){
-                console.log("  " + board[password][i]);
-        }
-}
-function switchTurn(password){
-		if (turn[password] == 1){
-   		 	turn[password] = 2;
-    	}else if (turn[password] == 2){
-    		turn[password] = 1;
-    	}
-}
-function existsAsPassword(password){
-	for (i = 0; i < passwordList.length; i++){
-		if (password === passwordList[i]) return true;
-	}
-	return false;
-}
-function checkAndHandleNewPassword(password, opponent){
-	if (!existsAsPassword(password)){
-		passwordList.push(password);
-		turn[password] = 1;
-		resigned[password] = [false, false];
-		fileCount[password] = 1;
-		initBoard(password);
-		
-		var date = new Date().toISOString();
-		date = date.split(".");
-		gameStartTime[password] = date;
-		
-		opponents[password] = opponent;
 
-		if (opponent !== 'human'){
-			//mirror the game on the java app
-			console.log('opponent is computer');
-			var blokusConstructor = java.import("Blokus");
-			javaGame[password] = new blokusConstructor();
-			javaPlayer[password] = [];
-			javaPlayer[password][0] = javaGame[password].getP1Sync();
-			javaPlayer[password][1] = javaGame[password].getP2Sync();
-			console.log('p1 strategy = ' + javaPlayer[password][0].getStrategySync());
-			console.log('p2 strategy = ' + javaPlayer[password][1].getStrategySync());
+class piece_position {
+	constructor(player_no, piece_code, rotation_code, coord){
+		this.player_no = player_no;
+		this.piece_code = piece_code;
+		this.rotation_code = rotation_code;
+		this.coord = coord;
+	}
+}
+class game {
+	constructor(gamecode, p1, single_player){
+		this.gamecode = gamecode;
+		this.board = new Array(board_size).fill(new Array(board_size).fill(0));
+		this.turn = 1;
+		this.moves = 0;
+		this.p1 = p1;
+		if (single_player){
+			this.p2 = '* computer *';
 		}else{
-			console.log('opponent is human');
+			this.p2 = null;
 		}
+		this.p1_resigned = false;
+		this.p2_resigned = false;
+		this.p1_pieces = new Array(piece_count).fill(null);
+		this.p2_pieces = new Array(piece_count).fill(null);
+		this.single_player = single_player;
+		//this.java_player
+	}
+	
+	player_moved(player_no, piece_code, rotation_code, coord){ //, ws_client){
+	
+		if (this.turn == player_no && !this.has_player_resigned(player_no) && this.is_piece_unused(player_no, piece_code) && this.is_placement_valid(piece_code, rotation_code, coord)){
 		
-
-		pieceSet[password] = [[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]];
+			this.place_piece(player_no, piece_code, rotation_code, coord);
+			this.moves++;
+			
+			//update all linked socket clients
+			
+		}else{
+			
+			//reply with error
+		}
+	
+	}
+	has_player_resigned(player_no){
+		if (player_no == 1){
+			return this.p1_resigned;
+		}else if (player_no == 2){
+			return this.p1_resigned;
+		}
+	}
+	is_piece_unused(player_no, piece_code){
+		if (player_no == 1){
+			return this.p1_pieces[piece_code] == null;
+		}else if (player_no == 2){
+			return this.p2_pieces[piece_code] == null;
+		}
+	}
+	is_placement_valid(piece_code, rotation_code, coord){
 		return true;
-	}else{
-		return false;
 	}
-}
-
-
-//Server code
-
-app.get('/', function(req, res) {
-	console.dir(req.param);
-    console.log("GET");
-    
-/*
-    var querier = java.newInstanceSync("ServerInterface");
-	console.log('querier.getHiWorldSync() = ' + querier.getHiWorldSync());
-	console.log('querier.printHiWorldSync():');
-	querier.printHiWorldSync();
-*/
-
-    var html = fs.readFileSync('index.html');
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(html);
-})
-
-app.get('/blokus.*', function(req, res) {
-	console.dir(req.param);
-    console.log("GET");
-
-    var html = fs.readFileSync('blokus.html');
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(html);
-})
-
-app.post('/blokus/piece', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var piece = bodyObject.piece;
-	var pieceID = bodyObject.pieceID;
-	var playerCode = parseInt(bodyObject.playerCode);
-	var password = bodyObject.password;
-	var opponent = bodyObject.opponent;
-	if (!existsAsPassword(password)) console.log("placing this piece has created the game");
-	checkAndHandleNewPassword(password,opponent);
-	addPieceToBoard(piece,pieceID,playerCode,password);
-	pieceToDropbox(password);
-	fileCount[password]++;
-	if (opponents[password] !== 'human'){
-		console.log('opponent is not human; interfacing with cmd-line app');
-		sendJavaSingleMove(password);
-		getJavaMove(password);
+	place_piece(player_no, piece_code, rotation_code, coord){
+		if (player_no == 1){
+			this.p1_pieces[piece_code] = new piece_position(player_no, piece_code, rotation_code, coord);
+		}else if (player_no == 2){
+			this.p2_pieces[piece_code] = new piece_position(player_no, piece_code, rotation_code, coord);
+		}
 	}
-	if (resigned[password][2-parseInt(playerCode)] == false && opponents[password] == 'human') switchTurn(password);
-	res.writeHead(200, {'Content-Type': 'text/html'});
-	reply = replyMsg(password);
-    res.end(reply);
-})
-
-app.post('/blokus/newGame', function(req, res) { // *** NOT USED YET ***
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var password = bodyObject.password;
-	var index = passwordList.indexOf(password);
-	if (index > -1){
-		passwordList.splice(index, 1);
-		console.log("in /newGame: password = " + password + ", index = " + index + ". Removed this value from passwordList.");
-	}else{
-		console.log("in /newGame: password = " + password + ", index = " + index + ". Could not remove this value from passwordList.");
+	update_ws_clients(piece_code, rotation_code, coord){
+		for (var i = 0; i < this.ws_clients.length; i++) {
+			console.log('updating client ' + i + '..');
+			
+		}
 	}
-	if (checkAndHandleNewPassword(password,'human')){
-		console.log("renewed game");
-	}else{
-		console.log("did not renew game");
+	resign_player(player_no){
+		if (player_no == 1){
+			this.p1_resigned = true;
+		}else if (player_no == 2){
+			this.p2_resigned = true;
+		}
 	}
-	reply = replyMsg(password);
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(reply);
-})
-
-app.post('/blokus/board', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var password = JSON.parse(bodyObject)["password"];
-	var opponent = JSON.parse(bodyObject)["opponent"];
-	checkAndHandleNewPassword(password, opponent);
-	reply = replyMsg(password);
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(reply);
-})
-
-app.post('/blokus/resign', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var password = bodyObject.password;
-	var playerCode = bodyObject.playerCode;
-	if (playerCode == turn[password]) switchTurn(password);
-	var playerCode = bodyObject.playerCode;
-	resigned[password][parseInt(playerCode)-1] = true;
-	reply = replyMsg(password);
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(reply);
-})
-
-app.post('/blokus/isGameOver', function(req, res) {
-	var bodyObject = JSON.parse(Object.keys(req.body)[0]);
-	var password = bodyObject.password;
-	if (resigned[password][0] == true && resigned[password][1] == true){
-		gameToDropbox(password);
-		var reply = JSON.stringify([true].concat(getScores(password)));
-	}else{
-		var reply = JSON.stringify([false].concat(getScores(password)));
+	add_p2(username){
+		if (this.is_joinable()){
+			this.p2 = username;
+			return true;
+		}else{
+			return false;
+		}
 	}
-	res.writeHead(200, {'Content-Type': 'text/html'});
-    res.end(reply);
-})
-
-
-
-
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'))
-})
-
-
-
-
-//Java app interfacing:
-
-java.classpath.push("commons-lang3-3.1.jar");
-java.classpath.push("commons-io.jar");
-java.classpath.push("src");
-
-function sendJavaSingleMove(password){	
-	return javaPlayer[password][0].takeMoveSync(board[password]);
-}
-
-function getJavaMove(password){
-	javaPlayer[password][1].takeMoveSync();
-	if (javaPlayer[password][1].isFinishedSync()){
-		resigned[password][1] = true;
-	}else{
-		var boardData = javaGame[password].getBoardArraySync();
-		setBoardAfterJavaMove(password,boardData);
+	is_joinable(){
+		return (!this.single_player && this.p2 == null);
 	}
-}
-
-function setBoardAfterJavaMove(password, newBoard){
-	for (y = 0; y < newBoard.length; y++){
-		for (x = 0; x < newBoard.length; x++){
-			if (newBoard[13-y][x] != null && board[password][y][x] == 0){
-				board[password][y][x] = newBoard[13-y][x];
-				//console.log('updated board at ' + x + ', ' + y);
-			}
+	is_player_joined(username){
+		return (this.p1 == username || this.p2 == username);
+	}
+	other_player(username){
+		if (this.p1 === username){
+			return this.p2;
+		}else{
+			return this.p1;
 		}
 	}
 }
+
+function create_unique_code(length){
+	var code = '';
+	do{
+		code = gen_random_string(length);
+	}while (game_list[code] != null);
+	return code;
+}
+function gen_random_string(length){
+	var text = '';
+    var possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    for (var i = 0; i < length; i++){
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	
+    return text;
+}
+
+
+// -- request functions --
+var request_functions = [];
+
+request_functions['msg_user'] = function (message){
+	if (user_list[message.to_user] !== null){
+		user_list[message.to_user].message_user(message.from_user,message.text);
+		return JSON.stringify({
+			response: 'msg_sent',
+			data: {}
+		});
+	}else{
+		return JSON.stringify({
+			response: 'msg_failed',
+			data: {}
+		});
+	}
+}
+request_functions['start_1p'] = function (message){
+	var gamecode = create_unique_code(8);
+	var one_player_game = new game(gamecode, message.username, true);
+	game_list[gamecode] = one_player_game;
+	user_list[message.username].add_game(one_player_game);
+	return JSON.stringify({
+		response: 'started_1p',
+		data: {
+			gamecode: gamecode,
+			game: game_list[gamecode]
+		}
+	});
+}
+request_functions['start_2p'] = function (message){
+	var gamecode = create_unique_code(8);
+	var two_player_game = new game(gamecode, message.username, false);
+	game_list[gamecode] = two_player_game;
+	user_list[message.username].add_game(two_player_game);
+	return JSON.stringify({
+		response: 'started_2p',
+		data: {
+			gamecode: gamecode,
+			game: game_list[gamecode]
+		}
+	});
+}
+request_functions['join_game'] = function (message){
+	if (game_list[message.gamecode] == null){
+		return JSON.stringify({
+			response: 'failed_join_game',
+			data: {
+				reason: 'nonexistant',
+				gamecode: message.gamecode
+			}
+		});
+	}
+	if (game_list[message.gamecode].is_player_joined(message.username)){
+		return JSON.stringify({
+			response: 'joined_game',
+			data: {
+				gamecode: message.gamecode,
+				game: game_list[message.gamecode]
+			}
+		});
+	}
+	if (game_list[message.gamecode].is_joinable()){
+		game_list[message.gamecode].add_p2(message.username);
+		user_list[message.username].add_game(game_list[message.gamecode]);
+		return JSON.stringify({
+			response: 'joined_game',
+			data: {
+				gamecode: message.gamecode,
+				game: game_list[message.gamecode]
+			}
+		});
+	}
+	return JSON.stringify({
+		response: 'failed_join_game',
+		data: {
+			reason: 'game_full',
+			gamecode: message.gamecode
+		}
+	});
+}
+request_functions['login'] = function (message, ws){	
+	if (user_list[message.username] == null){
+		user_list[message.username] = new user(message.username, message.password, ws);
+		
+		return JSON.stringify({
+			response: 'login_success',
+			data: {
+				type: 'new_user',
+				username: message.username,
+				password: message.password,
+				games: []
+			}
+		});
+	}else{
+		if (user_list[message.username].password === message.password){
+			var game_list = user_list[message.username].games;
+			user_list[message.username].add_ws_client(ws);
+			return JSON.stringify({
+				response: 'login_success',
+				data: {
+					type: 'current_user',
+					username: message.username,
+					password: message.password,
+					games: game_list
+				}
+			});
+		}else{
+			return JSON.stringify({
+				response: 'login_reject',
+				data: {
+					type: 'wrong_password',
+					username: message.username,
+					password: message.password
+				}
+			});
+		}
+	}
+}
+
+
+// -- socket logic --
+const wss = new SocketServer({ server:app });
+
+wss.on('connection', (ws) => {
+  //console.log('Client connected');
+  
+  ws.on('message', function incoming(message) {
+  	var parsed_message = JSON.parse(message);
+  	ws.send(request_functions[parsed_message.request](parsed_message.data, ws));
+  });
+  
+  //ws.on('close', () => console.log('Client disconnected'));
+});

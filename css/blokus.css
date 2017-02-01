@@ -1,0 +1,94 @@
+#blokus-game{
+	width:100%;
+	height:90%;
+	font-family: "Courier New", Courier, monospace;
+	text-align: center;
+	
+}
+.header{
+	height:3%;
+	padding:5px 0px 1px 0px;
+}
+.game{
+	height:95%;
+	display:flex;
+}
+.piece-set{
+	width:40%;
+	height:100%;
+	padding:0px 10px 0px 0px;
+}
+.board-controls{
+	width:60%;
+	height:100%;
+	display:block;
+}
+.board{
+	height:70%;
+	width:100%;
+}
+.controls{
+	height:30%;
+	width:100%;
+	display: flex;
+}
+#piece-controls{
+	height:100%;
+	width:33%;
+	display:block;
+}
+.piece-controls-row{
+	display:flex;
+}
+#main-viewer{
+	height:100%;
+	width:33%;
+}
+#options{
+	height:100%;
+	width:33%;
+	display:block;
+}
+.button {
+	background-color: #CCCCCC;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px;
+	cursor: pointer;
+}
+.button:hover{
+	background-color: #DDDEEE;
+}
+.board{
+	display:table;
+}
+.board-row{
+	display:table-row;
+}
+.board-cell{
+	display:table-cell;
+	background: #EEEEEE;
+	border: 1px solid white;
+}
+#piece-set{
+	display:table;
+}
+.piece-table{
+	display:table-cell;
+	background: white;
+}
+.piece-table-container{
+	display:table;
+	height:100%;
+	width:100%;
+	padding:5px;
+	border: 1px solid #EEEEEE;
+}
+.piece-table-cell{
+	display:table-cell;
+	background: white;
+}
