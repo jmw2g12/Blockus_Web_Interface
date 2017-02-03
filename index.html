@@ -19,10 +19,10 @@
 			<br>
 			<div id="splash-login">
 				<div class="splash-login-elem">
-					Username: <input id="splash-username" type="text" value="a">
+					Username: <input id="splash-username" type="text" value="">
 				</div>
 				<div class="splash-login-elem">
-					Password: <input id="splash-password" type="password" value="a">
+					Password: <input id="splash-password" type="password" value="">
 				</div>
 				<div class="splash-login-elem">
 					<input class="button" name="login-submit" value="Login / Create user" type="button" onclick="requestLogin($('#splash-username').val(),$('#splash-password').val())">
@@ -61,12 +61,12 @@
 					<div class="controls">
 						<div id="piece-controls">
 							<div id="top-piece-controls" class="piece-controls-row">
-								<input type="button" class="button" value="Rotate &#x21bb" style="width:47%; height:47%" />
-								<input type="button" class="button" value="Rotate &#x21ba" style="width:47%; height:47%" />
+								<input type="button" class="button" value="Rotate &#x21bb" style="width:47%; height:47%" onclick="transformSelected('cw')" disabled />
+								<input type="button" class="button" value="Rotate &#x21ba" style="width:47%; height:47%" onclick="transformSelected('ccw')" disabled />
 							</div>
 							<div id="bottom-piece-controls" class="piece-controls-row">
-								<input type="button" class="button" value="Flip &#x2194" style="width:47%; height:47%" />
-								<input type="button" class="button" value="Flip &#x2195" style="width:47%; height:47%" />
+								<input type="button" class="button" value="Flip &#x2195" style="width:47%; height:47%" onclick="transformSelected('ver')" disabled />
+								<input type="button" class="button" value="Flip &#x2194" style="width:47%; height:47%" onclick="transformSelected('hor')" disabled />
 							</div>
 						</div>
 						<div id="main-viewer">

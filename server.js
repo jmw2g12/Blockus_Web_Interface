@@ -7,13 +7,9 @@ const java = require('java')
 const util = require('util')
 const SocketServer = require('ws').Server;
 const url = require("url");
+const gamecode_length = 4;
 
 const port = process.env.PORT || 3000;
-const index = path.join(__dirname, 'index.html');
-const comms = path.join(__dirname, 'scripts/comms.js');
-const view = path.join(__dirname, 'scripts/view.js');
-const splash = path.join(__dirname, 'css/splash.css');
-const blokus = path.join(__dirname, 'css/blokus.css');
 
 const http = require('http');
 const fs = require('fs');
@@ -22,20 +18,8 @@ const dropbox = require('dropbox');
 const app = express()
   .use(function(req, res){
   	var pathname = url.parse(req.url).pathname;
-  	//console.log(pathname);
-  	if (pathname === '/'){
-  		res.sendFile(index);
-	}else if(pathname == '/scripts/comms.js'){
-		res.sendFile(comms);
-	}else if(pathname == '/scripts/view.js'){
-		res.sendFile(view);
-	}else if(pathname == '/css/splash.css'){
-		res.sendFile(splash);
-	}else if(pathname == '/css/blokus.css'){
-		res.sendFile(blokus);
-	}else{
-		res.sendFile(index);
-	}
+  	var doc = path.join(__dirname, pathname);
+  	res.sendFile(doc);
   })
   .listen(port, () => console.log('Listening on ' + port + '..'));
 
@@ -198,6 +182,9 @@ class game {
 			return this.p1;
 		}
 	}
+	get_players(){
+		return [this.p1, this.p2];
+	}
 }
 
 function create_unique_code(length){
@@ -209,7 +196,7 @@ function create_unique_code(length){
 }
 function gen_random_string(length){
 	var text = '';
-    var possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     for (var i = 0; i < length; i++){
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 	}
@@ -236,7 +223,7 @@ request_functions['msg_user'] = function (message){
 	}
 }
 request_functions['start_1p'] = function (message){
-	var gamecode = create_unique_code(8);
+	var gamecode = create_unique_code(4);
 	var one_player_game = new game(gamecode, message.username, true);
 	game_list[gamecode] = one_player_game;
 	user_list[message.username].add_game(one_player_game);
@@ -249,7 +236,7 @@ request_functions['start_1p'] = function (message){
 	});
 }
 request_functions['start_2p'] = function (message){
-	var gamecode = create_unique_code(8);
+	var gamecode = create_unique_code(gamecode_length);
 	var two_player_game = new game(gamecode, message.username, false);
 	game_list[gamecode] = two_player_game;
 	user_list[message.username].add_game(two_player_game);

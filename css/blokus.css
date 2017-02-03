@@ -14,12 +14,12 @@
 	display:flex;
 }
 .piece-set{
-	width:40%;
+	width:35%;
 	height:100%;
 	padding:0px 10px 0px 0px;
 }
 .board-controls{
-	width:60%;
+	width:65%;
 	height:100%;
 	display:block;
 }
@@ -48,6 +48,7 @@
 	height:100%;
 	width:33%;
 	display:block;
+	padding:10px;
 }
 .button {
 	background-color: #CCCCCC;
@@ -74,6 +75,12 @@
 	background: #EEEEEE;
 	border: 1px solid white;
 }
+.hover-cell{
+	background:rgb(204, 204, 204);
+}
+.rel-hover-cell{
+	background:rgb(154, 0, 0);
+}
 #piece-set{
 	display:table;
 }
@@ -86,7 +93,6 @@
 	height:100%;
 	width:100%;
 	padding:5px;
-	border: 1px solid #EEEEEE;
 }
 .piece-table-cell{
 	display:table-cell;

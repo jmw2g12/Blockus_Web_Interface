@@ -14,11 +14,24 @@ response_functions['login_success'] = function (reply){
 		$('#splash-input-container').fadeIn();
 		$('#splash-input-container').css('display','table');
 	});
-	$("#page-title").append(reply.username);
+	$("#page-title").html('Welcome to Blokus, ' + reply.username[0].toUpperCase() + reply.username.substring(1).toLowerCase());
 
 	reply.games.forEach(function(game){
 		$('#joinable-games-list').show();
-		$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + '</a><br>');
+		var other_player = '';
+		if (game.p1 == username){
+			other_player = game.p2;
+		}else{
+			other_player = game.p1;
+		}
+		if (other_player == null || other_player == undefined){
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' (no opponent yet)</a><br>');
+		}else if (other_player == '* computer *'){
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs ' + other_player.replace(/\s+/g,'') + '</a><br>');
+		}else{
+			other_player = other_player.charAt(0).toUpperCase() + other_player.slice(1);
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs \"' + other_player + '\"</a><br>');
+		}
 	});
 }
 response_functions['login_reject'] = function (reply){
@@ -26,14 +39,17 @@ response_functions['login_reject'] = function (reply){
 }
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
 	loadGame(reply.game);
 }
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
 	loadGame(reply.game);
 }
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
 	loadGame(reply.game);
 }
 response_functions['failed_join_game'] = function (reply){
