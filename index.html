@@ -6,7 +6,7 @@
 		<link rel="stylesheet" type="text/css" href="css/splash.css" />
 		<link rel="stylesheet" type="text/css" href="css/blokus.css" />
 	</head>
-	<body>
+	<body class="reg-background">
 		<div id="title-container">
 			<h1 id="page-title">
 				Welcome to Blokus
@@ -61,12 +61,12 @@
 					<div class="controls">
 						<div id="piece-controls">
 							<div id="top-piece-controls" class="piece-controls-row">
-								<input type="button" class="button" value="Rotate &#x21bb" style="width:47%; height:47%" onclick="transformSelected('cw')" disabled />
-								<input type="button" class="button" value="Rotate &#x21ba" style="width:47%; height:47%" onclick="transformSelected('ccw')" disabled />
+								<input id="rotatecw" type="button" class="button" value="Rotate &#x21bb" style="width:47%; height:47%" onclick="transformSelected('cw')" disabled />
+								<input id="rotateccw" type="button" class="button" value="Rotate &#x21ba" style="width:47%; height:47%" onclick="transformSelected('ccw')" disabled />
 							</div>
 							<div id="bottom-piece-controls" class="piece-controls-row">
-								<input type="button" class="button" value="Flip &#x2195" style="width:47%; height:47%" onclick="transformSelected('ver')" disabled />
-								<input type="button" class="button" value="Flip &#x2194" style="width:47%; height:47%" onclick="transformSelected('hor')" disabled />
+								<input id="flipver" type="button" class="button" value="Flip &#x2195" style="width:47%; height:47%" onclick="transformSelected('ver')" disabled />
+								<input id="fliphor" type="button" class="button" value="Flip &#x2194" style="width:47%; height:47%" onclick="transformSelected('hor')" disabled />
 							</div>
 						</div>
 						<div id="main-viewer">

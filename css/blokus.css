@@ -1,3 +1,12 @@
+.reg-background{
+	background: rgb(255,255,255);
+	transition: all 0.2s ease-in-out;
+}
+.good-move{
+	background: rgb(230,255,230);
+	transition: all 0.2s ease-in-out;
+}
+
 #blokus-game{
 	width:100%;
 	height:90%;
@@ -79,7 +88,8 @@
 	background:rgb(204, 204, 204);
 }
 .rel-hover-cell{
-	background:rgb(154, 0, 0);
+	//background:rgb(154, 0, 0);
+	background:rgb(170, 110, 120);
 }
 #piece-set{
 	display:table;
@@ -89,6 +99,8 @@
 	background: white;
 }
 .piece-table-container{
+	//background: rgb(255,255,255);
+	transition: all 0.2s ease-in-out;
 	display:table;
 	height:100%;
 	width:100%;
@@ -97,4 +109,16 @@
 .piece-table-cell{
 	display:table-cell;
 	background: white;
+}
+.piece-placed-table{
+	background: rgb(100,100,100);
+}
+.my-block{
+	background: rgb(66, 134, 244);
+}
+.opp-block{
+	background: rgb(244, 66, 107)
+}
+.corner-block{
+	background: rgb(206, 255, 211)
 }

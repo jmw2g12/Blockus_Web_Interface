@@ -1,10 +1,10 @@
 "use strict";
 
-const express = require('express')
-const path = require('path')
-const bodyParser = require('body-parser')
-const java = require('java')
-const util = require('util')
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const java = require('java');
+const util = require('util');
 const SocketServer = require('ws').Server;
 const url = require("url");
 const gamecode_length = 4;
@@ -21,7 +21,7 @@ const app = express()
   	var doc = path.join(__dirname, pathname);
   	res.sendFile(doc);
   })
-  .listen(port, () => console.log('Listening on ' + port + '..'));
+  .listen(port, () => console.log("Listening on " + port + ".."));
 
 var board_size = 14;
 var piece_count = 21;
@@ -79,20 +79,36 @@ class user {
 			}
 		}
 	}
+	update_user(game){
+		//console.log('in message_user function, list size is ' + this.ws_clients.length);
+		for (var i = 0; i < this.ws_clients.length; i++){
+			if (this.ws_clients[i].readyState == 1){
+				console.log('updating user');
+				this.ws_clients[i].send(JSON.stringify({
+					response: 'game_update',
+					data: {
+						game: game
+					}
+				}));
+			}
+		}
+	}
 }
 
 class piece_position {
-	constructor(player_no, piece_code, rotation_code, coord){
-		this.player_no = player_no;
+	constructor(piece_code, transform_code, coord){
 		this.piece_code = piece_code;
-		this.rotation_code = rotation_code;
+		this.transform_code = transform_code;
 		this.coord = coord;
 	}
 }
 class game {
 	constructor(gamecode, p1, single_player){
 		this.gamecode = gamecode;
-		this.board = new Array(board_size).fill(new Array(board_size).fill(0));
+		this.p1_board = this.generate_empty_board();
+		this.p1_board[board_size-1][0] = 3;
+		this.p2_board = this.generate_empty_board();
+		this.p2_board[board_size-1][0] = 3;
 		this.turn = 1;
 		this.moves = 0;
 		this.p1 = p1;
@@ -108,21 +124,113 @@ class game {
 		this.single_player = single_player;
 		//this.java_player
 	}
-	
-	player_moved(player_no, piece_code, rotation_code, coord){ //, ws_client){
-	
-		if (this.turn == player_no && !this.has_player_resigned(player_no) && this.is_piece_unused(player_no, piece_code) && this.is_placement_valid(piece_code, rotation_code, coord)){
+	generate_empty_board(){
+		var res = [];
+		for (var y = 0; y < board_size; y++){
+			res.push([]);
+			for (var x = 0; x < board_size; x++){
+				res[y].push(0);
+			}
+		}
+		return res;
+	}
+	rotate_CW(arr){
+		var res = [];
+		for (var x = 0; x < 5; x++){
+			res.push([]);
+			for (var y = 4; y >= 0; y--){
+				res[x].push(arr[y][x]);
+			}
+		}
+		return res;
+	}
+	flip_ver(arr){
+		var res = [];
+		for (var y = 4; y >= 0; y--){
+			res.push([]);
+			for (var x = 0; x < 5; x++){
+				res[4-y].push(arr[y][x]);
+			}
+		}
+		return res;
+	}
+	rotate_CCW(arr){
+		var res = [];
+		for (var x = 4; x >= 0; x--){
+			res.push([]);
+			for (var y = 0; y < 5; y++){
+				res[4-x].push(arr[y][x]);
+			}
+		}
+		return res;
+	}
+	flip_hor(arr){
+		var res = [];
+		for (var y = 0; y < 5; y++){
+			res.push([]);
+			for (var x = 4; x >= 0; x--){
+				res[y].push(arr[y][x]);
+			}
+		}
+		return res;
+	}
+	transform(id, code){
+		console.log(id + ', ' + code);
+		var res = piece_reference[id].slice();
+		switch (code){
+			case 1:
+				return res;
+				break;
+			case 2:
+				return this.rotate_CW(res);
+				break;
+			case 3:
+				return this.rotate_CW(this.rotate_CW(res));
+				break;
+			case 4:
+				return this.rotate_CCW(res);
+				break;
+			case 5:
+				return this.flip_ver(res);
+				break;
+			case 6:
+				return this.rotate_CW(this.flip_ver(res));
+				break;
+			case 7:
+				return this.flip_hor(res);
+				break;
+			case 8:
+				return this.rotate_CW(this.flip_hor(res));
+				break;
+		}
+		return res;
+	}
+	player_move(username, piece_code, transform_code, coord){ //, ws_client){
+		var player_no = this.which_player(username);
+		if (this.turn == player_no && !this.has_player_resigned(player_no) && this.is_piece_unused(player_no, piece_code) && this.is_placement_valid(piece_code, transform_code, coord)){
 		
-			this.place_piece(player_no, piece_code, rotation_code, coord);
+			this.place_piece(player_no, piece_code, transform_code, coord);
 			this.moves++;
+			if (this.turn === 1){
+				this.turn = 2;
+			}else{
+				this.turn = 1;
+			}
 			
 			//update all linked socket clients
-			
+			this.update_socket_clients();
+			return true;
 		}else{
-			
 			//reply with error
+			return false;
 		}
 	
+	}
+	update_socket_clients(){
+		user_list[this.p1].update_user(game_list[this.gamecode]);
+		if (!this.single_player && this.p2 != null){
+			user_list[this.p2].update_user(game_list[this.gamecode]);
+		}
 	}
 	has_player_resigned(player_no){
 		if (player_no == 1){
@@ -138,27 +246,136 @@ class game {
 			return this.p2_pieces[piece_code] == null;
 		}
 	}
-	is_placement_valid(piece_code, rotation_code, coord){
+	is_placement_valid(piece_code, transform_code, coord){
 		return true;
 	}
-	place_piece(player_no, piece_code, rotation_code, coord){
+	place_piece(player_no, piece_code, transform_code, coord){
+		if (piece_code === -1) return false;
 		if (player_no == 1){
-			this.p1_pieces[piece_code] = new piece_position(player_no, piece_code, rotation_code, coord);
+			this.p1_pieces[piece_code] = new piece_position(piece_code, transform_code, coord);
+			//add to board
+			var piece = this.transform(piece_code,transform_code);
+			var piece_coords = this.set_coords_relative(coord,this.piece_relative_coords(piece));
+			//console.log(piece_coords);
+			for (var y = 0; y < board_size; y++){
+				for (var x = 0; x < board_size; x++){
+					if (this.p1_board[y][x] === 3) this.p1_board[y][x] = 0;
+				}
+			}
+			//add new piece
+			for (var i = 0; i < piece_coords.length; i++){
+				this.p1_board[(piece_coords[i][1]-1)][(piece_coords[i][0]-1)] = 1;
+				this.p2_board[board_size-piece_coords[i][1]][board_size-piece_coords[i][0]] = 1;
+			}			
+			
+			//process corners
+			this.process_corners(this.p1_board,true);
+			console.log('p1 board');
+			this.print_array(this.p1_board);
+			console.log('p2 board');
+			this.print_array(this.p2_board);
 		}else if (player_no == 2){
-			this.p2_pieces[piece_code] = new piece_position(player_no, piece_code, rotation_code, coord);
+			this.p2_pieces[piece_code] = new piece_position(piece_code, transform_code, coord);
+			//add to board
+			var piece = this.transform(piece_code,transform_code);
+			var piece_coords = this.set_coords_relative(coord,this.piece_relative_coords(piece));
+			//console.log(piece_coords);
+			for (var y = 0; y < board_size; y++){
+				for (var x = 0; x < board_size; x++){
+					if (this.p2_board[y][x] === 3) this.p2_board[y][x] = 0;
+				}
+			}
+			//add new piece
+			for (var i = 0; i < piece_coords.length; i++){
+				this.p1_board[board_size-piece_coords[i][1]][board_size-piece_coords[i][0]] = 2;
+				this.p2_board[(piece_coords[i][1]-1)][(piece_coords[i][0]-1)] = 2;
+			}			
+			
+			//process corners
+			this.process_corners(this.p2_board,false);
+			console.log('p1 board');
+			this.print_array(this.p1_board);
+			console.log('p2 board');
+			this.print_array(this.p2_board);
 		}
 	}
-	update_ws_clients(piece_code, rotation_code, coord){
-		for (var i = 0; i < this.ws_clients.length; i++) {
-			console.log('updating client ' + i + '..');
-			
+	print_array(arr){
+		var line;
+		for (var y = 0; y < arr.length; y++){
+			line = '';
+			for (var x = 0; x < arr[y].length; x++){
+				line = line + ' ' + arr[y][x];
+			}
+			console.log(line);
 		}
+	}
+	process_corners(board,is_p1){
+		for (var y = 0; y < board_size; y++){
+			for (var x = 0; x < board_size; x++){
+				//console.log('testing at ' + x + ', ' + y);
+				if (board[y][x] == 0){ //if idx isn't block of piece
+					console.log('testing ' + x + ', ' + y);
+					if (this.is_corner(board,x,y,is_p1)) board[y][x] = 3;
+				}
+			}
+		}
+		//console.log('res = ' + res);
+		return board;
+	}
+	is_corner(board,x,y,is_p1){
+		//has corner
+		var block = (is_p1 ? 1 : 2);
+		if ((x > 0 && y > 0 && board[y-1][x-1] === block) || (x < (board_size-1) && y > 0 && board[y-1][x+1] === block) || (x < (board_size-1) && y < (board_size-1) && board[y+1][x+1] === block) || (x > 0 && y < (board_size-1) && board[y+1][x-1] === block)){
+			console.log('found a corner');
+			//does not have face
+			if (!(x > 0 && board[y][x-1] === block) && !(x < (board_size-1) && board[y][x+1] === block) && !(y > 0 && board[y-1][x] === block) && !(y < (board_size-1) && board[y+1][x] === block)) return true;
+			console.log('but has connecting face');
+		}
+		return false;
+	}
+	set_coords_relative(origin,coords){
+		var result = [];
+		for (var i = 0; i < coords.length; i++){
+			result.push([coords[i][0] + origin[0], coords[i][1] + origin[1]]);
+		}
+		return result;
+	}
+	piece_relative_coords(piece){
+		var rel_x = -1;
+		var rel_y = -1;
+		for (var y = 0; y < 5; y++){
+			for (var x = 0; x < 5; x++){
+				if (piece[y][x] == 2){
+					rel_x = x;
+					rel_y = y;
+					y = x = 5;
+				}
+			}
+		}
+		var coords = [];
+		for (var y = 0; y < 5; y++){
+			for (var x = 0; x < 5; x++){
+				if (piece[y][x] != 0){
+					coords.push([x-rel_x, y-rel_y]);
+				}
+			}
+		}
+		return coords;
 	}
 	resign_player(player_no){
 		if (player_no == 1){
 			this.p1_resigned = true;
 		}else if (player_no == 2){
 			this.p2_resigned = true;
+		}
+	}
+	which_player(username){
+		if (this.p1 === username){
+			return 1;
+		}else if (this.p2 === username){
+			return 2;
+		}else{
+			return -1;
 		}
 	}
 	add_p2(username){
@@ -187,6 +404,8 @@ class game {
 	}
 }
 
+
+//---
 function create_unique_code(length){
 	var code = '';
 	do{
@@ -208,6 +427,32 @@ function gen_random_string(length){
 // -- request functions --
 var request_functions = [];
 
+request_functions['place_piece'] = function (message){
+	if (game_list[message.gamecode] !== null){
+		if (game_list[message.gamecode].player_move(message.username, message.piece_id, message.transform_code, message.coordinates)){
+			return JSON.stringify({
+				response: 'piece_placed',
+				data: {
+					game: game_list[message.gamecode]
+				}
+			});
+		}else{
+			return JSON.stringify({
+				response: 'cant_place',
+				data: {
+					reason: 'invalid_placement'
+				}
+			});
+		}
+	}else{
+		return JSON.stringify({
+			response: 'cant_place',
+			data: {
+				reason: 'game_nonexistant'
+			}
+		});
+	}
+}
 request_functions['msg_user'] = function (message){
 	if (user_list[message.to_user] !== null){
 		user_list[message.to_user].message_user(message.from_user,message.text);

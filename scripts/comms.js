@@ -1,6 +1,7 @@
 var HOST = location.origin.replace(/^http/, 'ws')
 var ws = new WebSocket(HOST);
 var username = '';
+var gamecode = '';
 
 // -- response functions --
 var response_functions = [];
@@ -40,16 +41,19 @@ response_functions['login_reject'] = function (reply){
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['failed_join_game'] = function (reply){
@@ -60,6 +64,21 @@ response_functions['receive_message'] = function (reply){
 	$('#message-text').html(reply.text);
 	$('#message-view').slideToggle()
 }
+response_functions['piece_placed'] = function (reply){
+	setPieces(reply.game,(reply.game.p1 == username));
+	setMoves(reply.game,(reply.game.p1 == username));
+	resetPiece();
+	console.log(reply.game);
+}
+response_functions['cant_place'] = function (reply){
+	alert(reply.reason);
+}
+response_functions['game_update'] = function (reply){
+	console.log('game_update');
+	setMoves(reply.game,(reply.game.p1 == username));
+	setPieces(reply.game,(reply.game.p1 == username));
+	console.log(reply.game);
+}
 
 
 // -- response caller --
@@ -68,7 +87,7 @@ ws.onmessage = function (reply) {
 	if (response_functions[parsed_reply.response] != null){
 		response_functions[parsed_reply.response](parsed_reply.data);
 	}else{
-		console.log('invalid response function');
+		console.log('invalid response function : ' + parsed_reply.response);
 	}
 };
 
@@ -112,6 +131,19 @@ function joinGame(gamecode){
 		data: {
 			username: username,
 			gamecode: gamecode
+		}
+	};
+	ws.send(JSON.stringify(message));
+}
+function placePiece(piece_id, transform_code, coordinates){
+	var message = {
+		request: "place_piece",
+		data: {
+			username: username,
+			gamecode: gamecode,
+			piece_id: piece_id,
+			transform_code: transform_code,
+			coordinates: coordinates
 		}
 	};
 	ws.send(JSON.stringify(message));
