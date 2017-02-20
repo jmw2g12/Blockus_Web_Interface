@@ -317,6 +317,7 @@ function resetAll(){
 	$('.board-cell').removeClass("hover-cell");
 	$('.board-cell').removeClass("rel-hover-cell");
 	$('body').removeClass("good-move");
+	$('.piece-table-container').removeClass("good-move");
 }
 function createDivGrid(width, height, cell_class, row_class, incr){
 	var grid = '';
