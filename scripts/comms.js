@@ -11,6 +11,7 @@ response_functions['game_code'] = function (reply){
 }
 response_functions['login_success'] = function (reply){
 	username = reply.username;
+	$('#splash-text').fadeOut('slow');
 	$('#splash-login').fadeOut('slow',function(){
 		$('#splash-input-container').fadeIn();
 		$('#splash-input-container').css('display','table');
