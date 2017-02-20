@@ -15,12 +15,12 @@ const http = require('http');
 const fs = require('fs');
 const dropbox = require('dropbox');
 
-const app = express()
-  .use(function(req, res){
+const app = express().use(function(req, res){
   	var pathname = url.parse(req.url).pathname;
   	var doc = path.join(__dirname, pathname);
   	res.sendFile(doc);
   })
+  .use('/favicon.ico', express.static('images/favicon.ico'))
   .listen(port, () => console.log("Listening on " + port + ".."));
 
 var board_size = 14;

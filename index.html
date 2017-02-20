@@ -1,10 +1,21 @@
 <html>
 	<head>
+		<title>Blokus</title>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 		<script type='text/javascript' src="scripts/comms.js"></script>
 		<script type='text/javascript' src="scripts/view.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/splash.css" />
 		<link rel="stylesheet" type="text/css" href="css/blokus.css" />
+		<script type='text/javascript'>
+			$(document).ready(function(){
+				$('#splash-username').keypress(function(e){
+					if(e.keyCode==13) $('#login-submit').click();
+				});
+				$('#splash-password').keypress(function(e){
+					if(e.keyCode==13) $('#login-submit').click();
+				});
+			});
+		</script>
 	</head>
 	<body class="reg-background">
 		<div id="title-container">
@@ -14,8 +25,18 @@
 		</div>
 		<div id="splash">
 			<p id="splash-text">
-			Thank you for taking part!
+				This website is the data collection interface for my final year project.
+				<br>
+				The aim of the study is to create an AI model that can effectively play the game.
+				<br>
+				By starting or joining a game you are consenting to have your playing data used in the study.
+				<br>
+				You can withdraw at any time by not completing a game or emailing me at jmw2g12@soton.ac.uk.
+				<br>
+				<br>
+				You can log in or register using the form below:
 			</p>
+			<hr>
 			<br>
 			<div id="splash-login">
 				<div class="splash-login-elem">
@@ -25,7 +46,7 @@
 					Password: <input id="splash-password" type="password" value="">
 				</div>
 				<div class="splash-login-elem">
-					<input class="button" name="login-submit" value="Login / Create user" type="button" onclick="requestLogin($('#splash-username').val(),$('#splash-password').val())">
+					<input class="button" id="login-submit" value="Login / Create user" type="button" onclick="requestLogin($('#splash-username').val(),$('#splash-password').val())">
 				</div>
 			</div>
 			
