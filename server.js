@@ -523,7 +523,7 @@ function data_to_dropbox(){
         console.log(err);
       });
 }
-function gameToJSON(arr){
+function arrayToJSON(arr){
 	var result = '[';
 	for(var code in arr) {
 		if(arr.hasOwnProperty(code)){
