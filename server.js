@@ -693,6 +693,12 @@ request_functions['login'] = function (message, ws){
 		}
 	}
 }
+request_functions['backup_data'] = function (message, ws){
+	data_to_dropbox();
+	return JSON.stringify({
+		response: 'backup_requested'
+	});
+}
 
 
 // -- socket logic --

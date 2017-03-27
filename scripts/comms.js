@@ -204,6 +204,12 @@ function messageUser(to_user, text){
 		ws.send(JSON.stringify(message));
 	}
 }
+function requestBackup(){
+	var message = {
+		request: "backup_data"
+	}
+	ws.send(JSON.stringify(message));
+}
 function resign(){
 	var message = {
 		request: "resign",
