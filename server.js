@@ -54,17 +54,17 @@ class user {
 	constructor(username, password, ws){
 		this.username = username;
 		this.password = password;
-		this.games = [];
+		this.game_codes = [];
 		this.ws_clients = [ws];
 	}
 	add_game(game){
-		this.games.push(game);
+		this.game_codes.push(game.gamecode);
 	}
 	remove_game(game){
-		var index = this.games.indexOf(game);
+		var index = this.game_codes.indexOf(game.gamecode);
 		if (index > -1) {
-			this.games.splice(index, 1);
-			console.log('removing game : ' + game + ' from user : ' + this.username);
+			this.game_codes.splice(index, 1);
+			console.log('removing game : ' + game.gamecode + ' from user : ' + this.username);
 		}
 	}
 	add_ws_client(ws){
@@ -523,7 +523,7 @@ function data_to_dropbox(){
         console.log(err);
       });
 }
-function arrayToJSON(arr){
+function gameToJSON(arr){
 	var result = '[';
 	for(var code in arr) {
 		if(arr.hasOwnProperty(code)){
