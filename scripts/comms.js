@@ -17,7 +17,8 @@ response_functions['login_success'] = function (reply){
 		$('#splash-input-container').css('display','table');
 	});
 	$("#page-title").html('Welcome to Blokus, ' + reply.username[0].toUpperCase() + reply.username.substring(1).toLowerCase());
-
+	
+	console.log('login success : ' + reply);
 	reply.games.forEach(function(game){
 		$('#joinable-games-list').show();
 		var other_player = '';
