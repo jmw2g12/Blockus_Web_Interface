@@ -14,14 +14,6 @@ const port = process.env.PORT || 3000;
 const http = require('http');
 const fs = require('fs');
 const dropbox = require('dropbox');
-process.on('exit', function(){
-	data_to_dropbox();
-	process.exit();
-});
-process.on('SIGINT', function(){
-	data_to_dropbox();
-	process.exit();
-});
 
 const app = express().use(function(req, res){
   	var pathname = url.parse(req.url).pathname;
@@ -514,6 +506,8 @@ function data_to_dropbox(){
 	var game_path = '/BlokusData/backup/' + n + '_games.txt';
 	var user_contents = JSON.stringify(user_list);
 	var game_contents = JSON.stringify(game_list);
+	console.log('user_contents : ' + user_contents);
+	console.log('game_contents : ' + game_contents);
 	dbx.filesUpload({ path: user_path, contents: user_contents })
       .then(function (response) {
         console.log(response);
@@ -714,3 +708,9 @@ wss.on('connection', (ws) => {
   
   //ws.on('close', () => console.log('Client disconnected'));
 });
+
+
+
+// -- load previous data --
+//user_list = 
+//game_list = 
