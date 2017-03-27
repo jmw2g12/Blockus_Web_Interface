@@ -703,6 +703,14 @@ request_functions['backup_data'] = function (message, ws){
 		response: 'backup_requested'
 	});
 }
+request_functions['print_users'] = function (message, ws){
+	for (username in user_list){
+		console.log(user_list[username]);
+	}
+	return JSON.stringify({
+		response: 'users_printed'
+	});
+}
 
 
 // -- socket logic --

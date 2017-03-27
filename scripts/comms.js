@@ -210,6 +210,12 @@ function requestBackup(){
 	}
 	ws.send(JSON.stringify(message));
 }
+function printUsers(){
+	var message = {
+		request: "print_users"
+	}
+	ws.send(JSON.stringify(message));
+}
 function resign(){
 	var message = {
 		request: "resign",
