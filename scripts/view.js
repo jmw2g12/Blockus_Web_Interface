@@ -32,6 +32,7 @@ var transforms = [
 [5,7,2,4],
 ];
 var board = [];
+var turn; // 1 or 2 denoting player
 var is_p1;
 var transform_codes = ['cw','ccw','ver','hor'];
 var selected_piece_id = -1;
@@ -205,7 +206,6 @@ function injectGameElements(){
 		
 	});
 	$('.board-cell').click(function(){
-		if (painted[1].length < 2) return;
 		var cell_coords = $(this).attr('id').split('board-cell')[1].split('_');
 		cell_coords = cell_coords.map(Number);
 		cell_coords = [cell_coords[1], cell_coords[2]];
@@ -300,9 +300,9 @@ function moveValid(){
 	// for each coord in coordinates check if each face is not players' block
 	var block = is_p1 ? 1 : 2;
 	var x,y;
-	console.log('testing face connections');
+	//console.log('testing face connections');
 	for (var i = 0; i < coordinates.length; i++){
-		console.log('testing coordinates[' + i + '] = ' + coordinates[i]);
+		//console.log('testing coordinates[' + i + '] = ' + coordinates[i]);
 		x = coordinates[i][0];
 		y = coordinates[i][1];
 		if (x > 0 && board[y][x-1] === block) return false;
@@ -310,7 +310,7 @@ function moveValid(){
 		if (x < (board.length-1) && board[y][x+1] === block) return false;
 		if (y < (board.length-1) && board[y+1][x] === block) return false;
 	}
-	console.log('face connections good');
+	//console.log('face connections good');
 	return true;
 }
 function resetAll(){
@@ -338,9 +338,23 @@ function setPieces(game, p1){
 	var piece_list;
 	if (p1){
 		piece_list = game.p1_pieces;
+		if (game.p1_resigned){
+			for (var i = 0; i < piece_list.length; i++){
+				populatePieceTable(i+1,piece_reference[i],false,true);
+			}
+			return;
+		}
 	}else{
 		piece_list = game.p2_pieces;
+		if (game.p2_resigned){
+			for (var i = 0; i < piece_list.length; i++){
+				populatePieceTable(i+1,piece_reference[i],false,true);
+			}
+			return;
+		}
 	}
+	console.log('piece list = ');
+	console.log(piece_list);
 	for (var i = 0; i < piece_list.length; i++){
 		if (piece_list[i] == null){
 			populatePieceTable(i+1,piece_reference[i],false);

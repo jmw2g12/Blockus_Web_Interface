@@ -41,19 +41,28 @@ response_functions['login_reject'] = function (reply){
 }
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	var is_p1 = (reply.game.p1 === username);
+	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	var is_p1 = (reply.game.p1 === username);
+	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + '. Gamecode: ' + reply.gamecode);
+	var is_p1 = (reply.game.p1 === username);
+	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
@@ -73,12 +82,44 @@ response_functions['piece_placed'] = function (reply){
 }
 response_functions['cant_place'] = function (reply){
 	alert(reply.reason);
+	console.log(reply.game);
 }
 response_functions['game_update'] = function (reply){
 	console.log('game_update');
+	var is_p1 = (reply.game.p1 === username);
+	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
+	
 	setMoves(reply.game,(reply.game.p1 == username));
 	setPieces(reply.game,(reply.game.p1 == username));
 	console.log(reply.game);
+}
+response_functions['resigned'] = function (reply){
+	console.log('this player has resigned');
+	console.log(reply.game);
+	setPieces(reply.game,(reply.game.p1 == username));
+}
+response_functions['game_over'] = function (reply){
+	console.log('game is over');
+	console.log(reply.game);
+	setPieces(reply.game,(reply.game.p1 == username));
+	var p1_score = 0;
+	var p2_score = 0;
+	for (var y = 0; y < board.length; y++){
+		for (var x = 0; x < board[0].length; x++){
+			if (board[y][x] === 1) p1_score++;
+			if (board[y][x] === 2) p2_score++;
+		}
+	}
+	console.log('scores are ' + p1_score + ' : ' + p2_score);
+	if ((reply.game.p1 == username && (p1_score > p2_score)) || (reply.game.p2 == username && (p1_score < p2_score))){
+		alert('congratulations, you won');
+	}else if (p1_score === p2_score){
+		alert('the game was a draw!');
+	}else{
+		alert('better luck next time, the other player won');
+	}
 }
 
 
@@ -137,6 +178,7 @@ function joinGame(gamecode){
 	ws.send(JSON.stringify(message));
 }
 function placePiece(piece_id, transform_code, coordinates){
+	resetAll();
 	var message = {
 		request: "place_piece",
 		data: {
@@ -161,4 +203,14 @@ function messageUser(to_user, text){
 		};
 		ws.send(JSON.stringify(message));
 	}
+}
+function resign(){
+	var message = {
+		request: "resign",
+		data: {
+			username: username,
+			gamecode: gamecode
+		}
+	};
+	ws.send(JSON.stringify(message));
 }
