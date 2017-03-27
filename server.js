@@ -704,8 +704,10 @@ request_functions['backup_data'] = function (message, ws){
 	});
 }
 request_functions['print_users'] = function (message, ws){
-	for (username in user_list){
-		console.log(user_list[username]);
+	for (var username in user_list){
+		if (user_list.hasOwnProperty(username)){
+			console.log(user_list[username]);
+		}
 	}
 	return JSON.stringify({
 		response: 'users_printed'
