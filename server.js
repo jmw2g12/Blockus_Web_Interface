@@ -527,7 +527,7 @@ function arrayToJSON(arr){
 	var result = '[';
 	for(var code in arr) {
 		if(arr.hasOwnProperty(code)){
-			result += JSON.stringify(arr[code]));
+			result += JSON.stringify(arr[code]);
 		}
 	}
 	result += ']';
