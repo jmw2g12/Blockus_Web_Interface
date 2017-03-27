@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 const http = require('http');
 const fs = require('fs');
 const dropbox = require('dropbox');
-process.on('exit', data_to_dropbox());
+//process.on('exit', data_to_dropbox());
 
 const app = express().use(function(req, res){
   	var pathname = url.parse(req.url).pathname;
