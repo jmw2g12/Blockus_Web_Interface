@@ -682,7 +682,7 @@ request_functions['login'] = function (message, ws){
 		});
 	}else{
 		if (user_list[message.username].password === message.password){
-			var game_list = user_list[message.username].games;
+			var game_list = user_list[message.username].game_codes;
 			user_list[message.username].add_ws_client(ws);
 			return JSON.stringify({
 				response: 'login_success',

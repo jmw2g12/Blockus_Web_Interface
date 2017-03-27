@@ -28,12 +28,12 @@ response_functions['login_success'] = function (reply){
 			other_player = game.p1;
 		}
 		if (other_player == null || other_player == undefined){
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' (no opponent yet)</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' (no opponent yet)</a><br>');
 		}else if (other_player == '* computer *'){
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs ' + other_player.replace(/\s+/g,'') + '</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' vs ' + other_player.replace(/\s+/g,'') + '</a><br>');
 		}else{
 			other_player = other_player.charAt(0).toUpperCase() + other_player.slice(1);
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs \"' + other_player + '\"</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' vs \"' + other_player + '\"</a><br>');
 		}
 	});
 }
