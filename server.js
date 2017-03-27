@@ -505,9 +505,9 @@ function data_to_dropbox(){
 	var user_path = '/BlokusData/backup/' + n + '_users.txt';
 	var game_path = '/BlokusData/backup/' + n + '_games.txt';
 	var user_contents = arrayToJSON(user_list);
-	var game_contents = arrayToJSON(game_list);
+	//var game_contents = arrayToJSON(game_list);
 	console.log('user_contents : ' + user_contents);
-	console.log('game_contents : ' + game_contents);
+	//console.log('game_contents : ' + game_contents);
 	dbx.filesUpload({ path: user_path, contents: user_contents })
       .then(function (response) {
         console.log(response);
@@ -515,13 +515,13 @@ function data_to_dropbox(){
       .catch(function (err) {
         console.log(err);
       });
-    dbx.filesUpload({ path: game_path, contents: game_contents })
+    /*dbx.filesUpload({ path: game_path, contents: game_contents })
       .then(function (response) {
         console.log(response);
       })
       .catch(function (err) {
         console.log(err);
-      });
+      });*/
 }
 function arrayToJSON(arr){
 	var result = '[';
