@@ -504,8 +504,8 @@ function data_to_dropbox(){
     var n = d.getTime();
 	var user_path = '/BlokusData/backup/' + n + '_users.txt';
 	var game_path = '/BlokusData/backup/' + n + '_games.txt';
-	var user_contents = JSON.stringify(user_list);
-	var game_contents = JSON.stringify(game_list);
+	var user_contents = arrayToJSON(user_list);
+	var game_contents = arrayToJSON(game_list);
 	console.log('user_contents : ' + user_contents);
 	console.log('game_contents : ' + game_contents);
 	dbx.filesUpload({ path: user_path, contents: user_contents })
@@ -522,6 +522,16 @@ function data_to_dropbox(){
       .catch(function (err) {
         console.log(err);
       });
+}
+function arrayToJSON(arr){
+	var result = '[';
+	for(var code in arr) {
+		if(arr.hasOwnProperty(code)){
+			result += JSON.stringify(arr[code]));
+		}
+	}
+	result += ']';
+	return result;
 }
 
 
