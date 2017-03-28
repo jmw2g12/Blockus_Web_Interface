@@ -71,6 +71,7 @@ class user {
 		}
 	}
 	add_ws_client(ws){
+		console.log('adding web socket client to ' + this.username + '. size of arr = ' + this.ws_clients.length);
 		this.ws_clients.push(ws);
 	}
 	message_user(from,text){
