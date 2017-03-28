@@ -767,7 +767,9 @@ request_functions['print_games'] = function (message, ws){
 const wss = new SocketServer({ server:app });
 
 wss.on('connection', (ws) => {
-  //console.log('Client connected');
+  //console.log('Client connected : ' + Object.keys(ws));
+  //console.log(ws.hasOwnProperty('_closeTimer') + ', _closeTimer = ' + ws['_closeTimer']);
+  ws['_closeTimer'] = -1;
   
   ws.on('message', function incoming(message) {
   	var parsed_message = JSON.parse(message);
