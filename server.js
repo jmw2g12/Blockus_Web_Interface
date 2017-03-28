@@ -55,7 +55,11 @@ class user {
 		this.username = username;
 		this.password = password;
 		this.game_codes = [];
-		if (ws) this.ws_clients = [ws];
+		if (ws){
+			this.ws_clients = [ws];
+		}else{
+			this.ws_clients = [];
+		}
 		console.log(this.ws_clients);
 	}
 	set_game_codes(game_codes){
@@ -72,8 +76,8 @@ class user {
 		}
 	}
 	add_ws_client(ws){
-		console.log('adding web socket client to ' + this.username + '. size of arr = ' + this.ws_clients.length);
 		this.ws_clients.push(ws);
+		console.log('adding web socket client to ' + this.username + '. size of arr = ' + this.ws_clients.length);
 	}
 	message_user(from,text){
 		//console.log('in message_user function, list size is ' + this.ws_clients.length);
