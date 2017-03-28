@@ -782,7 +782,10 @@ setInterval(function(){
 	wss.clients.forEach(function each(client) {
 		if (client.readyState === 1) {
 			console.log('pinging client');
-			client.send('hello');
+			client.send(JSON.stringify({
+			response: 'hello',
+			data: {}
+		}));
 		}
 	});
 }, 40*1000);
