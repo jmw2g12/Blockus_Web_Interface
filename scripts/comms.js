@@ -126,7 +126,7 @@ response_functions['game_over'] = function (reply){
 		alert('better luck next time, the other player won');
 	}
 }
-response_functions['game_over'] = function (reply){};
+response_functions['ping'] = function (reply){};
 
 
 // -- response caller --
