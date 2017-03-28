@@ -763,7 +763,7 @@ backup_user_list.forEach(function(backup_user){
 	user_list[backup_user.username] = new user(backup_user.username, backup_user.password);
 	user_list[backup_user.username].set_game_codes(backup_user.game_codes);
 });
-backup_user_list.forEach(function(backup_game){
+backup_game_list.forEach(function(backup_game){
 	game_list[backup_game.gamecode] = new game(backup_game.game_code, backup_game.p1, backup_game.single_player);
 	game_list[backup_game.gamecode].set_game_configuration(backup_game.p2, backup_game.p1_board, backup_game.p2_board, backup_game.turn, backup_game.moves, backup_game.p1_resigned, backup_game.p2_resigned, backup_game.p1_pieces, backup_game.p2_pieces, backup_game.game_over, backup_game.move_record);
 });
