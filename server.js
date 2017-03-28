@@ -778,7 +778,13 @@ wss.on('connection', (ws) => {
   
   //ws.on('close', () => console.log('Client disconnected'));
 });
-
+setInterval(function(){
+	wss.clients.forEach(function each(client) {
+		if (client.readyState === WebSocket.OPEN) {
+		  client.send('hello');
+		}
+	});
+}, 40*1000);
 
 
 // -- load previous data --
