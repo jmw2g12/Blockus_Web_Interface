@@ -783,7 +783,7 @@ setInterval(function(){
 		if (client.readyState === 1) {
 			console.log('pinging client');
 			client.send(JSON.stringify({
-			response: 'hello',
+			response: 'ping',
 			data: {}
 		}));
 		}
