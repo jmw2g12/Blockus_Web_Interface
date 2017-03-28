@@ -28,12 +28,12 @@ response_functions['login_success'] = function (reply){
 			other_player = game.p1;
 		}
 		if (other_player == null || other_player == undefined){
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' (no opponent yet)</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' (no opponent yet)</a><br>');
 		}else if (other_player == '* computer *'){
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' vs ' + other_player.replace(/\s+/g,'') + '</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs ' + other_player.replace(/\s+/g,'') + '</a><br>');
 		}else{
 			other_player = other_player.charAt(0).toUpperCase() + other_player.slice(1);
-			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game + '\')"> -> ' + game + ' vs \"' + other_player + '\"</a><br>');
+			$('#joinable-games-list').append('<a class="joinable-game" onclick="joinGame(\'' + game.gamecode + '\')"> -> ' + game.gamecode + ' vs \"' + other_player + '\"</a><br>');
 		}
 	});
 }
@@ -43,27 +43,30 @@ response_functions['login_reject'] = function (reply){
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
+	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
+	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
+	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
@@ -76,25 +79,26 @@ response_functions['receive_message'] = function (reply){
 	$('#message-view').slideToggle()
 }
 response_functions['piece_placed'] = function (reply){
+	//console.log('piece placed');
 	setPieces(reply.game,(reply.game.p1 == username));
 	setMoves(reply.game,(reply.game.p1 == username));
 	resetPiece();
-	console.log(reply.game);
+	//console.log(reply.game);
 }
 response_functions['cant_place'] = function (reply){
 	alert(reply.reason);
-	console.log(reply.game);
+	//console.log(reply.game);
 }
 response_functions['game_update'] = function (reply){
-	console.log('game_update');
+	//console.log('game_update : ' + JSON.stringify(reply));
 	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.turn === 1) : (reply.turn === 2));
+	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.gamecode + ' | ' + appendage);
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	
 	setMoves(reply.game,(reply.game.p1 == username));
 	setPieces(reply.game,(reply.game.p1 == username));
-	console.log(reply.game);
+	//console.log(reply.game);
 }
 response_functions['resigned'] = function (reply){
 	console.log('this player has resigned');
@@ -214,6 +218,12 @@ function requestBackup(){
 function printUsers(){
 	var message = {
 		request: "print_users"
+	}
+	ws.send(JSON.stringify(message));
+}
+function printGames(){
+	var message = {
+		request: "print_games"
 	}
 	ws.send(JSON.stringify(message));
 }

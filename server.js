@@ -60,7 +60,6 @@ class user {
 		}else{
 			this.ws_clients = [];
 		}
-		console.log(this.ws_clients);
 	}
 	set_game_codes(game_codes){
 		this.game_codes = game_codes;
@@ -75,9 +74,15 @@ class user {
 			console.log('removing game : ' + game.gamecode + ' from user : ' + this.username);
 		}
 	}
+	get_games(){
+		var games = [];
+		for (var i = 0; i < this.game_codes.length; i++){
+			games.push(game_list[this.game_codes[i]]);
+		}
+		return games;
+	}
 	add_ws_client(ws){
 		this.ws_clients.push(ws);
-		console.log('adding web socket client to ' + this.username + '. size of arr = ' + this.ws_clients.length);
 	}
 	message_user(from,text){
 		//console.log('in message_user function, list size is ' + this.ws_clients.length);
@@ -287,6 +292,7 @@ class game {
 	
 	}
 	update_socket_clients(msg){
+		console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
 		user_list[this.p1].update_user(game_list[this.gamecode],msg);
 		if (!this.single_player && this.p2 != null){
 			user_list[this.p2].update_user(game_list[this.gamecode],msg);
@@ -550,8 +556,10 @@ function arrayToJSON(arr){
 	for(var code in arr) {
 		if(arr.hasOwnProperty(code)){
 			result += JSON.stringify(arr[code],replacer);
+			result += ',';
 		}
 	}
+	result = result.slice(0, -1);
 	result += ']';
 	return result;
 }
@@ -704,7 +712,7 @@ request_functions['login'] = function (message, ws){
 		});
 	}else{
 		if (user_list[message.username].password === message.password){
-			var game_list = user_list[message.username].game_codes;
+			var game_list = user_list[message.username].get_games();
 			user_list[message.username].add_ws_client(ws);
 			return JSON.stringify({
 				response: 'login_success',
@@ -736,11 +744,21 @@ request_functions['backup_data'] = function (message, ws){
 request_functions['print_users'] = function (message, ws){
 	for (var username in user_list){
 		if (user_list.hasOwnProperty(username)){
-			console.log(user_list[username]);
+			console.log(username + ' : ' + user_list[username]);
 		}
 	}
 	return JSON.stringify({
 		response: 'users_printed'
+	});
+}
+request_functions['print_games'] = function (message, ws){
+	for (var gamecode in game_list){
+		if (game_list.hasOwnProperty(gamecode)){
+			console.log(gamecode + ' : ' + game_list[gamecode]);
+		}
+	}
+	return JSON.stringify({
+		response: 'games_printed'
 	});
 }
 
@@ -762,14 +780,14 @@ wss.on('connection', (ws) => {
 
 
 // -- load previous data --
-var backup_user_list = [{"username":"a","password":"a","game_codes":["SGOP"],"ws_clients":[]}];
-var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":1,"moves":0,"p1":"a","p2":null,"p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"single_player":false,"game_over":false,"move_record":""}];
+var backup_user_list = [{"username":"a","password":"a","game_codes":["SGOP"],"ws_clients":[]},{"username":"b","password":"b","game_codes":["SGOP"],"ws_clients":[]}];
+var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,2,2],[0,0,0,0,0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,0,0,0,2,2,0],[0,0,0,0,0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,0,2,2,2,2,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,3,0,0,0,0,3,0,0,0,0,0],[0,0,0,0,1,1,1,1,0,0,0,0,0,0],[0,3,0,0,0,1,0,0,3,0,0,0,0,0],[0,0,1,1,1,0,3,0,0,0,0,0,0,0],[0,3,0,1,0,3,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,3,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,3,0,0,0,0,3,0,0,0,0,0,0],[0,0,0,2,2,2,2,0,0,0,0,0,0,0],[3,0,0,2,0,0,0,3,0,0,0,0,0,0],[0,2,2,0,3,0,0,0,0,0,0,0,0,0],[0,2,0,3,0,0,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":2,"moves":5,"p1":"a","p2":"b","p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,{"piece_code":11,"transform_code":1,"coord":[5,8]},null,null,{"piece_code":14,"transform_code":1,"coord":[1,13]},{"piece_code":15,"transform_code":1,"coord":[3,10]},null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,{"piece_code":10,"transform_code":1,"coord":[4,10]},null,null,null,null,null,null,null,{"piece_code":18,"transform_code":1,"coord":[2,12]},null,null],"single_player":false,"game_over":false,"move_record":"1: 13,1;12,1;11,1;13,0;11,0;\n2: 12,2;11,2;12,1;13,0;12,0;\n1: 11,4;10,4;9,4;10,3;10,2;\n2: 10,4;9,4;8,4;7,4;10,3;\n1: 9,6;8,6;7,6;6,6;8,5;\n"}];
 
 backup_user_list.forEach(function(backup_user){
 	user_list[backup_user.username] = new user(backup_user.username, backup_user.password);
 	user_list[backup_user.username].set_game_codes(backup_user.game_codes);
 });
 backup_game_list.forEach(function(backup_game){
-	game_list[backup_game.gamecode] = new game(backup_game.game_code, backup_game.p1, backup_game.single_player);
+	game_list[backup_game.gamecode] = new game(backup_game.gamecode, backup_game.p1, backup_game.single_player);
 	game_list[backup_game.gamecode].set_game_configuration(backup_game.p2, backup_game.p1_board, backup_game.p2_board, backup_game.turn, backup_game.moves, backup_game.p1_resigned, backup_game.p2_resigned, backup_game.p1_pieces, backup_game.p2_pieces, backup_game.game_over, backup_game.move_record);
 });
