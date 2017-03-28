@@ -56,6 +56,7 @@ class user {
 		this.password = password;
 		this.game_codes = [];
 		this.ws_clients = [ws];
+		console.log(this.ws_clients);
 	}
 	set_game_codes(game_codes){
 		this.game_codes = game_codes;
