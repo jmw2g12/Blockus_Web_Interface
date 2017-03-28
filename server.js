@@ -87,7 +87,7 @@ class user {
 	message_user(from,text){
 		//console.log('in message_user function, list size is ' + this.ws_clients.length);
 		for (var i = 0; i < this.ws_clients.length; i++){
-			if (this.ws_clients[i].readyState == 1){
+			if (this.ws_clients[i].readyState === 1){
 				console.log('messaging user');
 				this.ws_clients[i].send(JSON.stringify({
 					response: 'receive_message',
@@ -780,8 +780,9 @@ wss.on('connection', (ws) => {
 });
 setInterval(function(){
 	wss.clients.forEach(function each(client) {
-		if (client.readyState === WebSocket.OPEN) {
-		  client.send('hello');
+		if (client.readyState === 1) {
+			console.log('pinging client');
+			client.send('hello');
 		}
 	});
 }, 40*1000);
