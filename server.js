@@ -57,6 +57,9 @@ class user {
 		this.game_codes = [];
 		this.ws_clients = [ws];
 	}
+	set_game_codes(game_codes){
+		this.game_codes = game_codes;
+	}
 	add_game(game){
 		this.game_codes.push(game.gamecode);
 	}
@@ -133,6 +136,19 @@ class game {
 		this.game_over = false;
 		this.move_record = "";
 		//this.java_player
+	}
+	set_game_configuration(p2, p1_board, p2_board, turn, moves, p1_resigned, p2_resigned, p1_pieces, p2_pieces, game_over, move_record){
+		this.p2 = p2;
+		this.p1_board = p1_board;
+		this.p2_board = p2_board;
+		this.turn = turn;
+		this.moves = moves;
+		this.p1_resigned = p1_resigned;
+		this.p2_resigned = p2_resigned;
+		this.p1_pieces = p1_pieces;
+		this.p2_pieces = p2_pieces;
+		this.game_over = game_over;
+		this.move_record = move_record;
 	}
 	player_scores(board){
 		var p1_score = 0;
@@ -744,8 +760,10 @@ var backup_user_list = [{"username":"a","password":"a","game_codes":["SGOP"],"ws
 var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":1,"moves":0,"p1":"a","p2":null,"p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"single_player":false,"game_over":false,"move_record":""}];
 
 backup_user_list.forEach(function(backup_user){
-	user_list[backup_user.username] = backup_user;
+	user_list[backup_user.username] = new user(backup_user.username, backup_user.password);
+	user_list[backup_user.username].set_game_codes(backup_user.game_codes);
 });
 backup_user_list.forEach(function(backup_game){
-	game_list[backup_game.gamecode] = backup_game;
+	game_list[backup_game.gamecode] = new game(backup_game.game_code, backup_game.p1, backup_game.single_player);
+	game_list[backup_game.gamecode].set_game_configuration(backup_game.p2, backup_game.p1_board, backup_game.p2_board, backup_game.turn, backup_game.moves, backup_game.p1_resigned, backup_game.p2_resigned, backup_game.p1_pieces, backup_game.p2_pieces, backup_game.game_over, backup_game.move_record);
 });
