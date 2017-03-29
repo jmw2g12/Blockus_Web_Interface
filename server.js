@@ -790,7 +790,7 @@ wss.on('connection', (ws) => {
 setInterval(function(){
 	wss.clients.forEach(function each(client) {
 		if (client.readyState === 1) {
-			console.log('pinging client');
+			//console.log('pinging client');
 			client.send(JSON.stringify({
 			response: 'ping',
 			data: {}
@@ -798,6 +798,9 @@ setInterval(function(){
 		}
 	});
 }, 40*1000);
+setInterval(function(){
+	data_to_dropbox();
+}, 12*60*60*1000);
 
 
 // -- load previous data --
