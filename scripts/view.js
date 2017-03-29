@@ -187,9 +187,8 @@ function injectGameElements(){
 	$('.piece-table').click(function(){
 		var id = $(this).attr('id').split('_')[1]-1;
 		if (id < piece_reference.length){
-			//populatePieceTable(0,piece_reference[$(this).attr('id').split('_')[1]-1],true);
 			selected_piece_id = id;
-			rotation_code = 1;
+			piece_transform_code = 1;
 			populatePieceTable(0,piece_reference[$(this).attr('id').split('_')[1]-1],true);
 			$('.piece-controls-row > input').attr('disabled',false);
 		}
