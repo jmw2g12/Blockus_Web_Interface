@@ -68,16 +68,11 @@ class user {
 		this.game_codes.push(game.gamecode);
 	}
 	remove_game(gamecode){
-		console.log('attempting to remove game');
-		console.log('game_codes = ' + this.game_codes);
-		console.log('game code in question = ' + gamecode);
 		var index = this.game_codes.indexOf(gamecode);
 		if (index > -1) {
 			this.game_codes.splice(index, 1);
-			console.log('removing game : ' + gamecode + ' from user : ' + this.username);
+			//console.log('removing game : ' + gamecode + ' from user : ' + this.username);
 		}
-		console.log('game_codes after = ' + this.game_codes);
-		console.log('game_codes length = ' + this.game_codes.length);
 	}
 	get_games(){
 		var games = [];
@@ -93,7 +88,7 @@ class user {
 		//console.log('in message_user function, list size is ' + this.ws_clients.length);
 		for (var i = 0; i < this.ws_clients.length; i++){
 			if (this.ws_clients[i].readyState === 1){
-				console.log('messaging user');
+				//console.log('messaging user');
 				this.ws_clients[i].send(JSON.stringify({
 					response: 'receive_message',
 					data: {
@@ -263,11 +258,11 @@ class game {
 		var player_resigned;
 		if (player_no === 1){
 			player_resigned = this.p1_resigned;
-			console.log('player_no = 1, player_resigned = ' + player_resigned);
+			//console.log('player_no = 1, player_resigned = ' + player_resigned);
 		}
 		if (player_no === 2){
 			player_resigned = this.p2_resigned;
-			console.log('player_no = 2, player_resigned = ' + player_resigned);
+			//console.log('player_no = 2, player_resigned = ' + player_resigned);
 		
 		}
 		if (this.turn == player_no && !player_resigned && this.is_piece_unused(player_no, piece_code) && this.is_placement_valid(piece_code, transform_code, coord)){
@@ -285,13 +280,13 @@ class game {
 			return true;
 		}else{
 			//reply with error
-			console.log('');
-			console.log('invalid placement checks:');
-			console.log('player ' + player_no + ' attempted to go. it is player ' + this.turn + ' go.');
-			console.log('have players resigned ?  p1_resigned = ' + this.p1_resigned + ',  p2_resigned = ' + this.p2_resigned);
-			console.log('attempted to place piece ' + piece_code + '. is it unused ? ' + this.is_piece_unused(player_no, piece_code));
-			console.log('is the placement valid ? ' + this.is_placement_valid(piece_code, transform_code, coord));
-			console.log('');
+			//console.log('');
+			//console.log('invalid placement checks:');
+			//console.log('player ' + player_no + ' attempted to go. it is player ' + this.turn + ' go.');
+			//console.log('have players resigned ?  p1_resigned = ' + this.p1_resigned + ',  p2_resigned = ' + this.p2_resigned);
+			//console.log('attempted to place piece ' + piece_code + '. is it unused ? ' + this.is_piece_unused(player_no, piece_code));
+			//console.log('is the placement valid ? ' + this.is_placement_valid(piece_code, transform_code, coord));
+			//console.log('');
 			return false;
 		}
 	
@@ -447,7 +442,7 @@ class game {
 	finish_game(){
 		this.update_socket_clients('game_over');
 		this.game_over = true;
-		console.log(this.move_record);
+		//console.log(this.move_record);
 		game_to_dropbox(this);
 		//remove game from array to improve server performance
 	}
@@ -609,7 +604,7 @@ request_functions['place_piece'] = function (message){
 	}
 }
 request_functions['resign'] = function (message){
-	console.log('resign message from player in gamecode ' + message.gamecode);
+	//console.log('resign message from player in gamecode ' + message.gamecode);
 	if (game_list[message.gamecode] !== null && game_list[message.gamecode].is_player_joined(message.username)){
 		var game = game_list[message.gamecode];
 		//var game = JSON.parse(JSON.stringify(game_list[message.gamecode]));
