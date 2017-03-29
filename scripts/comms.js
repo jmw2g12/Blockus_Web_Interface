@@ -2,6 +2,7 @@ var HOST = location.origin.replace(/^http/, 'ws')
 var ws = new WebSocket(HOST);
 var username = '';
 var gamecode = '';
+var game_over = false;
 
 // -- response functions --
 var response_functions = [];
@@ -20,6 +21,7 @@ response_functions['login_success'] = function (reply){
 	
 	console.log('login success : ' + JSON.stringify(reply));
 	reply.games.forEach(function(game){
+		if (game == null) return;
 		$('#joinable-games-list').show();
 		var other_player = '';
 		if (game.p1 == username){
@@ -86,8 +88,25 @@ response_functions['piece_placed'] = function (reply){
 	//console.log(reply.game);
 }
 response_functions['cant_place'] = function (reply){
-	alert(reply.reason);
+	//alert(reply.reason);
 	//console.log(reply.game);
+	//console.log('here - invalid move from server');
+	$("#page-title").clearQueue();
+	$("#page-title").fadeOut('fast',function(){
+		var is_p1 = (reply.game.p1 === username);
+		var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
+		var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+		var prev = 'Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage;
+		//console.log('prev = ' + prev);
+		$("#page-title").html('Invalid move');
+		$("#page-title").fadeIn('fast',function(){
+			$("#page-title").delay(1500).fadeOut('fast',function(){
+				$("#page-title").html(prev);
+				$("#page-title").fadeIn('fast');
+			});
+		});
+	});
+	
 }
 response_functions['game_update'] = function (reply){
 	//console.log('game_update : ' + JSON.stringify(reply));
@@ -103,10 +122,16 @@ response_functions['game_update'] = function (reply){
 response_functions['resigned'] = function (reply){
 	console.log('this player has resigned');
 	console.log(reply.game);
+	var is_p1 = (reply.game.p1 === username);
+	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
+	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	setPieces(reply.game,(reply.game.p1 == username));
 }
 response_functions['game_over'] = function (reply){
 	console.log('game is over');
+	game_over = true;
+	setGameOver();
 	console.log(reply.game);
 	setPieces(reply.game,(reply.game.p1 == username));
 	var p1_score = 0;
@@ -119,11 +144,23 @@ response_functions['game_over'] = function (reply){
 	}
 	console.log('scores are ' + p1_score + ' : ' + p2_score);
 	if ((reply.game.p1 == username && (p1_score > p2_score)) || (reply.game.p2 == username && (p1_score < p2_score))){
-		alert('congratulations, you won');
+		console.log('Congratulations, you won!');
+		$("#page-title").fadeOut('fast',function(){
+			$("#page-title").html('Congratulations, you won!');
+			$("#page-title").fadeIn('fast');
+		});
 	}else if (p1_score === p2_score){
-		alert('the game was a draw!');
+		console.log('The game was a draw!');
+		$("#page-title").fadeOut('fast',function(){
+			$("#page-title").html('The game was a draw!');
+			$("#page-title").fadeIn('fast');
+		});
 	}else{
-		alert('better luck next time, the other player won');
+		console.log('Better luck next time, the other player won');
+		$("#page-title").fadeOut('fast',function(){
+			$("#page-title").html('Better luck next time, the other player won');
+			$("#page-title").fadeIn('fast');
+		});
 	}
 }
 response_functions['ping'] = function (reply){};

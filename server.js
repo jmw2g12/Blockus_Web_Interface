@@ -67,12 +67,17 @@ class user {
 	add_game(game){
 		this.game_codes.push(game.gamecode);
 	}
-	remove_game(game){
-		var index = this.game_codes.indexOf(game.gamecode);
+	remove_game(gamecode){
+		console.log('attempting to remove game');
+		console.log('game_codes = ' + this.game_codes);
+		console.log('game code in question = ' + gamecode);
+		var index = this.game_codes.indexOf(gamecode);
 		if (index > -1) {
 			this.game_codes.splice(index, 1);
-			console.log('removing game : ' + game.gamecode + ' from user : ' + this.username);
+			console.log('removing game : ' + gamecode + ' from user : ' + this.username);
 		}
+		console.log('game_codes after = ' + this.game_codes);
+		console.log('game_codes length = ' + this.game_codes.length);
 	}
 	get_games(){
 		var games = [];
@@ -292,7 +297,7 @@ class game {
 	
 	}
 	update_socket_clients(msg){
-		console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
+		//console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
 		user_list[this.p1].update_user(game_list[this.gamecode],msg);
 		if (!this.single_player && this.p2 != null){
 			user_list[this.p2].update_user(game_list[this.gamecode],msg);
@@ -500,8 +505,8 @@ function gen_random_string(length){
     return text;
 }
 function game_to_dropbox(game){
-	console.log(game);
-	console.log('sending file to dropbox');
+	//console.log(game);
+	//console.log('sending file to dropbox');
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	
 	// need to find an appropriate data storage system
@@ -515,18 +520,18 @@ function game_to_dropbox(game){
 	var d = new Date();
     var n = d.getTime();
 	var path = '/BlokusData/' + game.gamecode + '/' + n + '.txt';
-	console.log("path = " + path);
+	//console.log("path = " + path);
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
-        console.log(response);
+        //console.log(response);
       })
       .catch(function (err) {
-        console.log(err);
+        //console.log(err);
       });
-    console.log("leaving send file to dropbox function");
+    //console.log("leaving send file to dropbox function");
 }
 function data_to_dropbox(){
-	console.log('sending all game and user data to dropbox');
+	//console.log('sending all game and user data to dropbox');
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var d = new Date();
     var n = d.getTime();
@@ -534,32 +539,32 @@ function data_to_dropbox(){
 	var game_path = '/BlokusData/backup/' + n + '_games.txt';
 	var user_contents = arrayToJSON(user_list);
 	var game_contents = arrayToJSON(game_list);
-	console.log('user_contents : ' + user_contents);
-	console.log('game_contents : ' + game_contents);
+	//console.log('user_contents : ' + user_contents);
+	//console.log('game_contents : ' + game_contents);
 	dbx.filesUpload({ path: user_path, contents: user_contents })
       .then(function (response) {
-        console.log(response);
+        //console.log(response);
       })
       .catch(function (err) {
-        console.log(err);
+        //console.log(err);
       });
     dbx.filesUpload({ path: game_path, contents: game_contents })
       .then(function (response) {
-        console.log(response);
+        //console.log(response);
       })
       .catch(function (err) {
-        console.log(err);
+        //console.log(err);
       });
 }
 function arrayToJSON(arr){
 	var result = '[';
 	for(var code in arr) {
-		if(arr.hasOwnProperty(code)){
+		if(arr.hasOwnProperty(code) && arr[code] !== null){
 			result += JSON.stringify(arr[code],replacer);
 			result += ',';
 		}
 	}
-	result = result.slice(0, -1);
+	if (result.slice(-1) === ',') result = result.slice(0, -1);
 	result += ']';
 	return result;
 }
@@ -604,12 +609,15 @@ request_functions['place_piece'] = function (message){
 	}
 }
 request_functions['resign'] = function (message){
+	console.log('resign message from player in gamecode ' + message.gamecode);
 	if (game_list[message.gamecode] !== null && game_list[message.gamecode].is_player_joined(message.username)){
 		var game = game_list[message.gamecode];
+		//var game = JSON.parse(JSON.stringify(game_list[message.gamecode]));
 		game_list[message.gamecode].resign_player(game_list[message.gamecode].which_player(message.username));
 		if (game.game_over){
-			game_list[message.gamecode] = null;
 			user_list[message.username].remove_game(message.gamecode);
+			user_list[game_list[message.gamecode].other_player(message.username)].remove_game(message.gamecode);
+			delete game_list[message.gamecode];
 		}
 		return JSON.stringify({
 			response: 'resigned',
@@ -660,32 +668,33 @@ request_functions['start_2p'] = function (message){
 	});
 }
 request_functions['join_game'] = function (message){
-	if (game_list[message.gamecode] == null){
+	var code = message.gamecode.toUpperCase();
+	if (game_list[code] == null){
 		return JSON.stringify({
 			response: 'failed_join_game',
 			data: {
 				reason: 'nonexistant',
-				gamecode: message.gamecode
+				gamecode: code
 			}
 		});
 	}
-	if (game_list[message.gamecode].is_player_joined(message.username)){
+	if (game_list[code].is_player_joined(message.username)){
 		return JSON.stringify({
 			response: 'joined_game',
 			data: {
-				gamecode: message.gamecode,
-				game: game_list[message.gamecode]
+				gamecode: code,
+				game: game_list[code]
 			}
 		});
 	}
-	if (game_list[message.gamecode].is_joinable()){
-		game_list[message.gamecode].add_p2(message.username);
-		user_list[message.username].add_game(game_list[message.gamecode]);
+	if (game_list[code].is_joinable()){
+		game_list[code].add_p2(message.username);
+		user_list[message.username].add_game(game_list[code]);
 		return JSON.stringify({
 			response: 'joined_game',
 			data: {
-				gamecode: message.gamecode,
-				game: game_list[message.gamecode]
+				gamecode: code,
+				game: game_list[code]
 			}
 		});
 	}
@@ -693,7 +702,7 @@ request_functions['join_game'] = function (message){
 		response: 'failed_join_game',
 		data: {
 			reason: 'game_full',
-			gamecode: message.gamecode
+			gamecode: code
 		}
 	});
 }

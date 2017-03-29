@@ -32,19 +32,23 @@ var transforms = [
 [5,7,2,4],
 ];
 var board = [];
-var turn; // 1 or 2 denoting player
+var turn = 1; // 1 or 2 denoting player
 var is_p1;
 var transform_codes = ['cw','ccw','ver','hor'];
 var selected_piece_id = -1;
 var piece_transform_code = 1;
 var painted = [[],[]];
 var corners = [];
+var gamecode = '';
+var game_over = false;
 
 function loadGame(game){
 	$('#splash').fadeOut('fast', function(){
 		$('#blokus-game').fadeIn('slow');
 		injectGameElements();
 		var p1 = (game.p1 == username);
+		gamecode = game.gamecode;
+		turn = game.turn;
 		//console.log('this player is player 1 : ' + p1);
 		setMoves(game,p1);
 		
@@ -206,13 +210,31 @@ function injectGameElements(){
 		
 	});
 	$('.board-cell').click(function(){
+		if (game_over) return;
 		var cell_coords = $(this).attr('id').split('board-cell')[1].split('_');
 		cell_coords = cell_coords.map(Number);
 		cell_coords = [cell_coords[1], cell_coords[2]];
 		if (moveValid()){
 			placePiece(selected_piece_id, piece_transform_code, cell_coords);
 		}else{
-			alert('invalid move');
+			//alert('invalid move');
+			//console.log('here - invalid move');
+			$("#page-title").clearQueue();
+			$("#page-title").fadeOut('fast',function(){
+				//var prev = $("#page-title").html();
+				var is_turn = (is_p1 ? (turn === 1) : (turn === 2));
+				console.log('invalid move : is_p1=' + is_p1 + ', turn=' + turn + ', is_turn=' + is_turn);
+				var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+				var prev = 'Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + gamecode + ' | ' + appendage;
+				//console.log('prev = ' + prev);
+				$("#page-title").html('Invalid move');
+				$("#page-title").fadeIn('fast',function(){
+					$("#page-title").delay(1500).fadeOut('fast',function(){
+						$("#page-title").html(prev);
+						$("#page-title").fadeIn('fast');
+					});
+				});
+			});
 		}
 	});
 	
@@ -339,6 +361,8 @@ function setPieces(game, p1){
 	if (p1){
 		piece_list = game.p1_pieces;
 		if (game.p1_resigned){
+			$('.piece-table').prop('onclick',null).off('click');
+			resetPiece();
 			for (var i = 0; i < piece_list.length; i++){
 				populatePieceTable(i+1,piece_reference[i],false,true);
 			}
@@ -347,6 +371,8 @@ function setPieces(game, p1){
 	}else{
 		piece_list = game.p2_pieces;
 		if (game.p2_resigned){
+			$('.piece-table').prop('onclick',null).off('click');
+			resetPiece();
 			for (var i = 0; i < piece_list.length; i++){
 				populatePieceTable(i+1,piece_reference[i],false,true);
 			}
@@ -370,7 +396,7 @@ function resetPiece(){
 	$('#rotateccw').prop('disabled', true);
 	$('#fliphor').prop('disabled', true);
 	$('#flipver').prop('disabled', true);
-	populatePieceTable(i+1,piece_reference[i],true,true);
+	populatePieceTable(-1,-1,true,true);
 	selected_piece_id = -1;
 	piece_transform_code = 1;
 	//painted = [[],[]];
@@ -397,10 +423,15 @@ function populatePieceTable(i,piece,main,empty){
 		}
 	}
 }
+function setGameOver(){
+	game_over = true;
+}
 function setMoves(game, p1){
 	var my_pieces = [];
 	var opp_pieces = [];
 	var my_board;
+	turn = game.turn;
+	game_over = game.game_over;
 	if (p1){
 		my_pieces = game.p1_pieces;
 		opp_pieces = game.p2_pieces;
