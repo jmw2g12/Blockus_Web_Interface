@@ -15,6 +15,7 @@ response_functions['login_success'] = function (reply){
 		$('#blokus-game').fadeOut('slow',function(){
 			$('#splash').fadeIn('slow');
 		});
+		gamecode = '';
 	}
 	$('#splash-login').fadeOut('slow',function(){
 		$('#splash-input-container').fadeIn();
@@ -22,7 +23,8 @@ response_functions['login_success'] = function (reply){
 	});
 	$("#page-title").html('Welcome to Blokus, ' + reply.username[0].toUpperCase() + reply.username.substring(1).toLowerCase());
 	
-	//console.log('login success : ' + JSON.stringify(reply));
+	console.log('login success : ' + JSON.stringify(reply));
+	$('#joinable-games-list').html('');
 	reply.games.forEach(function(game){
 		if (game == null) return;
 		$('#joinable-games-list').show();
@@ -187,7 +189,7 @@ function requestLogin(username, password){
 		var message = {
 			request: "login",
 			data: {
-				username: username,
+				username: username.toLowerCase(),
 				password: password
 			}
 		};
@@ -195,6 +197,9 @@ function requestLogin(username, password){
 	}else{
 		alert('Please enter a valid username and password');
 	}
+}
+function backToAccount(){
+	requestLogin(username, password);
 }
 function start1pGame(){
 	var message = {
@@ -244,7 +249,7 @@ function messageUser(to_user, text){
 			request: "msg_user",
 			data: {
 				from_user: username,
-				to_user: to_user,
+				to_user: to_user.toLowerCase(),
 				text: text
 			}
 		};
@@ -267,7 +272,7 @@ function printUser(username){
 	var message = {
 		request: "print_user",
 		data: {
-			username: username
+			username: username.toLowerCase()
 		}
 	}
 	ws.send(JSON.stringify(message));
