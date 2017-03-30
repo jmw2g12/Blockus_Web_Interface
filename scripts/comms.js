@@ -110,6 +110,7 @@ response_functions['cant_place'] = function (reply){
 }
 response_functions['game_update'] = function (reply){
 	//console.log('game_update : ' + JSON.stringify(reply));
+	if (gamecode === '') return;
 	var is_p1 = (reply.game.p1 === username);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
