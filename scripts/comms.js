@@ -306,6 +306,6 @@ function send(message){
 	if (ws.readyState === 1) {
 		ws.send(message);
 	}else{
-		alert('The Blokus server is down. Please refresh this page.');
+		alert('Connection to the server was lost. Please refresh this page, log back in and click on gamecode ' + gamecode + ' to continue playing.');
 	}
 }
