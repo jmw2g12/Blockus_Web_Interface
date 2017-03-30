@@ -24,7 +24,8 @@ const app = express().use(function(req, res){
   .listen(port, () => console.log("Listening on " + port + ".."));
   
 process.on('uncaughtException', function (err) {
-  console.log('*** Error occurred *** : ' + err);
+	data_to_dropbox('error_at_');
+	console.log('*** Error occurred *** : ' + err);
 })
 
 var board_size = 14;
@@ -534,11 +535,16 @@ function game_to_dropbox(game){
       });
     //console.log("leaving send file to dropbox function");
 }
-function data_to_dropbox(){
+function data_to_dropbox(name){
 	//console.log('sending all game and user data to dropbox');
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var d = new Date();
-    var n = d.getTime();
+	var n = '';
+    if (name){
+    	n = name + d.getTime();
+    }else{
+    	n = d.getTime();
+    }
 	var user_path = '/BlokusData/backup/' + n + '_users.txt';
 	var game_path = '/BlokusData/backup/' + n + '_games.txt';
 	var user_contents = arrayToJSON(user_list);

@@ -303,10 +303,10 @@ function resign(){
 	send(JSON.stringify(message));
 }
 function send(message){
-	try{
+	console.log(Object.keys(ws));
+	if (true) {
 		ws.send(message);
-	}catch(err){
-		console.log(err);
+	}else{
 		alert('The Blokus server is down. Please refresh this page.');
 	}
 }
