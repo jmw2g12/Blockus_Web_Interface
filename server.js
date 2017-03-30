@@ -448,6 +448,7 @@ class game {
 			this.turn = 1;
 			if (this.p1_resigned) this.finish_game();
 		}
+		this.update_socket_clients('game_update');
 	}
 	finish_game(){
 		this.update_socket_clients('game_over');
