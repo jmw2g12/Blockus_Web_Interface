@@ -306,6 +306,7 @@ function send(message){
 	try{
 		ws.send(message);
 	}catch(err){
+		console.log(err);
 		alert('The Blokus server is down. Please refresh this page.');
 	}
 }
