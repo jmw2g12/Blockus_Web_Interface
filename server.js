@@ -22,6 +22,10 @@ const app = express().use(function(req, res){
   })
   .use('/favicon.ico', express.static('images/favicon.ico'))
   .listen(port, () => console.log("Listening on " + port + ".."));
+  
+process.on('uncaughtException', function (err) {
+  console.log('*** Error occurred *** : ' + err);
+})
 
 var board_size = 14;
 var piece_count = 21;
