@@ -546,8 +546,8 @@ function data_to_dropbox(name){
     }else{
     	n = d.getTime();
     }
-	var user_path = '/BlokusData/backup/' + n + '_users.txt';
-	var game_path = '/BlokusData/backup/' + n + '_games.txt';
+	var user_path = '/BlokusBackups/' + n + '_users.txt';
+	var game_path = '/BlokusBackups/' + n + '_games.txt';
 	var user_contents = arrayToJSON(user_list);
 	var game_contents = arrayToJSON(game_list);
 	//console.log('user_contents : ' + user_contents);
