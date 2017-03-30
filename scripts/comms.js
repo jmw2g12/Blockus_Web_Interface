@@ -11,6 +11,10 @@ var response_functions = [];
 response_functions['login_success'] = function (reply){
 	username = reply.username;
 	$('#splash-text').fadeOut('slow');
+	if (gamecode === ''){
+		$('#blokus-game').fadeOut('slow');
+		$('#splash').fadeIn('slow');
+	}
 	$('#splash-login').fadeOut('slow',function(){
 		$('#splash-input-container').fadeIn();
 		$('#splash-input-container').css('display','table');
