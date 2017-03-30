@@ -1,15 +1,13 @@
 var HOST = location.origin.replace(/^http/, 'ws')
 var ws = new WebSocket(HOST);
 var username = '';
+var password = '';
 var gamecode = '';
 var game_over = false;
 
 // -- response functions --
 var response_functions = [];
 
-response_functions['game_code'] = function (reply){
-	alert(reply);
-}
 response_functions['login_success'] = function (reply){
 	username = reply.username;
 	$('#splash-text').fadeOut('slow');
@@ -41,11 +39,11 @@ response_functions['login_success'] = function (reply){
 }
 response_functions['login_reject'] = function (reply){
 	alert(reply.username + ' is already in use!');
+	password = '';
 }
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
@@ -55,7 +53,6 @@ response_functions['started_1p'] = function (reply){
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
@@ -65,7 +62,6 @@ response_functions['started_2p'] = function (reply){
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
 	var is_p1 = (reply.game.p1 === username);
-	console.log('reply.turn = ' + reply.turn + ', reply.game.turn = ' + reply.game.turn);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
@@ -122,8 +118,8 @@ response_functions['game_update'] = function (reply){
 	//console.log(reply.game);
 }
 response_functions['resigned'] = function (reply){
-	console.log('this player has resigned');
-	console.log(reply.game);
+	//console.log('this player has resigned');
+	//console.log(reply.game);
 	var is_p1 = (reply.game.p1 === username);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
@@ -131,10 +127,10 @@ response_functions['resigned'] = function (reply){
 	setPieces(reply.game,(reply.game.p1 == username));
 }
 response_functions['game_over'] = function (reply){
-	console.log('game is over');
+	//console.log('game is over');
 	game_over = true;
 	setGameOver();
-	console.log(reply.game);
+	//console.log(reply.game);
 	setPieces(reply.game,(reply.game.p1 == username));
 	var p1_score = 0;
 	var p2_score = 0;
@@ -144,21 +140,21 @@ response_functions['game_over'] = function (reply){
 			if (board[y][x] === 2) p2_score++;
 		}
 	}
-	console.log('scores are ' + p1_score + ' : ' + p2_score);
+	//console.log('scores are ' + p1_score + ' : ' + p2_score);
 	if ((reply.game.p1 == username && (p1_score > p2_score)) || (reply.game.p2 == username && (p1_score < p2_score))){
-		console.log('Congratulations, you won!');
+		//console.log('Congratulations, you won!');
 		$("#page-title").fadeOut('fast',function(){
 			$("#page-title").html('Congratulations, you won!');
 			$("#page-title").fadeIn('fast');
 		});
 	}else if (p1_score === p2_score){
-		console.log('The game was a draw!');
+		//console.log('The game was a draw!');
 		$("#page-title").fadeOut('fast',function(){
 			$("#page-title").html('The game was a draw!');
 			$("#page-title").fadeIn('fast');
 		});
 	}else{
-		console.log('Better luck next time, the other player won');
+		//console.log('Better luck next time, the other player won');
 		$("#page-title").fadeOut('fast',function(){
 			$("#page-title").html('Better luck next time, the other player won');
 			$("#page-title").fadeIn('fast');
@@ -182,6 +178,7 @@ ws.onmessage = function (reply) {
 // -- request functions --
 function requestLogin(username, password){
 	if (username.match(/^[a-zA-Z0-9]+$/) && password.match(/^[a-zA-Z0-9]+$/)){
+		this.password = password;
 		var message = {
 			request: "login",
 			data: {

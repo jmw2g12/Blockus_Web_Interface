@@ -63,7 +63,7 @@ function loadGame(game){
 		//if not resigned:
 		setPieces(game,p1);
 		setGo(game,p1);
-		console.log(game);
+		//console.log(game);
 	});
 }
 function setCoordsRelative(origin,coords){
@@ -223,7 +223,7 @@ function injectGameElements(){
 			$("#page-title").fadeOut('fast',function(){
 				//var prev = $("#page-title").html();
 				var is_turn = (is_p1 ? (turn === 1) : (turn === 2));
-				console.log('invalid move : is_p1=' + is_p1 + ', turn=' + turn + ', is_turn=' + is_turn);
+				//console.log('invalid move : is_p1=' + is_p1 + ', turn=' + turn + ', is_turn=' + is_turn);
 				var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 				var prev = 'Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + gamecode + ' | ' + appendage;
 				//console.log('prev = ' + prev);
@@ -379,8 +379,8 @@ function setPieces(game, p1){
 			return;
 		}
 	}
-	console.log('piece list = ');
-	console.log(piece_list);
+	//console.log('piece list = ');
+	//console.log(piece_list);
 	for (var i = 0; i < piece_list.length; i++){
 		if (piece_list[i] == null){
 			populatePieceTable(i+1,piece_reference[i],false);
@@ -457,10 +457,10 @@ function setMoves(game, p1){
 			p = transform(opp_pieces[i].piece_code,opp_pieces[i].transform_code);
 			rel_p = pieceRelativeCoords(p);
 			to_paint = setCoordsRelative(opp_pieces[i].coord,rel_p);
-			console.log(to_paint);
+			//console.log(to_paint);
 			var twisted;
 			for (var j = 0; j < to_paint.length; j++){
-				console.log(to_paint[j]);
+				//console.log(to_paint[j]);
 				twisted = twistCoord(to_paint[j]);
 				$('#board-cell_' + twisted[0] + '_' + twisted[1]).addClass("opp-block");
 			}
@@ -470,7 +470,7 @@ function setMoves(game, p1){
 	for (var y = 0; y < board.length; y++){
 		for (var x = 0; x < board.length; x++){
 			if (board[y][x] === 3){
-				console.log('setting corner ' + x + ', ' + y + ' :   #board-cell_' + (x+1) + '_' + (y+1));
+				//console.log('setting corner ' + x + ', ' + y + ' :   #board-cell_' + (x+1) + '_' + (y+1));
 				$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("corner-block");
 				corners.push([x,y]);
 			}else{
@@ -478,7 +478,7 @@ function setMoves(game, p1){
 			}
 		}
 	}
-	console.log('corners.length = ' + corners.length);
+	//console.log('corners.length = ' + corners.length);
 }
 function twistCoord(coord){
 	return [15 - coord[0], 15 - coord[1]];
