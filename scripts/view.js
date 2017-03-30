@@ -483,6 +483,6 @@ function setMoves(game, p1){
 function twistCoord(coord){
 	return [15 - coord[0], 15 - coord[1]];
 }
-function setGo(game, p1){
-	
+function setTurn(turn){
+	this.turn = turn;
 }
