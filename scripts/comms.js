@@ -76,9 +76,10 @@ response_functions['failed_join_game'] = function (reply){
 	alert('could not join the game : ' + reply.reason);
 }
 response_functions['receive_message'] = function (reply){
-	$('#message-from').html(reply.from_user);
-	$('#message-text').html(reply.text);
-	$('#message-view').slideToggle()
+	//$('#message-from').html(reply.from_user);
+	//$('#message-text').html(reply.text);
+	//$('#message-view').slideToggle()
+	alert('Message from ' + reply.from_user + ':\n\n' + reply.text);
 }
 response_functions['piece_placed'] = function (reply){
 	//console.log('piece placed');
