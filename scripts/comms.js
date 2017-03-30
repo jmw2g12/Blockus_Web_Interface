@@ -193,7 +193,7 @@ function requestLogin(username, password){
 				password: password
 			}
 		};
-		ws.send(JSON.stringify(message));
+		send(JSON.stringify(message));
 	}else{
 		alert('Please enter a valid username and password');
 	}
@@ -208,7 +208,7 @@ function start1pGame(){
 			username: username
 		}
 	};
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function start2pGame(){
 	var message = {
@@ -217,7 +217,7 @@ function start2pGame(){
 			username: username
 		}
 	};
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function joinGame(gamecode){
 	var message = {
@@ -227,7 +227,7 @@ function joinGame(gamecode){
 			gamecode: gamecode
 		}
 	};
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function placePiece(piece_id, transform_code, coordinates){
 	resetAll();
@@ -241,7 +241,7 @@ function placePiece(piece_id, transform_code, coordinates){
 			coordinates: coordinates
 		}
 	};
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function messageUser(to_user, text){
 	if (username !== null){
@@ -253,20 +253,20 @@ function messageUser(to_user, text){
 				text: text
 			}
 		};
-		ws.send(JSON.stringify(message));
+		send(JSON.stringify(message));
 	}
 }
 function requestBackup(){
 	var message = {
 		request: "backup_data"
 	}
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function printUsers(){
 	var message = {
 		request: "print_users"
 	}
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function printUser(username){
 	var message = {
@@ -275,13 +275,13 @@ function printUser(username){
 			username: username.toLowerCase()
 		}
 	}
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function printGames(){
 	var message = {
 		request: "print_games"
 	}
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function printGame(gamecode){
 	var message = {
@@ -290,7 +290,7 @@ function printGame(gamecode){
 			gamecode: gamecode
 		}
 	}
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
 }
 function resign(){
 	var message = {
@@ -300,5 +300,12 @@ function resign(){
 			gamecode: gamecode
 		}
 	};
-	ws.send(JSON.stringify(message));
+	send(JSON.stringify(message));
+}
+function send(message){
+	try{
+		ws.send(message);
+	}catch(err){
+		alert('The Blokus server is down. Please refresh this page.');
+	}
 }
