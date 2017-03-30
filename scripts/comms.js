@@ -172,7 +172,7 @@ ws.onmessage = function (reply) {
 	if (response_functions[parsed_reply.response] != null){
 		response_functions[parsed_reply.response](parsed_reply.data);
 	}else{
-		console.log('invalid response function : ' + parsed_reply.response);
+		console.log('unassigned response function : ' + parsed_reply.response);
 	}
 };
 
@@ -259,9 +259,27 @@ function printUsers(){
 	}
 	ws.send(JSON.stringify(message));
 }
+function printUser(username){
+	var message = {
+		request: "print_user",
+		data: {
+			username: username
+		}
+	}
+	ws.send(JSON.stringify(message));
+}
 function printGames(){
 	var message = {
 		request: "print_games"
+	}
+	ws.send(JSON.stringify(message));
+}
+function printGame(gamecode){
+	var message = {
+		request: "print_game",
+		data: {
+			gamecode: gamecode
+		}
 	}
 	ws.send(JSON.stringify(message));
 }

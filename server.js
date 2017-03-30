@@ -55,6 +55,7 @@ class user {
 		this.username = username;
 		this.password = password;
 		this.game_codes = [];
+		this.games_played = 0;
 		if (ws){
 			this.ws_clients = [ws];
 		}else{
@@ -64,12 +65,16 @@ class user {
 	set_game_codes(game_codes){
 		this.game_codes = game_codes;
 	}
+	set_games_played(played){
+		this.games_played = played;
+	}
 	add_game(game){
 		this.game_codes.push(game.gamecode);
 	}
 	remove_game(gamecode){
 		var index = this.game_codes.indexOf(gamecode);
 		if (index > -1) {
+			this.games_played++;
 			this.game_codes.splice(index, 1);
 			//console.log('removing game : ' + gamecode + ' from user : ' + this.username);
 		}
@@ -746,19 +751,48 @@ request_functions['backup_data'] = function (message, ws){
 	});
 }
 request_functions['print_users'] = function (message, ws){
+	console.log('request to print all users : ');
 	for (var username in user_list){
 		if (user_list.hasOwnProperty(username)){
-			console.log(username + ' : ' + user_list[username]);
+			console.log(username + ' : ' + util.inspect(user_list[username],{depth: 1}));
 		}
 	}
 	return JSON.stringify({
 		response: 'users_printed'
 	});
 }
+request_functions['print_user'] = function (message, ws){
+	console.log('request to print single user (' + message.username + ') : ');
+	if (user_list.hasOwnProperty(message.username)){
+		console.log(util.inspect(user_list[message.username],{depth: 1}));
+		return JSON.stringify({
+			response: 'user_printed'
+		});
+	}else{
+		return JSON.stringify({
+			response: 'user_nonexistant'
+		});
+	}
+}
+request_functions['print_game'] = function (message, ws){
+	console.log('request to print single game (' + message.gamecode + ') : ');
+	if (game_list.hasOwnProperty(message.gamecode)){
+		console.log(JSON.stringify(game_list[message.gamecode]));
+		return JSON.stringify({
+			response: 'game_printed'
+		});
+	}else{
+		return JSON.stringify({
+			response: 'game_nonexistant'
+		});
+	}
+}
 request_functions['print_games'] = function (message, ws){
+	console.log('request to print all games');
 	for (var gamecode in game_list){
 		if (game_list.hasOwnProperty(gamecode)){
-			console.log(gamecode + ' : ' + game_list[gamecode]);
+			console.log(gamecode + ' : ' + JSON.stringify(game_list[gamecode]));
+			console.log('');
 		}
 	}
 	return JSON.stringify({
@@ -805,6 +839,7 @@ var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,
 backup_user_list.forEach(function(backup_user){
 	user_list[backup_user.username] = new user(backup_user.username, backup_user.password);
 	user_list[backup_user.username].set_game_codes(backup_user.game_codes);
+	if (backup_user.games_played) user_list[backup_user.username].set_games_played(backup_user.games_played);
 });
 backup_game_list.forEach(function(backup_game){
 	game_list[backup_game.gamecode] = new game(backup_game.gamecode, backup_game.p1, backup_game.single_player);
