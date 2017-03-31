@@ -62,7 +62,6 @@ function loadGame(game){
 		
 		//if not resigned:
 		setPieces(game,p1);
-		setGo(game,p1);
 		//console.log(game);
 	});
 }

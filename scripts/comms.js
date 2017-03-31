@@ -113,7 +113,7 @@ response_functions['cant_place'] = function (reply){
 	
 }
 response_functions['game_update'] = function (reply){
-	//console.log('game_update : ' + JSON.stringify(reply));
+	console.log('game_update : ' + JSON.stringify(reply));
 	if (gamecode === '') return;
 	setTurn(game.turn);
 	var is_p1 = (reply.game.p1 === username);
