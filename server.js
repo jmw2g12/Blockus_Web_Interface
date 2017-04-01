@@ -27,12 +27,6 @@ process.on('uncaughtException', function (err) {
 	data_to_dropbox('error_at_');
 	console.log('*** Error occurred *** : ' + util.inspect(err));
 })
-process.on('SIGINT', function (err) {
-	data_to_dropbox('down_at_');
-})
-process.on('SIGTERM', function (err) {
-	data_to_dropbox('down_at_');
-})
 
 var board_size = 14;
 var piece_count = 21;

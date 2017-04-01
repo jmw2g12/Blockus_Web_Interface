@@ -45,6 +45,7 @@ var game_over = false;
 function loadGame(game){
 	$('#splash').fadeOut('fast', function(){
 		$('#blokus-game').fadeIn('slow');
+		
 		injectGameElements();
 		var p1 = (game.p1 == username);
 		gamecode = game.gamecode;
@@ -59,6 +60,11 @@ function loadGame(game){
 			board = game.p2_board;
 			is_p1 = false;
 		}
+		
+		var is_turn = (is_p1 ? (turn === 1) : (turn === 2));
+		var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
+		$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + gamecode + ' | ' + appendage);
+	
 		
 		//if not resigned:
 		setPieces(game,p1);

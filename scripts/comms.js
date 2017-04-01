@@ -50,28 +50,16 @@ response_functions['login_reject'] = function (reply){
 }
 response_functions['started_1p'] = function (reply){
 	//alert('started a 1 player game with game code ' + reply.gamecode);
-	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
-	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['started_2p'] = function (reply){
 	//alert('started a 2 player game with game code ' + reply.gamecode);
-	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
-	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
 response_functions['joined_game'] = function (reply){
 	//alert('joined an already running game with game code ' + reply.gamecode);
-	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
-	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	gamecode = reply.gamecode;
 	loadGame(reply.game);
 }
@@ -119,7 +107,8 @@ response_functions['game_update'] = function (reply){
 	var is_p1 = (reply.game.p1 === username);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
 	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
+	
+	if (!game_over) $("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
 	
 	setMoves(reply.game,(reply.game.p1 == username));
 	setPieces(reply.game,(reply.game.p1 == username));
@@ -128,10 +117,9 @@ response_functions['game_update'] = function (reply){
 response_functions['resigned'] = function (reply){
 	//console.log('this player has resigned');
 	//console.log(reply.game);
-	var is_p1 = (reply.game.p1 === username);
-	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
-	var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
-	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | ' + appendage);
+	$("#resign-button").prop('disabled', true);
+	$('.board-cell').off('click');
+	$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + reply.game.gamecode + ' | You have resigned, waiting for other player');
 	setPieces(reply.game,(reply.game.p1 == username));
 }
 response_functions['game_over'] = function (reply){
@@ -148,6 +136,8 @@ response_functions['game_over'] = function (reply){
 			if (board[y][x] === 2) p2_score++;
 		}
 	}
+	$("#resign-button").prop('disabled', true);
+	$('.board-cell').off('click');
 	//console.log('scores are ' + p1_score + ' : ' + p2_score);
 	if ((reply.game.p1 == username && (p1_score > p2_score)) || (reply.game.p2 == username && (p1_score < p2_score))){
 		//console.log('Congratulations, you won!');
@@ -307,6 +297,10 @@ function send(message){
 	if (ws.readyState === 1) {
 		ws.send(message);
 	}else{
-		alert('Connection to the server was lost. Please refresh this page, log back in and click on gamecode ' + gamecode + ' to continue playing.');
+		if (gamecode == ''){
+			alert('Connection to the server was lost. Please refresh this page.');
+		}else{
+			alert('Connection to the server was lost. Please refresh this page, log back in and click on gamecode ' + gamecode + ' to continue playing.');
+		}
 	}
 }
