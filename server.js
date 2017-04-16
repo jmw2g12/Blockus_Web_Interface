@@ -24,7 +24,7 @@ const app = express().use(function(req, res){
   .listen(port, () => console.log("Listening on " + port + ".."));
   
 process.on('uncaughtException', function (err) {
-	data_to_dropbox('error_at_');
+	//data_to_dropbox('error_at_');
 	console.log('*** Error occurred *** : ' + util.inspect(err));
 })
 
@@ -156,7 +156,13 @@ class game {
 		this.single_player = single_player;
 		this.game_over = false;
 		this.move_record = "";
-		//this.java_player
+		if (single_player){
+			var blokusConstructor = java.import("Blokus");
+			this.java_game = new blokusConstructor();
+			this.java_human = this.java_game.getP1Sync();
+			this.java_computer = this.java_game.getP2Sync();
+			this.intervalFunc = null;
+		}
 	}
 	set_game_configuration(p2, p1_board, p2_board, turn, moves, p1_resigned, p2_resigned, p1_pieces, p2_pieces, game_over, move_record){
 		this.p2 = p2;
@@ -264,6 +270,7 @@ class game {
 		return res;
 	}
 	player_move(username, piece_code, transform_code, coord){ //, ws_client){
+		
 		var player_no = this.which_player(username);
 		var player_resigned;
 		if (player_no === 1){
@@ -287,6 +294,12 @@ class game {
 			
 			//update all linked socket clients
 			this.update_socket_clients('game_update');
+				
+				
+			if (this.single_player){
+				this.make_java_human_move();
+				this.intervalFunc = setInterval(this.computer_move_check.bind(this),1000);
+			}
 			return true;
 		}else{
 			//reply with error
@@ -300,6 +313,64 @@ class game {
 			return false;
 		}
 	
+	}
+	setBoardAfterJavaMove(newBoard){
+		var board = this.generate_empty_board();
+		for (var y = 0; y < newBoard.length; y++){
+			for (var x = 0; x < newBoard.length; x++){
+				if (newBoard[13-y][x] == 1 || newBoard[13-y][x] == 2) board[y][x] = parseInt(newBoard[13-y][x]);
+			}
+		}
+		this.update_java_move_record(board,this.p2_board);
+		this.p1_board = this.process_corners(JSON.parse(JSON.stringify(board)),true);
+		this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
+		//console.log(this.p1_board);
+	}
+	update_java_move_record(new_board,old_board){
+		this.move_record = this.move_record.concat('2: ');
+		for (var y = 0; y < new_board.length; y++){
+			for (var x = 0; x < new_board.length; x++){
+				if (new_board[y][x] == 2 && old_board[y][x] != 2){
+					this.move_record = this.move_record.concat(String(board_size-x), ',', String(board_size-y), ';');
+				}
+			}
+		}			
+		this.move_record = this.move_record.concat('\n');
+	}
+	computer_move_check(){
+		//console.log("checking if comp is finished : " + this.java_game);
+		if (this.java_game.hasCompFinishedSync()){
+			//console.log("is finished!");
+			clearInterval(this.intervalFunc);
+			this.moves++;
+			this.java_game.resetCompMoveFlagSync();
+			this.setBoardAfterJavaMove(this.java_game.getBoardArraySync());
+			this.p2_resigned = this.java_game.hasCompResignedSync();
+			console.log("has comp resigned? " + this.p2_resigned);
+			if (!this.p1_resigned) this.turn = 1;
+			this.update_socket_clients('game_update');
+		}else{
+			//console.log("not finished.");
+		}
+	}
+	make_java_human_move(){
+		//console.log("is java_computer null ? " + this.java_computer);
+		this.java_game.webMove(this.neutral_board(),function(err, result) {
+			result.compMove(function(err, result){
+			
+			});
+		});
+	}
+	neutral_board(){
+		var board = JSON.parse(JSON.stringify(this.p1_board));
+		for (var y = 0; y < board_size; y++){
+			for (var x = 0; x < board_size; x++){
+				if (board[y][x] == 3){
+					board[y][x] = 0;
+				}
+			}
+		}
+		return board;
 	}
 	update_socket_clients(msg){
 		//console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
@@ -386,10 +457,11 @@ class game {
 		}
 	}
 	process_corners(board,is_p1){
+		//console.log('processing corners for ' + (is_p1 ? 'p1' : 'p2'));
 		for (var y = 0; y < board_size; y++){
 			for (var x = 0; x < board_size; x++){
 				//console.log('testing at ' + x + ', ' + y);
-				if (board[y][x] == 0){ //if idx isn't block of piece
+				if (board[y][x] == 0 || board[y][x] == null){ //if idx isn't block of piece
 					//console.log('testing ' + x + ', ' + y);
 					if (this.is_corner(board,x,y,is_p1)) board[y][x] = 3;
 				}
@@ -401,10 +473,10 @@ class game {
 	is_corner(board,x,y,is_p1){
 		//has corner
 		var block = (is_p1 ? 1 : 2);
-		if ((x > 0 && y > 0 && board[y-1][x-1] === block) || (x < (board_size-1) && y > 0 && board[y-1][x+1] === block) || (x < (board_size-1) && y < (board_size-1) && board[y+1][x+1] === block) || (x > 0 && y < (board_size-1) && board[y+1][x-1] === block)){
+		if ((x > 0 && y > 0 && board[y-1][x-1] == block) || (x < (board_size-1) && y > 0 && board[y-1][x+1] == block) || (x < (board_size-1) && y < (board_size-1) && board[y+1][x+1] == block) || (x > 0 && y < (board_size-1) && board[y+1][x-1] == block)){
 			//console.log('found a corner');
 			//does not have face
-			if (!(x > 0 && board[y][x-1] === block) && !(x < (board_size-1) && board[y][x+1] === block) && !(y > 0 && board[y-1][x] === block) && !(y < (board_size-1) && board[y+1][x] === block)) return true;
+			if (!(x > 0 && board[y][x-1] == block) && !(x < (board_size-1) && board[y][x+1] == block) && !(y > 0 && board[y-1][x] == block) && !(y < (board_size-1) && board[y+1][x] == block)) return true;
 			//console.log('but has connecting face');
 		}
 		return false;
@@ -593,20 +665,22 @@ function replacer(key,value){
 var request_functions = [];
 
 request_functions['place_piece'] = function (message){
+	//console.log('here');
 	if (game_list[message.gamecode] !== null){
 		if (game_list[message.gamecode].player_move(message.username, message.piece_id, message.transform_code, message.coordinates)){
+			
 			return JSON.stringify({
 				response: 'piece_placed',
 				data: {
-					game: game_list[message.gamecode]
+					//game: game_list[message.gamecode]
 				}
 			});
 		}else{
 			return JSON.stringify({
 				response: 'cant_place',
 				data: {
-					reason: 'invalid_placement',
-					game: game_list[message.gamecode]
+					reason: 'invalid_placement'//,
+					//game: game_list[message.gamecode]
 				}
 			});
 		}
@@ -617,6 +691,7 @@ request_functions['place_piece'] = function (message){
 				reason: 'game_nonexistant'
 			}
 		});
+		
 	}
 }
 request_functions['resign'] = function (message){
@@ -822,6 +897,7 @@ wss.on('connection', (ws) => {
   
   ws.on('message', function incoming(message) {
   	var parsed_message = JSON.parse(message);
+  	console.log('here');
   	ws.send(request_functions[parsed_message.request](parsed_message.data, ws));
   });
   
@@ -856,3 +932,10 @@ backup_game_list.forEach(function(backup_game){
 	game_list[backup_game.gamecode] = new game(backup_game.gamecode, backup_game.p1, backup_game.single_player);
 	game_list[backup_game.gamecode].set_game_configuration(backup_game.p2, backup_game.p1_board, backup_game.p2_board, backup_game.turn, backup_game.moves, backup_game.p1_resigned, backup_game.p2_resigned, backup_game.p1_pieces, backup_game.p2_pieces, backup_game.game_over, backup_game.move_record);
 });
+
+
+// -- Java app interfacing --
+java.classpath.push("commons-lang3-3.1.jar");
+java.classpath.push("commons-io.jar");
+java.classpath.push("src");
+

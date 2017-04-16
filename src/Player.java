@@ -89,7 +89,7 @@ public abstract class Player{
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
-				
+		
 		return true;
 	}
 	public ArrayList<Piece> possibleMovesForPlayer(){

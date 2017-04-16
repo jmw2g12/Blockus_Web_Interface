@@ -11,6 +11,7 @@ public class Blokus{
 	ArrayList<Player> players = new ArrayList<Player>();
 	Random rand = new Random();
 	Board board = new Board(boardSize);
+	Boolean moveMade = false;
 	
 	public Blokus(){
 	
@@ -25,7 +26,27 @@ public class Blokus{
 		players.add(p1);
 		players.add(p2);
 		
+		System.out.println("players.size() = " + players.size());
 		
+	}
+	public boolean hasCompResigned(){
+		//return board.doesPlayerHaveMoves(players.get(1));
+		return false;
+	}
+	public boolean hasCompFinished(){
+		return moveMade;
+	}
+	public void resetCompMoveFlag(){
+		moveMade = false;
+	}
+	public Blokus webMove(Object[] newBoard){
+		this.moveMade = false;
+		((WebPlayer)players.get(0)).takeMove(newBoard);
+		return this;
+	}
+	public void compMove(){
+		players.get(1).takeMove();
+		moveMade = true;
 	}
 	public Player getP1(){
 		return players.get(0);

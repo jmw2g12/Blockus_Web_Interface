@@ -222,7 +222,6 @@ function injectGameElements(){
 		if (moveValid()){
 			placePiece(selected_piece_id, piece_transform_code, cell_coords);
 		}else{
-			//alert('invalid move');
 			//console.log('here - invalid move');
 			$("#page-title").clearQueue();
 			$("#page-title").fadeOut('fast',function(){
@@ -457,17 +456,27 @@ function setMoves(game, p1){
 			}
 		}
 	}
-	for (var i = 0; i < opp_pieces.length; i++){
-		if (opp_pieces[i] != null){
-			p = transform(opp_pieces[i].piece_code,opp_pieces[i].transform_code);
-			rel_p = pieceRelativeCoords(p);
-			to_paint = setCoordsRelative(opp_pieces[i].coord,rel_p);
-			//console.log(to_paint);
-			var twisted;
-			for (var j = 0; j < to_paint.length; j++){
-				//console.log(to_paint[j]);
-				twisted = twistCoord(to_paint[j]);
-				$('#board-cell_' + twisted[0] + '_' + twisted[1]).addClass("opp-block");
+	if (game.p2 == '* computer *'){
+		for (var y = 0; y < board.length; y++){
+			for (var x = 0; x < board.length; x++){
+				if (board[y][x] == 2){
+					$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("opp-block");
+				}
+			}
+		}
+	}else{
+		for (var i = 0; i < opp_pieces.length; i++){
+			if (opp_pieces[i] != null){
+				p = transform(opp_pieces[i].piece_code,opp_pieces[i].transform_code);
+				rel_p = pieceRelativeCoords(p);
+				to_paint = setCoordsRelative(opp_pieces[i].coord,rel_p);
+				//console.log(to_paint);
+				var twisted;
+				for (var j = 0; j < to_paint.length; j++){
+					//console.log(to_paint[j]);
+					twisted = twistCoord(to_paint[j]);
+					$('#board-cell_' + twisted[0] + '_' + twisted[1]).addClass("opp-block");
+				}
 			}
 		}
 	}

@@ -74,9 +74,9 @@ response_functions['receive_message'] = function (reply){
 }
 response_functions['piece_placed'] = function (reply){
 	//console.log('piece placed');
-	setPieces(reply.game,(reply.game.p1 == username));
-	setMoves(reply.game,(reply.game.p1 == username));
-	resetPiece();
+	//setPieces(reply.game,(reply.game.p1 == username));
+	//setMoves(reply.game,(reply.game.p1 == username));
+	//resetPiece();
 	//console.log(reply.game);
 }
 response_functions['cant_place'] = function (reply){
@@ -101,8 +101,8 @@ response_functions['cant_place'] = function (reply){
 	
 }
 response_functions['game_update'] = function (reply){
+	if (gamecode === '' || gamecode !== reply.game.gamecode) return;
 	console.log('game_update : ' + JSON.stringify(reply));
-	if (gamecode === '') return;
 	setTurn(reply.game.turn);
 	var is_p1 = (reply.game.p1 === username);
 	var is_turn = (is_p1 ? (reply.game.turn === 1) : (reply.game.turn === 2));
@@ -221,7 +221,6 @@ function joinGame(gamecode){
 	send(JSON.stringify(message));
 }
 function placePiece(piece_id, transform_code, coordinates){
-	resetAll();
 	var message = {
 		request: "place_piece",
 		data: {
@@ -233,6 +232,8 @@ function placePiece(piece_id, transform_code, coordinates){
 		}
 	};
 	send(JSON.stringify(message));
+	resetAll();
+	resetPiece();
 }
 function messageUser(to_user, text){
 	if (username !== null){
