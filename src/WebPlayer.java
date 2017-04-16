@@ -22,7 +22,7 @@ public class WebPlayer extends Player{
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
 		Piece p;
-		possibleMoves = possibleMovesForPlayer();
+		possibleMoves = moveToPieceList(board.getMoves(this));
 		if (possibleMoves.size() == 0){
 			finished = true;
 			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
@@ -34,7 +34,7 @@ public class WebPlayer extends Player{
 		removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
 		
-		board.print();
+		//board.print();
 		return true;
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){

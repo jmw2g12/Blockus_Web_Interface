@@ -31,15 +31,14 @@ public abstract class Player{
 		this.rand = rand;
 		this.startingCorner = startingCorner;
 	}
-	public void setConstructorValues(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner){
-		this.board = board;
-		this.pieces = pieces;
-		this.piecesRemaining = new ArrayList<Piece>(pieces);
-		this.piecesOnBoard = new ArrayList<Piece>();
-		this.pieceCode = pieceCode;
-		this.allPlayers = allPlayers;
-		this.rand = rand;
-		this.startingCorner = startingCorner;
+	
+	
+	
+	public int numberOfMoves(){
+		return piecesOnBoard.size();
+	}
+	public int getStartingCorner(){
+		return startingCorner;
 	}
 	public void placeStarterBlock(){
 		switch (startingCorner){
@@ -77,25 +76,50 @@ public abstract class Player{
 	public ArrayList<Piece> getPiecesRemaining(){ return piecesRemaining; }
 	public boolean takeMove(){	
 		if (firstMove) placeStarterBlock();
-		updatePieceIDs();
+		if (strategy.equals("human")) updatePieceIDs();
 		Piece p;
-		possibleMoves = possibleMovesForPlayer();
+		possibleMoves = moveToPieceList(board.getMoves(this));
+		//System.out.println("num of possible moves: " + possibleMoves.size());
+		//System.out.println(countTrue(board.getPiecesDown(this)) + " == " + piecesOnBoard.size());
+		//printBools(board.getPiecesDown(this));
 		if (possibleMoves.size() == 0){
 			finished = true;
-			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
+			//System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
 			return false;
 		}
 		p = choosePiece();
+		if (p == null){
+			finished = true;
+			//System.out.println("There is no move chosen! Player in " + startingCorner + " is finished.");
+			return false;
+		}
 		board.putPieceOnBoard(p,pieceCode);
-		removePiece(piecesRemaining.get(p.ID),true);
+		//removePiece(piecesRemaining.get(p.ID),true);
 		piecesOnBoard.add(p);
-		
+				
 		return true;
 	}
-	public ArrayList<Piece> possibleMovesForPlayer(){
-		cornerBlocks = board.getCornerBlocks(pieceCode);
-		connectableBlocks = board.getConnectableBlocks(cornerBlocks,pieceCode);
-		return getPossibleMoves(startingCorner,connectableBlocks,false);
+	public ArrayList<Piece> moveToPieceList(ArrayList<Move> ml){
+		ArrayList<Piece> pl = new ArrayList<Piece>();
+		for (Move m : ml){
+			pl.add(m.getPiece());
+		}
+		return pl;
+	}
+	public int countTrue(ArrayList<Boolean> bl){
+		int count = 0;
+		for (Boolean b : bl){
+			if (b) count++;
+		}
+		return count;
+	}
+	public void printBools(ArrayList<Boolean> bl){
+		int count = 0;
+		for (Boolean b : bl){
+			if (b) System.out.print("#" + count + "   ");
+			count++;
+		}
+		System.out.println();
 	}
 	public abstract Piece choosePiece();
 	public void removePiece(Piece piece, boolean removePermutations){
@@ -113,63 +137,6 @@ public abstract class Player{
 			p.ID = counter;
 			counter++;
 		}
-	}
-	public ArrayList<Piece> getPossibleMoves(int startingCorner, ArrayList<Pair<Block,Integer>> connectables, Boolean printPieces){
-		ArrayList<Piece> result = new ArrayList<Piece>();
-		Piece pieceToTest;
-		Block block_of_piece;
-		for (Pair<Block,Integer> c : connectables){	
-			for (Pair<Piece,Block> pcs : findPiecesToConnect(c.getR(),allPlayers.get(indexFromStartCorner(startingCorner)).getPiecesRemaining())){
-				pieceToTest = pcs.getL().clone();
-				block_of_piece = pieceToTest.blocks.get(pcs.getL().blocks.indexOf(pcs.getR())); //gets equivalent cloned block in new piece
-				pieceToTest.place_piece(block_of_piece, c.getL(), c.getR());
-				if (board.doesPieceFit(pieceToTest,true)){
-					result.add(pieceToTest);
-					if (printPieces){
-						pieceToTest.print_piece();
-						System.out.println("");
-					}
-				}
-			}
-		}
-		return result;
-	}
-	public Integer indexFromStartCorner(int start){
-		if (start == 1) return 0;
-		if (start == 3) return 1;
-		return null;
-	}
-	public ArrayList<Pair<Piece,Block>> findPiecesToConnect(int connectorDirection, ArrayList<Piece> piecesRemaining){
-		int direction = (connectorDirection + 2) % 4;
-		if (direction == 0) direction = 4;
-		ArrayList<Pair<Piece,Block>> connectable_pieces = new ArrayList<Pair<Piece,Block>>();
-		for (Piece p : piecesRemaining){
-			for (Block bl : p.blocks){
-				switch (direction){
-					case 1 : 
-						if (bl.topright){
-							connectable_pieces.add(new Pair<Piece,Block>(p,bl));
-						}
-						break;
-					case 2 : 	
-						if (bl.bottomright){
-							connectable_pieces.add(new Pair<Piece,Block>(p,bl));
-						}
-						break;
-					case 3 : 
-						if (bl.bottomleft){
-							connectable_pieces.add(new Pair<Piece,Block>(p,bl));
-						}
-						break;
-					case 4 : 
-						if (bl.topleft){
-							connectable_pieces.add(new Pair<Piece,Block>(p,bl));
-						}
-						break;
-				}
-			}
-		}
-		return connectable_pieces;
 	}
 	public void printRemainingPieces(){
 		int counter = 0;

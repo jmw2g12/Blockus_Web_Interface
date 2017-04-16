@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Random;
 import java.lang.Math;
+import java.util.Arrays;
 
 public class HumanPlayer extends Player{
 	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -15,11 +16,10 @@ public class HumanPlayer extends Player{
 		piecesOnBoard = new ArrayList<Piece>();
 		strategy = "human";
 	}
+	public Player clone(){
+		return new HumanPlayer(board,rand,new ArrayList<Piece>(pieces),pieceCode,allPlayers,startingCorner);
+	}
 	public Piece choosePiece(){ //should have no side effects, simply return player's chosen piece.
-		scoreBoard(board,startingCorner);
-		scoreBoard(board,startingCorner+1);
-		scoreBoard(board,startingCorner+2);
-		scoreBoard(board,startingCorner+3);
 		return acceptUserInput();
 	}
 	public String[] acceptValues(int numOfConnectors){
@@ -80,7 +80,7 @@ public class HumanPlayer extends Player{
 				System.out.println("");
 				continue;
 			}
-			if (!input[0].equals("") && input.length == 1 && isNumeric(input[0])){
+			if (input.length == 1 && isNumeric(input[0])){
 				if (Integer.parseInt(input[0]) < uniquePieces.size() && Integer.parseInt(input[0]) >= 0){
 					//Accepted piece is valid, print rotations
 					pieceIndex = Integer.parseInt(input[0]);
@@ -95,7 +95,7 @@ public class HumanPlayer extends Player{
 						System.out.println("");
 						continue;
 					}
-					if (!input[0].equals("") && input.length == 1 && isNumeric(input[0])){
+					if (input.length == 1 && isNumeric(input[0])){
 						if (Integer.parseInt(input[0]) < pieceVariations.size() && Integer.parseInt(input[0]) >= 0){
 							//Accepted rotation is valid, obtain piecesRemaining index of piece
 							chosenPiece = pieceVariations.get(Integer.parseInt(input[0]));
@@ -111,7 +111,7 @@ public class HumanPlayer extends Player{
 								System.out.println("");
 								continue;
 							}
-							if (!input[0].equals("") && input.length == 1 && isNumeric(input[0]) && Integer.parseInt(input[0]) < chosenPiece.blocks.size() && Integer.parseInt(input[0]) >= 0){
+							if (input.length == 1 && isNumeric(input[0]) && Integer.parseInt(input[0]) < chosenPiece.blocks.size() && Integer.parseInt(input[0]) >= 0){
 								//Accepted block number is valid
 								result[1] = input[0];
 								System.out.println('\n' + "Please enter connector number");
@@ -123,46 +123,47 @@ public class HumanPlayer extends Player{
 									System.out.println("");
 									continue;
 								}
-								if (!input[0].equals("") && input.length == 1 && isNumeric(input[0]) && Integer.parseInt(input[0]) <= numOfConnectors && Integer.parseInt(input[0]) >= 1){
+								if (input.length == 1 && isNumeric(input[0]) && Integer.parseInt(input[0]) <= numOfConnectors && Integer.parseInt(input[0]) >= 1){
 									result[2] = input[0];
 									break;
-								}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
+								}else if (input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
 									printBoardAndOptions();
 									continue;
 								}else{
 									System.out.println("Invalid input! Choose one of the connectors on the board, " + ((numOfConnectors == 1) ? ("of which there is only 1.") : (" from 1 to " + numOfConnectors + ".")));
 								}
-							}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
+							}else if (input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
 									printBoardAndOptions();
 									continue;
 							}else{
 								System.out.println("Invalid input! The piece only has " + (((chosenPiece.blocks.size() + chosenPiece.blocks.size()) == 1) ? " block." : " blocks."));
 							}
-						}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
+						}else if (input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
 									printBoardAndOptions();
 									continue;
 						}else{
 							System.out.println("Invalid input! Please enter a valid rotation ID (<=" + (pieceVariations.size()-1) + ").");
 						}
-					}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
+					}else if (input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
 						printBoardAndOptions();
 						continue;
 					}else{
 						System.out.println("Invalid input! Too many values or not numeric.");
 					}
-				}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
+				}else if (input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
 					printBoardAndOptions();
 					continue;
 				}else{
 					System.out.println("Invalid input! Please enter a valid piece ID (<=" + (uniquePieces.size()-1) + ").");
 				}
-			}else if (!input[0].equals("") && input.length == 1 && (input[0].equals("undo") || input[0].equals("print"))){
-				printBoardAndOptions();
-				continue;
 			}else{
 				if (input.length >= 1 && (input[0].equals("q") || input[0].equals("quit"))){
 					System.out.println('\n' + "Goodbye!" + '\n' + '\n');
 					System.exit(0);
+				}
+				if (input.length >= 1 && (input[0].equals("finish") || input[0].equals("resign"))){
+					System.out.println('\n' + "Resigning player" + '\n' + '\n');
+					return new String[]{"resign"};
 				}
 				System.out.println("Invalid input! Too many values or not numeric.");
 			}
@@ -177,7 +178,9 @@ public class HumanPlayer extends Player{
 		Piece p;
 		String[] input = {""};
 		while(true){
+			
 			input = orderedInput ? acceptValuesInOrder(connectableBlocks.size(),uniquePieces) : acceptValues(connectableBlocks.size());
+			if (input[0].equals("resign")) return null;
 			p = piecesRemaining.get(Integer.parseInt(input[0])).clone();
 			Block bl = p.blocks.get(Integer.parseInt(input[1]));
 			Block con = connectableBlocks.get(Integer.parseInt(input[2])-1).getL();
@@ -210,99 +213,5 @@ public class HumanPlayer extends Player{
 		board.printOptionsBoard(connectableBlocks, pieceCode);
 		System.out.println();
 		printPiecesInLine(piecesRemaining, 120, 3, 0, orderedInput,false);
-	}
-	
-	
-	//to check heuristic scores: 		****************************
-	
-	public int scoreBoard(Board b, int startingCorner){
-		int result = 0;
-		
-		int opportunities = scoreSituation_Opportunities(b,startingCorner);
-		
-		ArrayList<Piece> playerPieces = b.getPiecesFromCode(allPlayers.get(startingCorner-1).getPieceCode());
-		double explorationScore = 0;
-		int explorationInt = 0;
-		for (Piece p : playerPieces){
-			explorationScore += calcExplorationScore(p,startingCorner);
-		}
-		explorationScore /= playerPieces.size();
-		explorationInt = (int)Math.round(explorationScore);
-		
-		int blocksLeft = numberOfBlocksLeftForPlayer(b,startingCorner);
-		
-		result = 4*opportunities + explorationInt + 2*(75-blocksLeft);
-		
-		System.out.println("*****  Scoring Board for Corner " + startingCorner + ":  *****");
-		System.out.println("Opportunities = " + opportunities);
-		System.out.println("Exploration score = " + explorationInt);
-		System.out.println("Blocks left = " + blocksLeft + " (/75)");
-		System.out.println("Result = " + result);
-		System.out.println("****************************");
-		
-		return result;
-	}
-	public int numberOfBlocksLeftForPlayer(Board b, int startingCorner){
-		int runningTotal = 76;
-		ArrayList<Piece> playerPieces = b.getPiecesFromCode(allPlayers.get(startingCorner-1).getPieceCode());
-		for (Piece p : playerPieces){
-			runningTotal -= p.blocks.size();
-		}
-		return runningTotal;
-	}
-	public int scoreSituation_Opportunities(Board b, int startingCorner){
-		return b.getConnectableBlocks(b.getCornerBlocks(pieceCode),pieceCode).size();
-	}
-	public double getExplorationScore(Board b, int startingCorner){
-		ArrayList<Piece> piecesOnBoard = b.getPiecesFromCode(allPlayers.get(startingCorner-1).pieceCode);
-		int blocksOnBoard = b.blocksOnBoard(allPlayers.get(startingCorner-1).pieceCode);
-		double score = 0.0;
-		for (int i = 0; i < 4; i++){
-			if (i == startingCorner-1){
-				score += 3*b.blocksOnBoard(allPlayers.get(i).pieceCode);
-			}else{
-				score -= b.blocksOnBoard(allPlayers.get(i).pieceCode);
-			}
-		}
-		return score;
-	}
-	public Double calcExplorationScore(Piece m, int startingCorner){
-		double result = 0.0;
-		double hyp = 0.0;
-		double diag = 0.0;
-		double x,y;
-		for (Block b : m.blocks){
-			switch (startingCorner){
-				case 1 :
-					x = b.coordinate.x;
-					y = b.coordinate.y;
-					hyp = Math.sqrt(x*x+y*y);
-					diag = Math.sqrt(x*y);
-					result += hyp + diag;
-					break;
-				case 2 :
-					x = b.coordinate.x;
-					y = (board.getHeight()-b.coordinate.y-1);
-					hyp = Math.sqrt(x*x+y*y);
-					diag = Math.sqrt(x*y);
-					result += hyp + diag;
-					break;
-				case 3 :
-					x = (board.getWidth()-b.coordinate.x-1);
-					y = (board.getHeight()-b.coordinate.y-1);
-					hyp = Math.sqrt(x*x+y*y);
-					diag = Math.sqrt(x*y);
-					result += hyp + diag;
-					break;
-				case 4 :
-					x = (board.getWidth()-b.coordinate.x-1);
-					y = b.coordinate.y;
-					hyp = Math.sqrt(x*x+y*y);
-					diag = Math.sqrt(x*y);
-					result += hyp + diag;
-					break;
-			}
-		}
-		return new Double(result);
 	}
 }

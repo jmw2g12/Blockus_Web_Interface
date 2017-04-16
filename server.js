@@ -23,10 +23,10 @@ const app = express().use(function(req, res){
   .use('/favicon.ico', express.static('images/favicon.ico'))
   .listen(port, () => console.log("Listening on " + port + ".."));
   
-process.on('uncaughtException', function (err) {
+/*process.on('uncaughtException', function (err) {
 	//data_to_dropbox('error_at_');
 	console.log('*** Error occurred *** : ' + util.inspect(err));
-})
+})*/
 
 var board_size = 14;
 var piece_count = 21;
@@ -120,7 +120,7 @@ class user {
 					data: {
 						game: game
 					}
-				}));
+				},replacer));
 			}
 		}
 	}
@@ -341,14 +341,24 @@ class game {
 		//console.log("checking if comp is finished : " + this.java_game);
 		if (this.java_game.hasCompFinishedSync()){
 			//console.log("is finished!");
-			clearInterval(this.intervalFunc);
 			this.moves++;
 			this.java_game.resetCompMoveFlagSync();
 			this.setBoardAfterJavaMove(this.java_game.getBoardArraySync());
 			this.p2_resigned = this.java_game.hasCompResignedSync();
-			console.log("has comp resigned? " + this.p2_resigned);
+			//console.log("has comp resigned? " + this.p2_resigned);
 			if (!this.p1_resigned) this.turn = 1;
 			this.update_socket_clients('game_update');
+			if (this.p1_resigned && !this.p2_resigned){
+				//console.log("computer moving again");
+				this.java_game.compMove(function(err,result){
+					if (err) console.log(err);
+				});
+			}else{
+				clearInterval(this.intervalFunc);
+			}
+			if (this.p1_resigned && this.p2_resigned){
+				this.finish_game();
+			}
 		}else{
 			//console.log("not finished.");
 		}
@@ -356,8 +366,9 @@ class game {
 	make_java_human_move(){
 		//console.log("is java_computer null ? " + this.java_computer);
 		this.java_game.webMove(this.neutral_board(),function(err, result) {
+			if (err) console.log(err);
 			result.compMove(function(err, result){
-			
+				if (err) console.log(err);
 			});
 		});
 	}
@@ -514,7 +525,13 @@ class game {
 		if (player_no == 1){
 			this.p1_resigned = true;
 			this.turn = 2;
-			if (this.p2_resigned) this.finish_game();
+			if (this.p2_resigned){
+				this.finish_game();
+			}else if (this.single_player){
+				//console.log("computer moving again");
+				this.intervalFunc = setInterval(this.computer_move_check.bind(this),1000);
+				this.java_game.compMove();
+			}
 		}else if (player_no == 2){
 			this.p2_resigned = true;
 			this.turn = 1;
@@ -655,6 +672,14 @@ function replacer(key,value){
     switch (key){
     	case 'ws_clients':
     		return [];
+    	case 'java_human':
+    		return [];
+    	case 'java_game':
+    		return [];
+    	case 'java_computer':
+    		return [];
+    	case 'intervalFunc':
+    		return [];
     	default:
     		return value;
 	}
@@ -702,7 +727,7 @@ request_functions['resign'] = function (message){
 		game_list[message.gamecode].resign_player(game_list[message.gamecode].which_player(message.username));
 		if (game.game_over){
 			user_list[message.username].remove_game(message.gamecode);
-			user_list[game_list[message.gamecode].other_player(message.username)].remove_game(message.gamecode);
+			if (!game.single_player) user_list[game_list[message.gamecode].other_player(message.username)].remove_game(message.gamecode);
 			delete game_list[message.gamecode];
 		}
 		return JSON.stringify({
@@ -710,7 +735,7 @@ request_functions['resign'] = function (message){
 			data: {
 				game: game
 			}
-		});
+		},replacer);
 	}
 }
 request_functions['msg_user'] = function (message){
@@ -897,7 +922,6 @@ wss.on('connection', (ws) => {
   
   ws.on('message', function incoming(message) {
   	var parsed_message = JSON.parse(message);
-  	console.log('here');
   	ws.send(request_functions[parsed_message.request](parsed_message.data, ws));
   });
   

@@ -6,6 +6,7 @@ import java.util.Random;
 import java.lang.Math;
 
 public class RandomPlayer extends Player{
+	
 	public RandomPlayer(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner){
 		super(board,rand,pieces,pieceCode,allPlayers,startingCorner);
 		piecesRemaining = new ArrayList<Piece>(pieces);
@@ -16,4 +17,8 @@ public class RandomPlayer extends Player{
 		int n = rand.nextInt(possibleMoves.size());
 		return possibleMoves.get(n);
 	}
+	public Player clone(){
+		return new RandomPlayer(board,rand,new ArrayList<Piece>(pieces),pieceCode,allPlayers,startingCorner);
+	}
+
 }
