@@ -18,12 +18,12 @@ public class HeuristicPlayer extends Player{
 	public Piece choosePiece(){
 		int bestScore = 0;
 		int pieceScore = 0;
-		Board cloned;
+		//Board cloned;
 		ArrayList<Piece> best = new ArrayList<Piece>();
 		for (Piece p : possibleMoves){
-			cloned = board.clone();
-			cloned.putPieceOnBoard(p,pieceCode);
-			pieceScore = explorationProductScore(p);
+			//cloned = board.clone();
+			//cloned.putPieceOnBoard(p,pieceCode);
+			pieceScore = board.explorationHeatMapScore(p);
 			if (pieceScore > bestScore){
 				best.clear();
 				best.add(p);
@@ -37,7 +37,7 @@ public class HeuristicPlayer extends Player{
 		return best.get(n);
 	}
 	public int explorationManhattanScore(Piece p){
-		Coord startingCoord = (startingCorner == 1 ? new Coord(0,0) : new Coord(board.getWidth()-1,board.getHeight()-1));
+		Coord startingCoord = (startingCorner == 1 ? new Coord(0,0) : new Coord(board.getBoardSize()-1,board.getBoardSize()-1));
 		int score = 0;
 		for (Block b : p.blocks){
 			score += startingCoord.manhattanDistance(b.coordinate);
@@ -46,7 +46,7 @@ public class HeuristicPlayer extends Player{
 		
 	}
 	public int explorationProductScore(Piece p){
-		Coord startingCoord = (startingCorner == 1 ? new Coord(0,0) : new Coord(board.getWidth()-1,board.getHeight()-1));
+		Coord startingCoord = (startingCorner == 1 ? new Coord(0,0) : new Coord(board.getBoardSize()-1,board.getBoardSize()-1));
 		int score = 0;
 		for (Block b : p.blocks){
 			score += startingCoord.productScore(b.coordinate);

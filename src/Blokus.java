@@ -12,28 +12,52 @@ public class Blokus{
 	Random rand = new Random();
 	Board board = new Board(boardSize);
 	Boolean moveMade = false;
+	Boolean humanP1 = true;
+	String compStrategy = "";
 	
 	public Blokus(){
 	
 		initPieces();
 		
 		rand = new Random(System.currentTimeMillis());
-		Player p1,p2;
-		
-		p1 = generatePlayer("web","1",1);
-		p2 = generatePlayer("smcts_50_heat","2",3);
-		
-		players.add(p1);
-		players.add(p2);
-		
-		board.setPlayers(players);
+
 		board.setPieces(pieces);
 		
 		//System.out.println("players.size() = " + players.size());
 		
 	}
+	public void setCompStrategy(String compStrategy){
+		System.out.println("setting comp strategy : " + compStrategy);
+		this.compStrategy = compStrategy;
+	}
+	public void setHumanP1(){
+		Player p1,p2;
+		
+		p1 = generatePlayer("web","1",1);
+		p2 = generatePlayer(compStrategy,"2",3);
+		
+		players.add(p1);
+		players.add(p2);
+		
+		humanP1 = true;
+		
+		board.setPlayers(players);
+	}
+	public void setCompP1(){
+		Player p1,p2;
+		
+		p1 = generatePlayer(compStrategy,"1",1);
+		p2 = generatePlayer("web","2",3);
+		
+		players.add(p1);
+		players.add(p2);
+		
+		humanP1 = false;
+		
+		board.setPlayers(players);
+	}
 	public boolean hasCompResigned(){
-		return players.get(1).isFinished() || !board.doesPlayerHaveRemainingMoves(players.get(1));
+		return players.get(humanP1 ? 1 : 0).isFinished() || !board.doesPlayerHaveRemainingMoves(players.get(humanP1 ? 1 : 0));
 	}
 	public boolean hasCompFinished(){
 		return moveMade;
@@ -43,13 +67,13 @@ public class Blokus{
 	}
 	public Blokus webMove(Object[] newBoard){
 		this.moveMade = false;
-		((WebPlayer)players.get(0)).takeMove(newBoard);
+		((WebPlayer)players.get(humanP1 ? 0 : 1)).takeMove(newBoard);
 		return this;
 	}
 	public void compMove(){
 		//System.out.println("comp taking move from java");
-		board.setCurrentPlayer(players.get(1));
-		players.get(1).takeMove();
+		board.setCurrentPlayer(players.get(humanP1 ? 1 : 0));
+		players.get(humanP1 ? 1 : 0).takeMove();
 		//System.out.println("finished move");
 		moveMade = true;
 	}
@@ -72,33 +96,20 @@ public class Blokus{
 	}
 	public Player generatePlayer(String strategy, String pieceCode, int corner){
 		Player p;
-		if (strategy.equals("human")){
-			return new HumanPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("random")){
+		if (strategy.equals("random")){
 			return new RandomPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("explorer")){
-			return new ExplorerPlayer(board,rand,pieces,pieceCode,players,corner);
+		}else if (strategy.equals("exploration_heuristic")){
+			return new HeuristicPlayer(board,rand,pieces,pieceCode,players,corner);
+		}else if (strategy.equals("value_net")){
+			return new ValueNetPlayer(board,rand,pieces,pieceCode,players,corner);
+		}else if (strategy.startsWith("mcts")){
+			System.out.println("returning mcts player with a " + Integer.parseInt(strategy.split("_")[1]) + " millisecond limit, an exploration constant of " + strategy.split("_")[2] + ", " + strategy.split("_")[3] + " move weighting and " + strategy.split("_")[4] + " scoring.");
+			return new MCTSPlayer(board,rand,pieces,pieceCode,players,corner,Integer.parseInt(strategy.split("_")[1]),Double.parseDouble(strategy.split("_")[2]),strategy.split("_")[3],strategy.split("_")[4]);
 		}else if (strategy.equals("web")){
 			return new WebPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.startsWith("mcts")){
-			//e.g. mcts100binary for 100 iterations and binary scoring. mcts1000 for 100 iterations and difference scoring
-			return new MCTSPlayer(board,rand,pieces,pieceCode,players,corner,Integer.parseInt(strategy.split("mcts")[1].replaceAll("\\D+","")),strategy.split("mcts")[1].replaceAll("\\d+","").equals("binary"));
-		}else if (strategy.equals("heuristic")){
-			return new HeuristicPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.startsWith("smcts")){
-			return new SmartMCTSPlayer(board,rand,pieces,pieceCode,players,corner,Integer.parseInt(strategy.split("_")[1]),strategy.split("_")[2].equals("binary"),strategy.split("_")[strategy.split("_").length-1]);
 		}
 		System.out.println("*** Invalid player strategy given! ***");
 		return null;
-	}
-	public void printAllPieces(){
-		int counter = 0;
-		for (Piece p : pieces){
-			System.out.println("Piece " + counter + ": ");
-			p.print_piece();
-			System.out.println("");
-			counter++;
-		}
 	}
 	public void initPieces(){
 		Block b1 = new Block();
@@ -113,15 +124,15 @@ public class Blokus{
 		
 		
 		b1 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
+		b1.addBottom(b2);
+		b2.addTop(b1);
 		pieces.add(new Piece(b1,b2));
 		pieces.get(pieces.size()-1).pieceNumber = 1;
 		
 		b1 = new Block();
 		b2 = new Block();
-		b1.add_left(b2);
-		b2.add_right(b1);
+		b1.addLeft(b2);
+		b2.addRight(b1);
 		pieces.add(new Piece(b1,b2));
 		pieces.get(pieces.size()-1).pieceNumber = 1;
 		
@@ -130,60 +141,60 @@ public class Blokus{
 		
 		b1 = new Block();
 		b2 = new Block();
-		b1.add_right(b2);
-		b2.add_left(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
+		b1.addRight(b2);
+		b2.addLeft(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 2;	
 			
 		b1 = new Block();
 		b2 = new Block();
 		b3 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 2;
 				
 		b1 = new Block();
 		b2 = new Block();
 		b3 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_right(b3);
-		b3.add_left(b2);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addRight(b3);
+		b3.addLeft(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 2;
 		
 		b1 = new Block();
 		b2 = new Block();
 		b3 = new Block();
-		b1.add_left(b2);
-		b2.add_right(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
+		b1.addLeft(b2);
+		b2.addRight(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 2;
 		
 		b1 = new Block();
 		b2 = new Block();
 		b3 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 3;
 		
 		b1 = new Block();
 		b2 = new Block();
 		b3 = new Block();
-		b1.add_left(b2);
-		b2.add_right(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
+		b1.addLeft(b2);
+		b2.addRight(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
 		pieces.add(new Piece(b1,b2,b3));
 		pieces.get(pieces.size()-1).pieceNumber = 3;
 		
@@ -233,12 +244,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
-		b3.add_right(b4);
-		b4.add_left(b3);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
+		b3.addRight(b4);
+		b4.addLeft(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 4;
 		
@@ -246,12 +257,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
-		b3.add_left(b4);
-		b4.add_right(b3);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
+		b3.addLeft(b4);
+		b4.addRight(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 4;
 		
@@ -259,12 +270,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_left(b2);
-		b2.add_right(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
-		b3.add_top(b4);
-		b4.add_bottom(b3);
+		b1.addLeft(b2);
+		b2.addRight(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
+		b3.addTop(b4);
+		b4.addBottom(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 4;
 		
@@ -272,12 +283,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_left(b2);
-		b2.add_right(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
-		b3.add_bottom(b4);
-		b4.add_top(b3);
+		b1.addLeft(b2);
+		b2.addRight(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
+		b3.addBottom(b4);
+		b4.addTop(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 4;
 		
@@ -285,14 +296,14 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_right(b2);
-		b1.add_bottom(b4);
-		b2.add_left(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
-		b3.add_left(b4);
-		b4.add_right(b3);
-		b4.add_top(b1);
+		b1.addRight(b2);
+		b1.addBottom(b4);
+		b2.addLeft(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
+		b3.addLeft(b4);
+		b4.addRight(b3);
+		b4.addTop(b1);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 5;
 		
@@ -300,12 +311,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_right(b2);
-		b2.add_left(b1);
-		b2.add_top(b3);
-		b3.add_bottom(b2);
-		b2.add_right(b4);
-		b4.add_left(b2);
+		b1.addRight(b2);
+		b2.addLeft(b1);
+		b2.addTop(b3);
+		b3.addBottom(b2);
+		b2.addRight(b4);
+		b4.addLeft(b2);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 6;
 		
@@ -313,12 +324,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_right(b2);
-		b2.add_left(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
-		b2.add_right(b4);
-		b4.add_left(b2);
+		b1.addRight(b2);
+		b2.addLeft(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
+		b2.addRight(b4);
+		b4.addLeft(b2);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 6;
 		
@@ -326,12 +337,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
-		b2.add_bottom(b4);
-		b4.add_top(b2);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
+		b2.addBottom(b4);
+		b4.addTop(b2);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 6;
 		
@@ -339,12 +350,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_right(b3);
-		b3.add_left(b2);
-		b2.add_bottom(b4);
-		b4.add_top(b2);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addRight(b3);
+		b3.addLeft(b2);
+		b2.addBottom(b4);
+		b4.addTop(b2);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 6;
 		
@@ -352,12 +363,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_right(b2);
-		b2.add_left(b1);
-		b2.add_bottom(b3);
-		b3.add_top(b2);
-		b3.add_right(b4);
-		b4.add_left(b3);
+		b1.addRight(b2);
+		b2.addLeft(b1);
+		b2.addBottom(b3);
+		b3.addTop(b2);
+		b3.addRight(b4);
+		b4.addLeft(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 7;
 		
@@ -365,12 +376,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_right(b2);
-		b2.add_left(b1);
-		b2.add_top(b3);
-		b3.add_bottom(b2);
-		b3.add_right(b4);
-		b4.add_left(b3);
+		b1.addRight(b2);
+		b2.addLeft(b1);
+		b2.addTop(b3);
+		b3.addBottom(b2);
+		b3.addRight(b4);
+		b4.addLeft(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 7;
 		
@@ -378,12 +389,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_left(b3);
-		b3.add_right(b2);
-		b3.add_bottom(b4);
-		b4.add_top(b3);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addLeft(b3);
+		b3.addRight(b2);
+		b3.addBottom(b4);
+		b4.addTop(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 7;
 		
@@ -391,12 +402,12 @@ public class Blokus{
 		b2 = new Block();
 		b3 = new Block();
 		b4 = new Block();
-		b1.add_bottom(b2);
-		b2.add_top(b1);
-		b2.add_right(b3);
-		b3.add_left(b2);
-		b3.add_bottom(b4);
-		b4.add_top(b3);
+		b1.addBottom(b2);
+		b2.addTop(b1);
+		b2.addRight(b3);
+		b3.addLeft(b2);
+		b3.addBottom(b4);
+		b4.addTop(b3);
 		pieces.add(new Piece(b1,b2,b3,b4));
 		pieces.get(pieces.size()-1).pieceNumber = 7;
 		

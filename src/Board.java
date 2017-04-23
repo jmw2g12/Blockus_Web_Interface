@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.lang.Math;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-public class Board implements BoardMCTS{
+public class Board{
 	String[][] board;
 	Integer boardSize;
 	ArrayList<String> allPieceCodes = new ArrayList<String>();
@@ -15,6 +15,8 @@ public class Board implements BoardMCTS{
 	ArrayList<Boolean> p1PiecesDown = new ArrayList<Boolean>();
 	ArrayList<Boolean> p2PiecesDown = new ArrayList<Boolean>();
 	ArrayList<Piece> allPieces = new ArrayList<Piece>();
+	ValueNet vn = new ValueNet();
+	
 	public Board(int size){
 		this.boardSize = size;
 		this.board = new String[size][size];
@@ -27,7 +29,7 @@ public class Board implements BoardMCTS{
 		Board b = new Board(boardSize);
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
-				b.board[i][j] = cloneString(board[i][j]);
+				b.board[i][j] = (board[i][j] == null ? null : new String(board[i][j]));
 			}
 		}
 		b.allPieceCodes = new ArrayList<String>(allPieceCodes);
@@ -37,9 +39,13 @@ public class Board implements BoardMCTS{
 		b.p1PiecesDown = new ArrayList<Boolean>(p1PiecesDown);
 		b.p2PiecesDown = new ArrayList<Boolean>(p2PiecesDown);
 		b.allPieces = allPieces;
+		b.vn = vn;
 		return b;
 	}
-	public Integer getBoardSize(){
+	public Board duplicate(){
+		return clone();
+	}
+	public int getBoardSize(){
 		return boardSize;
 	}
 	public String[][] getArray(){
@@ -52,346 +58,61 @@ public class Board implements BoardMCTS{
 	public void setPieces(ArrayList<Piece> pieces){
 		this.allPieces = pieces;
 	}
-	public boolean gameOver(){
-		return !doPlayersHaveRemainingMoves();
-	}	
-	public int getCurrentPlayer(){
-		return players.indexOf(currentPlayer);
-	}
 	public void setCurrentPlayer(Player p){
 		currentPlayer = p;
+	}
+	public void setCurrentPlayer(int i){
+		currentPlayer = players.get(i);
+	}
+	public int getCurrentPlayer(){
+		return players.indexOf(currentPlayer);
 	}
 	public int getQuantityOfPlayers(){
 		return players.size();
 	}
-	public double[] getBinaryScore(){
-		double[] score = new double[2];
-		if (gameOver()){	//need to update if more than 2 players are playing
-			int p1Score = blocksOnBoard(players.get(0).getPieceCode());
-			int p2Score = blocksOnBoard(players.get(1).getPieceCode());
-			if (p1Score > p2Score){
-				score[0] = 1.0d;
-				score[1] = 0.0d;
-			}else if (p1Score < p2Score){
-				score[0] = 0.0d;
-				score[1] = 1.0d;
-			}else{
-				score[0] = 0.5d;
-				score[1] = 0.5d;
-			}
-		}else{
-			score[0] = 0.0d;
-			score[1] = 0.0d;
-		}
-		return score;
+	public int getPlayerIndex(Player p){
+		return players.indexOf(p);
 	}
-	public double[] getScore(){
-		double[] score = new double[2];
-		
-		int p1Blocks = blocksOnBoard(players.get(0).getPieceCode());
-		int p2Blocks = blocksOnBoard(players.get(1).getPieceCode());
-		
-		score[0] = p1Blocks - p2Blocks;
-		score[1] = p2Blocks - p1Blocks;
-		
-		return score;
-	}
-	public void bPrint(){
-		print();
-	}
-	public ArrayList<Boolean> getPiecesDown(Player p){
-		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
-		if (p == players.get(0)){
-			piecesDown = p1PiecesDown;
-		}else if (p == players.get(1)){
-			piecesDown = p2PiecesDown;
-		}
-		return piecesDown;
-	}
-	public ArrayList<Boolean> getPiecesDown(){
-		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
-		if (currentPlayer == players.get(0)){
-			piecesDown = p1PiecesDown;
-		}else if (currentPlayer == players.get(1)){
-			piecesDown = p2PiecesDown;
-		}
-		return piecesDown;
-	}
-	public ArrayList<Move> getMoves(){
-		return getMoves(currentPlayer);	
-	}
-	public ArrayList<Move> getMoves(Player pl){
-		ArrayList<Pair<Block,Integer>> cornerBlocks = new ArrayList<Pair<Block,Integer>>();
-		ArrayList<Pair<Block,Integer>> connectableBlocks = new ArrayList<Pair<Block,Integer>>();
-		ArrayList<Piece> possibleMoves = new ArrayList<Piece>();
-		
-		String pieceCode = pl.getPieceCode();
-		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
-		if (pl == players.get(0)){
-			piecesDown = p1PiecesDown;
-		}else if (pl == players.get(1)){
-			piecesDown = p2PiecesDown;
-		}
-		
-		//*************************************************************************
-
-		cornerBlocks = getCornerBlocks(pieceCode);
-//		System.out.println("num of corner blocks: " + cornerBlocks.size());
-//		System.out.println("corner blocks:");
-//		for (Pair<Block,Integer> bi : cornerBlocks){
-//			System.out.println(bi.getL().coordinate.to_string() + " in dir " + bi.getR());
-//		}
-//		System.out.println("/corner blocks--");
-//		
-//		System.out.println("");
-//		System.out.println("");
-		
-		connectableBlocks = getConnectableBlocks(cornerBlocks,pieceCode);
-//		System.out.println("num of connectable blocks: " + connectableBlocks.size());
-//		
-//		System.out.println("connectable blocks:");
-//		for (Pair<Block,Integer> bi : connectableBlocks){
-//			System.out.println(bi.getL().coordinate.to_string() + " in dir " + bi.getR());
-//		}
-//		System.out.println("/connectable blocks--");
-		
-		
-		possibleMoves = getPossibleMoves(connectableBlocks, pieceCode, piecesDown);
-		
-		/*for (Piece p : possibleMoves){
-			System.out.println("here at " + possibleMoves.indexOf(p) + " out of " + possibleMoves.size());
-			Board temp = new Board(14);
-			temp.setPlayers(players);
-			temp.setPieces(allPieces);
-			temp.putTestPieceOnBoard(p, pieceCode);
-			temp.print();
-		}*/
-		
-		ArrayList<Move> moves = new ArrayList<Move>();
-		for (Piece piece : possibleMoves){
-			moves.add(new MoveMCTS(piece));
-		}
-		return moves;
-		
-		//*************************************************************************
-		
-	}
-
-	public ArrayList<Piece> getPossibleMoves(ArrayList<Pair<Block,Integer>> connectables, String pieceCode, ArrayList<Boolean> piecesDown){
-		ArrayList<Piece> pl = new ArrayList<Piece>();
-		for (Pair<Block,Integer> bi : connectables){
-			for (Piece p : filterPiecesDown(allPieces,piecesDown)){
-				Piece toPlace = p.clone();
-				for (Block b : toPlace.blocks){
-					if (canBlockConnect(b,bi.getR())){
-						//want to toPlace equivalent of b
-						//toPlace.place_piece(b, bi.getL(), bi.getR());
-						placePiece(b,bi.getL(),bi.getR());
-						if (doesPieceFit(toPlace,pieceCode)){
-							pl.add(toPlace.clone());
-						}
-					}
-					
+	
+	public void print(){
+		Board cloned = clone();
+		for (int i = 0; i < cloned.getBoardSize(); i++){
+			for (int j = 0; j < cloned.getBoardSize(); j++){
+				if (cloned.board[i][j] != null && cloned.board[i][j].equals("1")){
+					cloned.board[i][j] = "#";
+				}else if (cloned.board[i][j] != null && cloned.board[i][j].equals("2")){
+					cloned.board[i][j] = "O";
 				}
 			}
 		}
-		return pl;
-	}
-	public void placePiece(Block b, Block connectTo, int direction){
-		//System.out.println(direction + " from " + connectTo.coordinate.to_string());
-		if (direction == 1){
-			b.set_adjacent_coords_to_null();
-			b.coordinate = new Coord(connectTo.coordinate.x+1,connectTo.coordinate.y+1);
-			b.set_adjacent_coords();
-		}else if (direction == 2){
-			b.set_adjacent_coords_to_null();
-			b.coordinate = new Coord(connectTo.coordinate.x+1,connectTo.coordinate.y-1);
-			b.set_adjacent_coords();
-		}else if (direction == 3){
-			b.set_adjacent_coords_to_null();
-			b.coordinate = new Coord(connectTo.coordinate.x-1,connectTo.coordinate.y-1);
-			b.set_adjacent_coords();
-		}else if (direction == 4){
-			b.set_adjacent_coords_to_null();
-			b.coordinate = new Coord(connectTo.coordinate.x-1,connectTo.coordinate.y+1);
-			b.set_adjacent_coords();
-		}
-	}
-	public boolean canBlockConnect(Block b, int direction){
-		switch (direction){
-		case 1:
-			return b.bottomleft;
-		case 2:
-			return b.topleft;
-		case 3:
-			return b.topright;
-		case 4:
-			return b.bottomright;
-		}
-		return false;
-	}
-	public ArrayList<Piece> filterPiecesDown(ArrayList<Piece> pl, ArrayList<Boolean> piecesDown){
-		ArrayList<Piece> unused = new ArrayList<Piece>();
-		for (Piece p : pl){
-			if (!piecesDown.get(p.pieceNumber)) unused.add(p);
-		}
-		return unused;
-	}
-	public boolean doPlayersHaveRemainingMoves(){
-		for (Player p : players){		
-			if (getMoves(p).size() > 0) return true;
-		}
-		return false;
 		
-	}
-	public boolean doesCurrentPlayerHaveRemainingMoves(){
-		return getMoves().size() > 0;	
-	}
-	public boolean doesPlayerHaveRemainingMoves(Player p){
-		return getMoves(p).size() > 0;
-	}
-	public ArrayList<Integer> numberOfPossibleMovesForEachPlayer(){
-		ArrayList<Integer> numMoves = new ArrayList<Integer>();
-		for (Player p : players){
-			numMoves.add(getMoves(p).size());
+		System.out.print("+");
+		for (int j = 0; j < cloned.getBoardSize(); j++){
+			System.out.print(" - ");
 		}
-		return numMoves;
-	}
-	public double[] getMoveWeights() {
-		return getMoveWeights(getMoves(),"");
-	}
-	public double[] getMoveWeights(ArrayList<Move> moves, String weighting_method) {
-		if (weighting_method.equals("size") || weighting_method.equals("")){
-			double[] result = new double[moves.size()];
-			for (Move m : moves){
-				result[moves.indexOf(m)] = Math.pow((double)m.getPiece().size(),1.5);
+		System.out.print("+");
+		System.out.println("");
+		for (int i = cloned.getBoardSize()-1; i >= 0; i--){
+			System.out.print("|");
+			for (int j = 0; j < cloned.getBoardSize(); j++){
+				if (cloned.board[i][j] != null && cloned.board[i][j].length() > 1){
+					System.out.print(" " + cloned.board[i][j] + "");
+				}else if (cloned.board[i][j] != null && cloned.board[i][j].length() == 1){
+					System.out.print(" " + cloned.board[i][j] + " ");
+				}else{
+					System.out.print(" " + ((char)183) + " ");
+				}
 			}
-			return result;
-		}else{
-			return null;
+			System.out.println("|");
 		}
-	}
-	public Board duplicate(){
-		return clone();
-	}
-	public String cloneString(String s){
-		return (s == null ? null : new String(s));
-	}
-	public String getFromCoordinate(int x, int y){
-		if (x < boardSize && y < boardSize && x >= 0 && y >= 0){
-			return board[y][x];
+		System.out.print("+");
+		for (int j = 0; j < cloned.getBoardSize(); j++){
+			System.out.print(" - ");
 		}
-		return null;
+		System.out.print("+");
+		System.out.println("");
 	}
-	public boolean doesPieceFit(Piece p, String pieceCode){
-		if (pieceCode.equals(players.get(0).pieceCode)){
-			if (p1PiecesDown.get(p.pieceNumber)) return false;
-		}else if (pieceCode.equals(players.get(1).pieceCode)){
-			if (p2PiecesDown.get(p.pieceNumber)) return false;
-		}
-		for (Block b : p.blocks){
-			int x = b.coordinate.x;
-			int y = b.coordinate.y;
-			if (x < 0) return false;
-			if (y < 0) return false;
-			if (x >= boardSize) return false;
-			if (y >= boardSize) return false;
-			if (getFromCoordinate(x,y) != null && !getFromCoordinate(x,y).equals("")) return false;
-			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(0).getPieceCode())) return false;
-			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(1).getPieceCode())) return false;
-			if (getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
-			if (getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
-			if (getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
-			if (getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
-		}
-		return true;
-	}
-	public boolean isConnectorFree(Block b, int direction, String pieceCode){
-		int x = b.coordinate.x;
-		int y = b.coordinate.y;
-		switch (direction){
-			case 1 : // direction one relates to top right
-				if (b.coordinate.x+1 >= boardSize) return false;		
-				if (b.coordinate.y+1 >= boardSize) return false;
-				if (board[b.coordinate.y+1][b.coordinate.x+1] != null && !board[b.coordinate.y+1][b.coordinate.x+1].equals("")) return false; 
-				if (getFromCoordinate(x+1,y+2) != null && getFromCoordinate(x+1,y+2).equals(pieceCode)) return false;
-				if (getFromCoordinate(x+2,y+1) != null && getFromCoordinate(x+2,y+1).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
-				return true;
-			case 2 : // direction one relates to bottom right
-				if (b.coordinate.x+1 >= boardSize) return false;		
-				if (b.coordinate.y-1 < 0) return false;
-				if (board[b.coordinate.y-1][b.coordinate.x+1] != null && !board[b.coordinate.y-1][b.coordinate.x+1].equals("")) return false; 
-				if (getFromCoordinate(x+2,y-1) != null && getFromCoordinate(x+2,y-1).equals(pieceCode)) return false;
-				if (getFromCoordinate(x+1,y-2) != null && getFromCoordinate(x+1,y-2).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
-				return true;
-			case 3 : // direction one relates to bottom left
-				if (b.coordinate.x-1 < 0) return false;		
-				if (b.coordinate.y-1 < 0) return false;
-				if (board[b.coordinate.y-1][b.coordinate.x-1] != null && !board[b.coordinate.y-1][b.coordinate.x-1].equals("")) return false; 
-				if (getFromCoordinate(x-1,y-2) != null && getFromCoordinate(x-1,y-2).equals(pieceCode)) return false;
-				if (getFromCoordinate(x-2,y-1) != null && getFromCoordinate(x-2,y-1).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
-				return true;
-			case 4 : // direction one relates to top left
-				if (b.coordinate.x-1 < 0) return false;		
-				if (b.coordinate.y+1 >= boardSize) return false;
-				if (board[b.coordinate.y+1][b.coordinate.x-1] != null && !board[b.coordinate.y+1][b.coordinate.x-1].equals("")) return false; 
-				if (getFromCoordinate(x-1,y+2) != null && getFromCoordinate(x-1,y+2).equals(pieceCode)) return false;
-				if (getFromCoordinate(x-2,y+1) != null && getFromCoordinate(x-2,y+1).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
-				if (!b.starter_block && getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
-				return true;
-		}
-		return false;
-	}
-	public void putPieceOnBoard(Piece p, String pieceCode){
-		// System.out.println("here 1");
- 		if (pieceCode.equals(players.get(0).pieceCode)){
- 			p1PiecesDown.set(p.pieceNumber, new Boolean(true));
- 		}else if (pieceCode.equals(players.get(1).pieceCode)){
-			p2PiecesDown.set(p.pieceNumber, new Boolean(true));
-		}
-
-		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
-		//pieces_left.remove(p);
-		for (Block b : p.blocks){
-			Coord c = b.coordinate;
-			board[c.y][c.x] = pieceCode;
-		}
-		if (currentPlayer == players.get(0)){
-			if (doesPlayerHaveRemainingMoves(players.get(1))) currentPlayer = players.get(1);
-		}else{
-			if (doesPlayerHaveRemainingMoves(players.get(0))) currentPlayer = players.get(0);
-		}
-	}
-	public void putTestPieceOnBoard(Piece p, String pieceCode){
-		for (Block b : p.blocks){
-			Coord c = b.coordinate;
-			board[c.y][c.x] = pieceCode;
-		}
-	}
-	public void makeMove(Move m, String pieceCode){
-		putPieceOnBoard(m.getPiece(), pieceCode);
-	}
-	public void makeMove(Move m){
-		putPieceOnBoard(m.getPiece(), currentPlayer.getPieceCode());
-	}
-	public void makeMove(Move m, int playerId){		
-		putPieceOnBoard(m.getPiece(), players.get(playerId).getPieceCode());
-	}
-	public void putStartingPieceOnBoard(Piece p, String pieceCode){
-		allPieceCodes.add(pieceCode);
-		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
-	}
-	public static boolean isNumeric(String str){
-    	return str.matches("[+-]?\\d*(\\.\\d+)?");
-	}
-	public void print(){
+	public void printValues(){
 		System.out.print("+");
 		for (int j = 0; j < boardSize; j++){
 			System.out.print(" - ");
@@ -418,105 +139,291 @@ public class Board implements BoardMCTS{
 		System.out.print("+");
 		System.out.println("");
 	}
-	public void printCleanDisplay(String pieceCode){
-		System.out.print("+");
-		for (int j = 0; j < boardSize; j++){
-			System.out.print(" - ");
+	public boolean gameOver(){
+		return !doPlayersHaveRemainingMoves();
+	}	
+	public double[] getBinaryScore(){
+		double[] score = new double[2];
+		if (gameOver()){	
+			int p1Score = blocksOnBoard(players.get(0).getPieceCode());
+			int p2Score = blocksOnBoard(players.get(1).getPieceCode());
+			if (p1Score > p2Score){
+				score[0] = 1.0d;
+				score[1] = 0.0d;
+			}else if (p1Score < p2Score){
+				score[0] = 0.0d;
+				score[1] = 1.0d;
+			}else{
+				score[0] = 0.5d;
+				score[1] = 0.5d;
+			}
+		}else{
+			score[0] = 0.0d;
+			score[1] = 0.0d;
 		}
-		System.out.print("+");
-		System.out.println("");
-		for (int i = boardSize-1; i >= 0; i--){
-			System.out.print("|");
-			for (int j = 0; j < boardSize; j++){
-				if (board[i][j] != null && board[i][j].length() > 1){
-					System.out.print(" " + board[i][j] + "");
-				}else if (board[i][j] != null && board[i][j].length() == 1){
-					if (board[i][j].equals(pieceCode)){
-						System.out.print(" " + ((char)248) + " ");
-					}else{
-						if (isNumeric(board[i][j])){
-							System.out.print(" " + board[i][j] + " ");
-						}else{
-							System.out.print(" " + ((char)183) + " ");
+		return score;
+	}
+	public double[] getProductScore(){
+		double[] score = new double[2];
+		Coord startingCoord = new Coord(0,0);
+		String p1pieceCode = players.get(0).getPieceCode();
+		int p1score = 0;
+		for (Pair<Piece,String> p : piecesDown){
+			if (!p.getR().equals(p1pieceCode)) continue;
+			for (Block b : p.getL().blocks){
+				p1score += startingCoord.productScore(b.coordinate);
+			}
+		}
+		
+		startingCoord = new Coord(getBoardSize()-1,getBoardSize()-1);
+		String p2pieceCode = players.get(1).getPieceCode();
+		int p2score = 0;
+		for (Pair<Piece,String> p : piecesDown){
+			if (!p.getR().equals(p2pieceCode)) continue;
+			for (Block b : p.getL().blocks){
+				p2score += startingCoord.productScore(b.coordinate);
+			}
+		}
+		
+		score[0] = p1score - p2score;
+		score[1] = p2score - p1score;
+		
+		return score;
+	}
+	public double[] getScore(){
+		double[] score = new double[2];
+		
+		int p1Blocks = blocksOnBoard(players.get(0).getPieceCode());
+		int p2Blocks = blocksOnBoard(players.get(1).getPieceCode());
+		
+		score[0] = p1Blocks - p2Blocks;
+		score[1] = p2Blocks - p1Blocks;
+		
+		return score;
+	}
+	public String getFromCoordinate(int x, int y){
+		if (x < boardSize && y < boardSize && x >= 0 && y >= 0){
+			return board[y][x];
+		}
+		return null;
+	}
+	public boolean doPlayersHaveRemainingMoves(){
+		for (Player p : players){		
+			if (getMoves(p).size() > 0) return true;
+		}
+		return false;
+	}
+	public boolean doesCurrentPlayerHaveRemainingMoves(){
+		return getMoves().size() > 0;	
+	}
+	public boolean doesPlayerHaveRemainingMoves(Player p){
+		return getMoves(p).size() > 0;
+	}
+	public ArrayList<String> getAllPieceCodes(){ return new ArrayList<String>(allPieceCodes); }
+	
+	public ArrayList<Boolean> getPiecesDown(Player p){
+		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
+		if (p == players.get(0)){
+			piecesDown = p1PiecesDown;
+		}else if (p == players.get(1)){
+			piecesDown = p2PiecesDown;
+		}
+		return piecesDown;
+	}
+	public ArrayList<Boolean> getPiecesDown(){
+		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
+		if (currentPlayer == players.get(0)){
+			piecesDown = p1PiecesDown;
+		}else if (currentPlayer == players.get(1)){
+			piecesDown = p2PiecesDown;
+		}
+		return piecesDown;
+	}
+	public ArrayList<Piece> getMoves(){
+		return getMoves(currentPlayer);	
+	}
+	public ArrayList<Piece> getMoves(int i){
+		return getMoves(players.get(i));	
+	}
+	public ArrayList<Piece> getMoves(Player pl){
+		ArrayList<Pair<Block,Integer>> cornerBlocks = new ArrayList<Pair<Block,Integer>>();
+		ArrayList<Pair<Block,Integer>> connectableBlocks = new ArrayList<Pair<Block,Integer>>();
+		ArrayList<Piece> possibleMoves = new ArrayList<Piece>();
+		
+		String pieceCode = pl.getPieceCode();
+		ArrayList<Boolean> piecesDown = new ArrayList<Boolean>();
+		if (pl == players.get(0)){
+			piecesDown = p1PiecesDown;
+		}else if (pl == players.get(1)){
+			piecesDown = p2PiecesDown;
+		}
+
+		cornerBlocks = getCornerBlocks(pieceCode);	
+		connectableBlocks = getConnectableBlocks(cornerBlocks,pieceCode);
+		possibleMoves = getPossibleMoves(connectableBlocks, pieceCode, piecesDown);
+		
+		return possibleMoves;
+
+	}
+	public ArrayList<Piece> getPossibleMoves(ArrayList<Pair<Block,Integer>> connectables, String pieceCode, ArrayList<Boolean> piecesDown){
+		ArrayList<Piece> pl = new ArrayList<Piece>();
+		for (Pair<Block,Integer> bi : connectables){
+			for (Piece p : filterPiecesDown(allPieces,piecesDown)){
+				Piece toPlace = p.clone();
+				for (Block b : toPlace.blocks){
+					if (canBlockConnect(b,bi.getR())){
+						setPieceLocation(b,bi.getL(),bi.getR());
+						if (doesPieceFit(toPlace,pieceCode)){
+							pl.add(toPlace.clone());
 						}
 					}
-				}else{
-					System.out.print("   ");
+					
 				}
 			}
-			System.out.println("|");
 		}
-		System.out.print("+");
-		for (int j = 0; j < boardSize; j++){
-			System.out.print(" - ");
-		}
-		System.out.print("+");
-		System.out.println("");
+		return pl;
 	}
-	public void printOptionsBoard(ArrayList<Pair<Block,Integer>> connectableBlocks){
-		ArrayList<Coord> optionCoords = new ArrayList<Coord>();
-		int coord_id = 1;
-		for (Pair<Block,Integer> p : connectableBlocks){	
-			switch (p.getR()){
-				case 1 : 
-					board[p.getL().coordinate.y+1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y+1));
-					break;
-				case 2 : 
-					board[p.getL().coordinate.y-1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y-1));
-					break;
-				case 3 : 
-					board[p.getL().coordinate.y-1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y-1));
-					break;
-				case 4 : 
-					board[p.getL().coordinate.y+1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y+1));
-					break;
-			}
-			coord_id++;
-		}
-		print();
-		for (Coord coord : optionCoords){ 
-			board[coord.y][coord.x] = null;
+	public void setPieceLocation(Block b, Block connectTo, int direction){
+		if (direction == 1){
+			b.setAdjacentCoordsToNull();
+			b.coordinate = new Coord(connectTo.coordinate.x+1,connectTo.coordinate.y+1);
+			b.setAdjacentCoords();
+		}else if (direction == 2){
+			b.setAdjacentCoordsToNull();
+			b.coordinate = new Coord(connectTo.coordinate.x+1,connectTo.coordinate.y-1);
+			b.setAdjacentCoords();
+		}else if (direction == 3){
+			b.setAdjacentCoordsToNull();
+			b.coordinate = new Coord(connectTo.coordinate.x-1,connectTo.coordinate.y-1);
+			b.setAdjacentCoords();
+		}else if (direction == 4){
+			b.setAdjacentCoordsToNull();
+			b.coordinate = new Coord(connectTo.coordinate.x-1,connectTo.coordinate.y+1);
+			b.setAdjacentCoords();
 		}
 	}
-	public void printOptionsBoard(ArrayList<Pair<Block,Integer>> connectableBlocks, String pieceCode){
-		ArrayList<Coord> optionCoords = new ArrayList<Coord>();
-		int coord_id = 1;
-		for (Pair<Block,Integer> p : connectableBlocks){	
-			switch (p.getR()){
-				case 1 : 
-					board[p.getL().coordinate.y+1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y+1));
-					break;
-				case 2 : 
-					board[p.getL().coordinate.y-1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y-1));
-					break;
-				case 3 : 
-					board[p.getL().coordinate.y-1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y-1));
-					break;
-				case 4 : 
-					board[p.getL().coordinate.y+1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
-					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y+1));
-					break;
-			}
-			coord_id++;
+	public boolean canBlockConnect(Block b, int direction){
+		switch (direction){
+		case 1:
+			return b.bottomleft;
+		case 2:
+			return b.topleft;
+		case 3:
+			return b.topright;
+		case 4:
+			return b.bottomright;
 		}
-		//printCleanDisplay(pieceCode);
-		print();
-		for (Coord coord : optionCoords){ 
-			board[coord.y][coord.x] = null;
+		System.out.println("fatal error in canBlockConnect");
+		return false;
+	}
+	public ArrayList<Piece> filterPiecesDown(ArrayList<Piece> pl, ArrayList<Boolean> piecesDown){
+		ArrayList<Piece> unused = new ArrayList<Piece>();
+		for (Piece p : pl){
+			if (!piecesDown.get(p.pieceNumber)) unused.add(p);
 		}
+		return unused;
+	}
+	public boolean doesPieceFit(Piece p, String pieceCode){
+		if (pieceCode.equals(players.get(0).pieceCode)){
+			if (p1PiecesDown.get(p.pieceNumber)) return false;
+		}else if (pieceCode.equals(players.get(1).pieceCode)){
+			if (p2PiecesDown.get(p.pieceNumber)) return false;
+		}
+		for (Block b : p.blocks){
+			int x = b.coordinate.x;
+			int y = b.coordinate.y;
+			if (x < 0) return false;
+			if (y < 0) return false;
+			if (x >= boardSize) return false;
+			if (y >= boardSize) return false;
+			if (getFromCoordinate(x,y) != null && !getFromCoordinate(x,y).equals("")) return false;
+			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(0).getPieceCode())) return false;
+			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(1).getPieceCode())) return false;
+			if (getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
+			if (getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
+			if (getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
+			if (getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
+		}
+		return true;
+	}
+	public boolean whyDoesntPieceFit(Piece p, String pieceCode){
+		if (pieceCode.equals(players.get(0).pieceCode)){
+			if (p1PiecesDown.get(p.pieceNumber)) return false;
+		}else if (pieceCode.equals(players.get(1).pieceCode)){
+			if (p2PiecesDown.get(p.pieceNumber)) return false;
+		}
+		System.out.println("1");
+		for (Block b : p.blocks){
+			int x = b.coordinate.x;
+			int y = b.coordinate.y;
+			System.out.println("x = " + x + ", y = " + y);
+			if (x < 0) return false;
+			if (y < 0) return false;
+			System.out.println("2");
+			if (x >= boardSize) return false;
+			if (y >= boardSize) return false;
+			System.out.println("3");
+			if (getFromCoordinate(x,y) != null && !getFromCoordinate(x,y).equals("")) return false;
+			System.out.println("4");
+			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(0).getPieceCode())) return false;
+			if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(players.get(1).getPieceCode())) return false;
+			System.out.println("5");
+			if (getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
+			if (getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
+			if (getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
+			if (getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
+			System.out.println("5");
+		}
+		return true;
+	}
+	public boolean isConnectorFree(Block b, int direction, String pieceCode){
+		int x = b.coordinate.x;
+		int y = b.coordinate.y;
+		switch (direction){
+			case 1 : 
+				if (b.coordinate.x+1 >= boardSize) return false;		
+				if (b.coordinate.y+1 >= boardSize) return false;
+				if (board[b.coordinate.y+1][b.coordinate.x+1] != null && !board[b.coordinate.y+1][b.coordinate.x+1].equals("")) return false; 
+				if (getFromCoordinate(x+1,y+2) != null && getFromCoordinate(x+1,y+2).equals(pieceCode)) return false;
+				if (getFromCoordinate(x+2,y+1) != null && getFromCoordinate(x+2,y+1).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
+				return true;
+			case 2 : 
+				if (b.coordinate.x+1 >= boardSize) return false;		
+				if (b.coordinate.y-1 < 0) return false;
+				if (board[b.coordinate.y-1][b.coordinate.x+1] != null && !board[b.coordinate.y-1][b.coordinate.x+1].equals("")) return false; 
+				if (getFromCoordinate(x+2,y-1) != null && getFromCoordinate(x+2,y-1).equals(pieceCode)) return false;
+				if (getFromCoordinate(x+1,y-2) != null && getFromCoordinate(x+1,y-2).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x+1,y) != null && getFromCoordinate(x+1,y).equals(pieceCode)) return false;
+				return true;
+			case 3 : 
+				if (b.coordinate.x-1 < 0) return false;		
+				if (b.coordinate.y-1 < 0) return false;
+				if (board[b.coordinate.y-1][b.coordinate.x-1] != null && !board[b.coordinate.y-1][b.coordinate.x-1].equals("")) return false; 
+				if (getFromCoordinate(x-1,y-2) != null && getFromCoordinate(x-1,y-2).equals(pieceCode)) return false;
+				if (getFromCoordinate(x-2,y-1) != null && getFromCoordinate(x-2,y-1).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x,y-1) != null && getFromCoordinate(x,y-1).equals(pieceCode)) return false;
+				return true;
+			case 4 : 
+				if (b.coordinate.x-1 < 0) return false;		
+				if (b.coordinate.y+1 >= boardSize) return false;
+				if (board[b.coordinate.y+1][b.coordinate.x-1] != null && !board[b.coordinate.y+1][b.coordinate.x-1].equals("")) return false; 
+				if (getFromCoordinate(x-1,y+2) != null && getFromCoordinate(x-1,y+2).equals(pieceCode)) return false;
+				if (getFromCoordinate(x-2,y+1) != null && getFromCoordinate(x-2,y+1).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x-1,y) != null && getFromCoordinate(x-1,y).equals(pieceCode)) return false;
+				if (!b.starterBlock && getFromCoordinate(x,y+1) != null && getFromCoordinate(x,y+1).equals(pieceCode)) return false;
+				return true;
+		}
+		return false;
 	}
 	public ArrayList<Pair<Block,Integer>> getCornerBlocks(String pieceCode){
 		ArrayList<Pair<Block,Integer>> result = new ArrayList<Pair<Block,Integer>>();
 		for (Pair<Piece,String> p : piecesDown){
 			if (p.getR().equals(pieceCode)){
-				for (Pair<Block,Integer> b : p.getL().connectable_blocks()){
+				for (Pair<Block,Integer> b : p.getL().getConnectableBlocks()){
 					result.add(b);
 				}
 			}
@@ -530,9 +437,156 @@ public class Board implements BoardMCTS{
 		}
 		return result;
 	}
-	public int getHeight(){ return boardSize; }
-	public int getWidth(){ return boardSize; }
-	public ArrayList<String> getAllPieceCodes(){ return new ArrayList<String>(allPieceCodes); }
+	
+	public double[] getMoveWeights(String weightingMethod) {
+		return getMoveWeights(getMoves(),weightingMethod);
+	}
+	public double[] getMoveWeights(ArrayList<Piece> moves, String weighting_method) {
+		if (weighting_method.equals("size") || weighting_method.equals("")){
+			double[] result = new double[moves.size()];
+			for (Piece m : moves){
+				result[moves.indexOf(m)] = Math.pow((double)m.getSize(),1.5);
+			}
+			return result;
+		}else if (weighting_method.equals("heat")){
+			double[] result = new double[moves.size()];
+			for (Piece m : moves){
+				result[moves.indexOf(m)] = explorationHeatMapScore(m);
+			}
+			return result;
+		}else if (weighting_method.equals("product")){
+			double[] result = new double[moves.size()];
+			for (Piece m : moves){
+				result[moves.indexOf(m)] = explorationProductScore(m);
+			}
+			return result;
+		}else{
+			return null;
+		}
+	}
+	public int explorationHeatMapScore(Piece p){ //only works on 14x14 board size
+		int[][] smallStride = new int[boardSize/2][boardSize/2];
+		int[][] largeStride = new int[boardSize/7][boardSize/7];
+		double[][] cellPoints = new double[boardSize][boardSize];
+		for (int x = 0; x < boardSize; x++){
+			for (int y = 0; y < boardSize; y++){
+				if (getFromCoordinate(x,y) != null && getFromCoordinate(x,y).equals(currentPlayer.getPieceCode())){
+					int x_small_idx = (int)Math.floor(x/2);
+					int x_large_idx = (int)Math.floor(x/7);
+					int y_small_idx = (int)Math.floor(y/2);
+					int y_large_idx = (int)Math.floor(y/7);
+					smallStride[y_small_idx][x_small_idx]++;
+					largeStride[y_large_idx][x_large_idx]++;
+				}
+			}
+		}
+		for (int x = 0; x < boardSize; x++){
+			for (int y = 0; y < boardSize; y++){
+				cellPoints[y][x] = 10 - smallStride[(int)Math.floor(y/2)][(int)Math.floor(x/2)] - 0.1*largeStride[(int)Math.floor(y/7)][(int)Math.floor(x/7)];
+			}
+		}
+		Coord c;
+		int result = 0;
+		for (Block b : p.blocks){
+			c = b.coordinate;
+			result += cellPoints[c.y][c.x];
+		}
+		return result;
+	}
+	public int explorationProductScore(Piece p){
+		Coord startingCoord = (currentPlayer.startingCorner == 1 ? new Coord(0,0) : new Coord(getBoardSize()-1,getBoardSize()-1));
+		int score = 0;
+		for (Block b : p.blocks){
+			score += startingCoord.productScore(b.coordinate);
+		}
+		return score;
+		
+	}
+	public void printOptionsBoard(String pieceCode, ArrayList<Pair<Block,Integer>> connectableBlocks){
+		ArrayList<Coord> optionCoords = new ArrayList<Coord>();
+		Board cloned = clone();
+		for (int i = 0; i < cloned.getBoardSize(); i++){
+			for (int j = 0; j < cloned.getBoardSize(); j++){
+				if (cloned.board[i][j] != null && cloned.board[i][j].equals("1")){
+					cloned.board[i][j] = "#";
+				}else if (cloned.board[i][j] != null && cloned.board[i][j].equals("2")){
+					cloned.board[i][j] = "O";
+				}
+			}
+		}
+		int coord_id = 1;
+		for (Pair<Block,Integer> p : connectableBlocks){	
+			switch (p.getR()){
+				case 1 : 
+					cloned.board[p.getL().coordinate.y+1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
+					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y+1));
+					break;
+				case 2 : 
+					cloned.board[p.getL().coordinate.y-1][p.getL().coordinate.x+1] = Integer.toString(coord_id);
+					optionCoords.add(new Coord(p.getL().coordinate.x+1,p.getL().coordinate.y-1));
+					break;
+				case 3 : 
+					cloned.board[p.getL().coordinate.y-1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
+					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y-1));
+					break;
+				case 4 : 
+					cloned.board[p.getL().coordinate.y+1][p.getL().coordinate.x-1] = Integer.toString(coord_id);
+					optionCoords.add(new Coord(p.getL().coordinate.x-1,p.getL().coordinate.y+1));
+					break;
+			}
+			coord_id++;
+		}
+		cloned.printValues();
+	}
+	
+	public void putStartingPieceOnBoard(Piece p, String pieceCode){
+		allPieceCodes.add(pieceCode);
+		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
+	}
+	public void putPieceOnBoard(Piece p, String pieceCode){
+		boolean quit = false;
+		if (!doesPieceFit(p,pieceCode)){
+			System.out.print("Piece does not fit! : pieceCode = " + pieceCode + ", player = ");
+			if (pieceCode.equals(players.get(0).pieceCode)){
+				System.out.println("0");
+			}else if (pieceCode.equals(players.get(1).pieceCode)){
+				System.out.println("1");
+			}
+			whyDoesntPieceFit(p,pieceCode);
+			quit = true;
+		}
+ 		if (pieceCode.equals(players.get(0).pieceCode)){
+ 			p1PiecesDown.set(p.pieceNumber, new Boolean(true));
+ 		}else if (pieceCode.equals(players.get(1).pieceCode)){
+			p2PiecesDown.set(p.pieceNumber, new Boolean(true));
+		}
+
+		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
+		for (Block b : p.blocks){
+			Coord c = b.coordinate;
+			board[c.y][c.x] = pieceCode;
+		}
+		if (currentPlayer == players.get(0)){
+			if (doesPlayerHaveRemainingMoves(players.get(1))) currentPlayer = players.get(1);
+		}else{
+			if (doesPlayerHaveRemainingMoves(players.get(0))) currentPlayer = players.get(0);
+		}
+		if (quit){
+			printValues();
+			Thread.dumpStack();
+			System.exit(1);
+		}
+	}
+	public void makeMove(Piece m, String pieceCode){
+		putPieceOnBoard(m, pieceCode);
+	}
+	public void makeMove(Piece m){
+		putPieceOnBoard(m, currentPlayer.getPieceCode());
+	}
+	public void makeMove(Piece m, int playerId){		
+		putPieceOnBoard(m, players.get(playerId).getPieceCode());
+	}
+	
 	public void saveScoresToFile(Player... players){
 		File workingDir = new File(System.getProperty("user.dir"));
 		File scoresDir = new File(workingDir,"score_data_smcts");
@@ -545,7 +599,8 @@ public class Board implements BoardMCTS{
 				}catch(IOException ioe){
 					System.out.println("Caught ioe");
 				}
-				try(PrintWriter out = new PrintWriter(scoreFile)){
+				try{
+					PrintWriter out = new PrintWriter(scoreFile);
 					for (int j = 0; j < Math.min(players.length, 4); j++){
     					out.println(players[j].getStrategy() + "," + blocksOnBoard(players[j].getPieceCode()));
     				}
@@ -555,6 +610,30 @@ public class Board implements BoardMCTS{
 				}
 				break;
 			}
+		}
+	}
+	public void outputPlayingData(Player... players){
+		System.out.println("---");
+		System.out.println("1: " + players[0].getStrategy() + "1");
+		System.out.println("2: " + players[1].getStrategy() + "2");
+		boolean found_starter = false;
+		for (Pair<Piece,String> p : piecesDown){
+			found_starter = false;
+			String line = "";
+			if (p.getR().equals(players[0].getPieceCode())){
+				line = "1: ";
+				for (Block b : p.getL().blocks){
+					line += (13-b.coordinate.x) + "," + b.coordinate.y + ";";
+					if ((13-b.coordinate.x) == -1 || b.coordinate.y == -1 || (13-b.coordinate.x) == boardSize || b.coordinate.y == boardSize) found_starter = true;
+				}
+			}else{
+				line = "2: ";
+				for (Block b : p.getL().blocks){
+					line += b.coordinate.x + "," + (13-b.coordinate.y) + ";";
+					if (b.coordinate.x == -1 || (13-b.coordinate.y) == -1 || b.coordinate.x == boardSize || (13-b.coordinate.y) == boardSize) found_starter = true;
+				}
+			}
+			if (!found_starter) System.out.println(line);
 		}
 	}
 	public void savePlayingDataToFile(Player... players){
@@ -569,7 +648,8 @@ public class Board implements BoardMCTS{
 				}catch(IOException ioe){
 					System.out.println("Caught ioe");
 				}
-				try(PrintWriter out = new PrintWriter(movesFile)){
+				try{
+					PrintWriter out = new PrintWriter(movesFile);
     				out.println("1: " + players[0].getStrategy() + "1");
     				out.println("2: " + players[1].getStrategy() + "2");
     				boolean found_starter = false;
@@ -607,12 +687,5 @@ public class Board implements BoardMCTS{
 			}
 		}
 		return blockCount;
-	}
-	public ArrayList<Piece> getPiecesFromCode(String pieceCode){
-		ArrayList<Piece> result = new ArrayList<Piece>();
-		for (Pair<Piece,String> p : piecesDown){
-			if (p.getR().equals(pieceCode)) result.add(p.getL());
-		}
-		return result;
 	}
 }

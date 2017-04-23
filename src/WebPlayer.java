@@ -22,13 +22,15 @@ public class WebPlayer extends Player{
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
 		Piece p;
-		possibleMoves = moveToPieceList(board.getMoves(this));
+		possibleMoves = board.getMoves(this);
 		if (possibleMoves.size() == 0){
 			finished = true;
 			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
 			return false;
 		}
+		System.out.println("finding piece placed from board");
 		p = getPieceFromNewBoard(newBoard);
+		System.out.println("found piece : " + p.pieceNumber);
 		//System.out.println("pieceCode = " + pieceCode);
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
@@ -51,7 +53,7 @@ public class WebPlayer extends Player{
 	public Piece repositionPiece(ArrayList<Coord> differences, Piece p){
 		Coord bottomLeftCoord = getBottomLeft(differences);
 		Block block = p.blocks.get(0);
-		p.place_piece(block,new Coord(block.coordinate.x + bottomLeftCoord.x, block.coordinate.y + bottomLeftCoord.y));
+		p.placePiece(block,new Coord(block.coordinate.x + bottomLeftCoord.x, block.coordinate.y + bottomLeftCoord.y));
 		return p;
 	}
 	public Coord getBottomLeft(ArrayList<Coord> coords){
@@ -66,20 +68,7 @@ public class WebPlayer extends Player{
 	}
 	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
 		for (Piece p : pieces){
-			//System.out.println("testing:");
-			//p.print_piece();
-			//System.out.println("are:");
-			//for (Coord c : p.getCoordinates()){
-				//System.out.println(c);
-			//}
-			//System.out.println("equal to:");
-			//for (Coord c : coords){
-				//System.out.println(c);
-			//}
-			//System.out.println("");
 			if (coordArraysEqual(coords,p.getCoordinates())){
-				//System.out.println("found piece:");
-				//p.print_piece();
 				return p;
 			}
 		}
@@ -121,6 +110,9 @@ public class WebPlayer extends Player{
 	}
 	public ArrayList<Coord> getDifferences(String[][] b1, String[][] b2){
 		int boardSize = board.getBoardSize();
+		print2DStringArray(b1,false);
+		System.out.println("------");
+		print2DStringArray(b2,false);
 		ArrayList<Coord> result = new ArrayList<Coord>();
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
@@ -128,6 +120,9 @@ public class WebPlayer extends Player{
 					result.add(new Coord(j,i));
 				}
 			}
+		}
+		for (Coord c : result){
+			System.out.println("c = " + c.x + ", " + c.y);
 		}
 		return result;
 	}
@@ -137,6 +132,8 @@ public class WebPlayer extends Player{
 				return true;
 			}else if(s2.equals("0")){
 				return true;
+			}else if(s2.equals("3")){
+				return true;
 			}else{
 				return false;
 			}
@@ -145,9 +142,15 @@ public class WebPlayer extends Player{
 				return true;
 			}else if(s1.equals("0")){
 				return true;
+			}else if(s1.equals("3")){
+				return true;
 			}else{
 				return false;
 			}
+		}else if (s1.equals("3")){
+			return (s2.equals("3") || s2.equals("0"));
+		}else if (s2.equals("3")){
+			return (s1.equals("3") || s1.equals("0"));
 		}else{
 			return s1.equals(s2);
 		}
@@ -168,7 +171,7 @@ public class WebPlayer extends Player{
 		if (invertY){
 			for (int y = maxY-1; y >= 0; y--){
 				for (int x = 0; x < ar[y].length; x++){
-					line = line + ar[y][x];
+					line = line + (ar[y][x] == null ? "0" : ar[y][x]);
 				}
 				System.out.println(line);
 				line = "";
@@ -176,7 +179,7 @@ public class WebPlayer extends Player{
 		}else{
 			for (int y = 0; y < maxY; y++){
 				for (int x = 0; x < ar[y].length; x++){
-					line = line + ar[y][x];
+					line = line + (ar[y][x] == null ? "0" : ar[y][x]);
 				}
 				System.out.println(line);
 				line = "";
@@ -259,7 +262,7 @@ public class WebPlayer extends Player{
 				System.out.println("*** found match ***");
 				p.printPieceDiagram();
 				
-				p.place_piece(bl,c);
+				p.placePiece(bl,c);
 				return p;
 			}
 			System.out.println("");

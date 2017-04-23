@@ -50,7 +50,7 @@ function loadGame(game){
 		var p1 = (game.p1 == username);
 		gamecode = game.gamecode;
 		turn = game.turn;
-		//console.log('this player is player 1 : ' + p1);
+		console.log('this player is player 1 : ' + p1);
 		setMoves(game,p1);
 		
 		if (p1){
@@ -456,11 +456,21 @@ function setMoves(game, p1){
 			}
 		}
 	}
-	if (game.p2 == '* computer *'){
-		for (var y = 0; y < board.length; y++){
-			for (var x = 0; x < board.length; x++){
-				if (board[y][x] == 2){
-					$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("opp-block");
+	if (game.single_player){
+		if (game.humanP1 && game.p2 == '* computer *'){
+			for (var y = 0; y < board.length; y++){
+				for (var x = 0; x < board.length; x++){
+					if (board[y][x] == 2){
+						$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("opp-block");
+					}
+				}
+			}
+		}else if (!game.humanP1 && game.p1 == '* computer *'){
+			for (var y = 0; y < board.length; y++){
+				for (var x = 0; x < board.length; x++){
+					if (board[y][x] == 1){
+						$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("opp-block");
+					}
 				}
 			}
 		}

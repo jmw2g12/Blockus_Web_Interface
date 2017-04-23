@@ -143,12 +143,6 @@ class game {
 		this.p2_board[board_size-1][0] = 3;
 		this.turn = 1;
 		this.moves = 0;
-		this.p1 = p1;
-		if (single_player){
-			this.p2 = '* computer *';
-		}else{
-			this.p2 = null;
-		}
 		this.p1_resigned = false;
 		this.p2_resigned = false;
 		this.p1_pieces = new Array(piece_count).fill(null);
@@ -159,10 +153,85 @@ class game {
 		if (single_player){
 			var blokusConstructor = java.import("Blokus");
 			this.java_game = new blokusConstructor();
-			this.java_human = this.java_game.getP1Sync();
-			this.java_computer = this.java_game.getP2Sync();
-			this.intervalFunc = null;
+			this.comp_strategy = this.get_random_strategy();
+			console.log('comp_strategy = ' + this.comp_strategy);
+			this.java_game.setCompStrategySync(this.comp_strategy);
+			if (Math.random() < 0.5){
+				this.humanP1 = true;
+				this.p1 = p1;
+				this.p2 = '* computer *';
+				this.java_game.setHumanP1Sync();
+				this.java_human = this.java_game.getP1Sync();
+				this.java_computer = this.java_game.getP2Sync();
+				this.intervalFunc = null;
+			}else{
+				this.humanP1 = false;
+				this.p1 = '* computer *';
+				this.p2 = p1;
+				this.java_game.setCompP1Sync();
+				this.java_computer = this.java_game.getP1Sync();
+				this.java_human = this.java_game.getP2Sync();
+				this.java_game.compMove(function(err, result){
+					if (err) console.log(err);
+				});
+				this.intervalFunc = setInterval(this.computer_move_check.bind(this),3000);
+			}
+		}else{
+			this.p1 = p1;
+			this.p2 = null;
 		}
+	}
+	get_random_strategy(){
+		var weights = [];
+		var strategies = [];
+		weights[0] = 1;
+		strategies[0] = 'exploration_heuristic';
+		weights[1] = 1;
+		strategies[1] = 'value_net';
+		weights[2] = 1;
+		strategies[2] = 'mcts_50_binary_exploration';
+		weights[3] = 1;
+		strategies[3] = 'mcts_50_difference_exploration';
+		weights[4] = 3;
+		strategies[4] = 'mcts_50_binary_value';
+		weights[5] = 3;
+		strategies[5] = 'mcts_50_difference_value';
+		weights[6] = 1; 
+		strategies[6] = 'mcts_100_binary_exploration';
+		weights[7] = 1;
+		strategies[7] = 'mcts_100_difference_exploration';
+		weights[8] = 3;
+		strategies[8] = 'mcts_100_binary_value';
+		weights[9] = 3;
+		strategies[9] = 'mcts_100_difference_value';
+		weights[10] = 3;
+		strategies[10] = 'mcts_50_binary_uct';
+		weights[11] = 3;
+		strategies[11] = 'mcts_50_difference_uct';
+		weights[12] = 3;
+		strategies[12] = 'mcts_100_binary_uct';
+		weights[13] = 3;
+		strategies[13] = 'mcts_100_difference_uct';
+		
+		var totalWeights = 0;
+		for (var i = 0; i < weights.length; i++){
+			totalWeights += weights[i];
+		}
+		for (var i = 0; i < weights.length; i++){
+			weights[i] = weights[i]/totalWeights;
+		}		
+		var rnd = Math.random();
+		var idx = -1;
+		for (var i = 0; i < weights.length; i++){
+			if (rnd < weights[i]){
+				idx = i;
+				break;
+			}else{
+				rnd -= weights[i];
+			}
+		}
+		
+		return strategies[idx];
 	}
 	set_game_configuration(p2, p1_board, p2_board, turn, moves, p1_resigned, p2_resigned, p1_pieces, p2_pieces, game_over, move_record){
 		this.p2 = p2;
@@ -298,7 +367,7 @@ class game {
 				
 			if (this.single_player){
 				this.make_java_human_move();
-				this.intervalFunc = setInterval(this.computer_move_check.bind(this),1000);
+				this.intervalFunc = setInterval(this.computer_move_check.bind(this),3000);
 			}
 			return true;
 		}else{
@@ -315,23 +384,65 @@ class game {
 	
 	}
 	setBoardAfterJavaMove(newBoard){
+		this.print_java_board(newBoard);
+		//console.log('new board : ' + newBoard);
 		var board = this.generate_empty_board();
 		for (var y = 0; y < newBoard.length; y++){
 			for (var x = 0; x < newBoard.length; x++){
-				if (newBoard[13-y][x] == 1 || newBoard[13-y][x] == 2) board[y][x] = parseInt(newBoard[13-y][x]);
+				if (this.humanP1){
+					if (newBoard[13-y][x] == 1 || newBoard[13-y][x] == 2) board[y][x] = parseInt(newBoard[13-y][x]);
+				}else{
+					if (newBoard[y][13-x] == 1 || newBoard[y][13-x] == 2) board[y][x] = parseInt(newBoard[y][13-x]);
+				}
 			}
 		}
-		this.update_java_move_record(board,this.p2_board);
-		this.p1_board = this.process_corners(JSON.parse(JSON.stringify(board)),true);
-		this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
+		if (this.humanP1){
+			this.update_java_move_record(board,this.p2_board);
+			this.p1_board = this.process_corners(JSON.parse(JSON.stringify(board)),true);
+			this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
+		}else{
+			this.update_java_move_record(board,this.p1_board);
+			this.p1_board = this.transpose(this.process_corners(JSON.parse(JSON.stringify(board)),true));
+			this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
+		}
 		//console.log(this.p1_board);
 	}
+	print_java_board(b){
+		for (var i = 13; i >= 0; i--){
+			var line = '';
+			for (var j = 0; j < 14; j++){
+				line = line + (b[i][j] == null ? '0' : b[i][j]);
+			}
+			console.log(line);
+		}
+	}
+	transpose(board){
+		var transposed = this.generate_empty_board();
+		for (var y = 0; y < board.length; y++){
+			for (var x = 0; x < board.length; x++){
+				transposed[13-y][13-x] = board[y][x];
+			}
+		}
+		return transposed;
+	}
 	update_java_move_record(new_board,old_board){
-		this.move_record = this.move_record.concat('2: ');
+		if (this.humanP1){
+			this.move_record = this.move_record.concat('2: ');
+		}else{
+			this.move_record = this.move_record.concat('1: ');
+		}
 		for (var y = 0; y < new_board.length; y++){
 			for (var x = 0; x < new_board.length; x++){
-				if (new_board[y][x] == 2 && old_board[y][x] != 2){
-					this.move_record = this.move_record.concat(String(board_size-x), ',', String(board_size-y), ';');
+				if (this.humanP1){
+					if (new_board[y][x] == 2 && old_board[y][x] != 2){
+						console.log('found thing at x=' + x + ' y=' + y);
+						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
+					}
+				}else{
+					if (new_board[y][x] == 1 && old_board[y][x] != 1){
+						console.log('found thing at x=' + x + ' y=' + y);
+						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
+					}
 				}
 			}
 		}			
@@ -344,19 +455,34 @@ class game {
 			this.moves++;
 			this.java_game.resetCompMoveFlagSync();
 			this.setBoardAfterJavaMove(this.java_game.getBoardArraySync());
-			this.p2_resigned = this.java_game.hasCompResignedSync();
-			//console.log("has comp resigned? " + this.p2_resigned);
-			if (!this.p1_resigned) this.turn = 1;
-			this.update_socket_clients('game_update');
-			if (this.p1_resigned && !this.p2_resigned){
-				//console.log("computer moving again");
-				this.java_game.compMove(function(err,result){
-					if (err) console.log(err);
-				});
+			if (this.humanP1){
+				this.p2_resigned = this.java_game.hasCompResignedSync();
+				if (!this.p1_resigned) this.turn = 1;
+				this.update_socket_clients('game_update');
+				if (this.p1_resigned && !this.p2_resigned){
+					//console.log("computer moving again");
+					this.java_game.compMove(function(err,result){
+						if (err) console.log(err);
+					});
+				}else{
+					clearInterval(this.intervalFunc);
+				}
 			}else{
-				clearInterval(this.intervalFunc);
+				this.p1_resigned = this.java_game.hasCompResignedSync();
+				if (!this.p2_resigned) this.turn = 2;
+				this.update_socket_clients('game_update');
+				if (this.p2_resigned && !this.p1_resigned){
+					//console.log("computer moving again");
+					this.java_game.compMove(function(err,result){
+						if (err) console.log(err);
+					});
+				}else{
+					clearInterval(this.intervalFunc);
+				}
 			}
+			//console.log("has comp resigned? " + this.p2_resigned);
 			if (this.p1_resigned && this.p2_resigned){
+				clearInterval(this.intervalFunc);
 				this.finish_game();
 			}
 		}else{
@@ -385,8 +511,10 @@ class game {
 	}
 	update_socket_clients(msg){
 		//console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
-		user_list[this.p1].update_user(game_list[this.gamecode],msg);
-		if (!this.single_player && this.p2 != null){
+		if (this.p1 != '* computer *'){
+			user_list[this.p1].update_user(game_list[this.gamecode],msg);
+		}
+		if (this.p2 != '* computer *' && this.p2 != null){
 			user_list[this.p2].update_user(game_list[this.gamecode],msg);
 		}
 	}
@@ -469,14 +597,27 @@ class game {
 	}
 	process_corners(board,is_p1){
 		//console.log('processing corners for ' + (is_p1 ? 'p1' : 'p2'));
+		var started = false;
 		for (var y = 0; y < board_size; y++){
 			for (var x = 0; x < board_size; x++){
 				//console.log('testing at ' + x + ', ' + y);
 				if (board[y][x] == 0 || board[y][x] == null){ //if idx isn't block of piece
 					//console.log('testing ' + x + ', ' + y);
 					if (this.is_corner(board,x,y,is_p1)) board[y][x] = 3;
+				}else{
+					if ((board[y][x] == 1 && is_p1) || (board[y][x] == 2 && !is_p1)){
+						started = true;
+					}
 				}
 			}
+		}
+		if (!started){
+			console.log('started = false');
+			if ((this.humanP1 && is_p1) || (!this.humanP1 && !is_p1)){
+				board[board_size-1][0] = 3;
+			}
+		}else{
+			console.log('started = true');
 		}
 		//console.log('res = ' + res);
 		return board;
@@ -529,7 +670,7 @@ class game {
 				this.finish_game();
 			}else if (this.single_player){
 				//console.log("computer moving again");
-				this.intervalFunc = setInterval(this.computer_move_check.bind(this),1000);
+				this.intervalFunc = setInterval(this.computer_move_check.bind(this),3000);
 				this.java_game.compMove();
 			}
 		}else if (player_no == 2){
@@ -607,8 +748,16 @@ function game_to_dropbox(game){
 	// need to find an appropriate data storage system
 	//var contents = JSON.stringify(game_list[gamecode]);
 	var contents = '';
-	contents = contents.concat('1: ', game.p1, ';', '\n');
-	contents = contents.concat('2: ', game.p2, ';', '\n');
+	if (game.p1 == '* computer *'){
+		contents = contents.concat('1: ', game.strategy, ';', '\n');
+	}else{
+		contents = contents.concat('1: ', game.p1, ';', '\n');
+	}
+	if (game.p2 == '* computer *'){
+		contents = contents.concat('2: ', game.strategy, ';', '\n');
+	}else{
+		contents = contents.concat('2: ', game.p2, ';', '\n');
+	}
 	contents = contents.concat(game.move_record);
 	//
 	
@@ -704,10 +853,10 @@ request_functions['place_piece'] = function (message){
 			return JSON.stringify({
 				response: 'cant_place',
 				data: {
-					reason: 'invalid_placement'//,
-					//game: game_list[message.gamecode]
+					reason: 'invalid_placement',
+					game: game_list[message.gamecode]
 				}
-			});
+			},replacer);
 		}
 	}else{
 		return JSON.stringify({
@@ -763,7 +912,7 @@ request_functions['start_1p'] = function (message){
 			gamecode: gamecode,
 			game: game_list[gamecode]
 		}
-	});
+	},replacer);
 }
 request_functions['start_2p'] = function (message){
 	var gamecode = create_unique_code(gamecode_length);
