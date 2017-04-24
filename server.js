@@ -208,8 +208,6 @@ class game {
 		weights[9] = 3;
 		strategies[9] = 'mcts_playout_100000_1_policy_difference';
 		
-		return strategies[9];
-		
 		var totalWeights = 0;
 		for (var i = 0; i < weights.length; i++){
 			totalWeights += weights[i];
