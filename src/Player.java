@@ -74,7 +74,7 @@ public abstract class Player{
 	public ArrayList<Piece> getPiecesRemaining(){ return piecesRemaining; }
 	public boolean takeMove(){	
 		if (firstMove) placeStarterBlock();
-		if (strategy.equals("human")) updatePieceIDs();
+		updatePieceIDs();
 		Piece p;
 		possibleMoves = board.getMoves(this);
 		if (possibleMoves.size() == 0){

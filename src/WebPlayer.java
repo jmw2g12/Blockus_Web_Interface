@@ -25,12 +25,12 @@ public class WebPlayer extends Player{
 		possibleMoves = board.getMoves(this);
 		if (possibleMoves.size() == 0){
 			finished = true;
-			System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
+			//System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
 			return false;
 		}
-		System.out.println("finding piece placed from board");
+		//System.out.println("finding piece placed from board");
 		p = getPieceFromNewBoard(newBoard);
-		System.out.println("found piece : " + p.pieceNumber);
+		//System.out.println("found piece : " + p.pieceNumber);
 		//System.out.println("pieceCode = " + pieceCode);
 		board.putPieceOnBoard(p,pieceCode);
 		removePiece(piecesRemaining.get(p.ID),true);
@@ -110,9 +110,9 @@ public class WebPlayer extends Player{
 	}
 	public ArrayList<Coord> getDifferences(String[][] b1, String[][] b2){
 		int boardSize = board.getBoardSize();
-		print2DStringArray(b1,false);
-		System.out.println("------");
-		print2DStringArray(b2,false);
+		//print2DStringArray(b1,false);
+		//System.out.println("------");
+		//print2DStringArray(b2,false);
 		ArrayList<Coord> result = new ArrayList<Coord>();
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
@@ -121,9 +121,9 @@ public class WebPlayer extends Player{
 				}
 			}
 		}
-		for (Coord c : result){
+		/*for (Coord c : result){
 			System.out.println("c = " + c.x + ", " + c.y);
-		}
+		}*/
 		return result;
 	}
 	public boolean testCellEquality(String s1, String s2){
@@ -165,7 +165,7 @@ public class WebPlayer extends Player{
 		}
 		return result;
 	}
-	public void print2DStringArray(String[][] ar, boolean invertY){
+	/*public void print2DStringArray(String[][] ar, boolean invertY){
 		int maxY = ar.length;
 		String line = "";
 		if (invertY){
@@ -185,7 +185,7 @@ public class WebPlayer extends Player{
 				line = "";
 			}
 		}
-	}
+	}*/
 	public String nodeBoardVal(Object[] nodeBoard, int x, int y){
 		Object[] rowobj = (Object[])nodeBoard[y];
 		return String.valueOf(rowobj[x]);

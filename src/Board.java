@@ -15,7 +15,7 @@ public class Board{
 	ArrayList<Boolean> p1PiecesDown = new ArrayList<Boolean>();
 	ArrayList<Boolean> p2PiecesDown = new ArrayList<Boolean>();
 	ArrayList<Piece> allPieces = new ArrayList<Piece>();
-	ValueNet vn = new ValueNet();
+	PolicyNet pn = new PolicyNet();
 	
 	public Board(int size){
 		this.boardSize = size;
@@ -39,7 +39,7 @@ public class Board{
 		b.p1PiecesDown = new ArrayList<Boolean>(p1PiecesDown);
 		b.p2PiecesDown = new ArrayList<Boolean>(p2PiecesDown);
 		b.allPieces = allPieces;
-		b.vn = vn;
+		b.pn = pn;
 		return b;
 	}
 	public Board duplicate(){
@@ -441,23 +441,32 @@ public class Board{
 	public double[] getMoveWeights(String weightingMethod) {
 		return getMoveWeights(getMoves(),weightingMethod);
 	}
-	public double[] getMoveWeights(ArrayList<Piece> moves, String weighting_method) {
-		if (weighting_method.equals("size") || weighting_method.equals("")){
+	public double[] getMoveWeights(ArrayList<Piece> moves, String weightingMethod) {
+		if (weightingMethod.equals("size") || weightingMethod.equals("")){
 			double[] result = new double[moves.size()];
 			for (Piece m : moves){
 				result[moves.indexOf(m)] = Math.pow((double)m.getSize(),1.5);
 			}
 			return result;
-		}else if (weighting_method.equals("heat")){
+		}else if (weightingMethod.equals("heat")){
 			double[] result = new double[moves.size()];
 			for (Piece m : moves){
 				result[moves.indexOf(m)] = explorationHeatMapScore(m);
 			}
 			return result;
-		}else if (weighting_method.equals("product")){
+		}else if (weightingMethod.equals("product")){
 			double[] result = new double[moves.size()];
 			for (Piece m : moves){
 				result[moves.indexOf(m)] = explorationProductScore(m);
+			}
+			return result;
+		}else if (weightingMethod.equals("policy") || weightingMethod.equals("policynet")){
+			double[] result = new double[moves.size()];
+			Board cloned;
+			for (Piece m : moves){
+				cloned = clone();
+				cloned.putPieceOnBoard(m,currentPlayer.getPieceCode());
+				result[moves.indexOf(m)] = pn.getValue(cloned,getCurrentPlayer()==0);
 			}
 			return result;
 		}else{
@@ -544,17 +553,6 @@ public class Board{
 		piecesDown.add(new Pair<Piece,String>(p,pieceCode));
 	}
 	public void putPieceOnBoard(Piece p, String pieceCode){
-		boolean quit = false;
-		if (!doesPieceFit(p,pieceCode)){
-			System.out.print("Piece does not fit! : pieceCode = " + pieceCode + ", player = ");
-			if (pieceCode.equals(players.get(0).pieceCode)){
-				System.out.println("0");
-			}else if (pieceCode.equals(players.get(1).pieceCode)){
-				System.out.println("1");
-			}
-			whyDoesntPieceFit(p,pieceCode);
-			quit = true;
-		}
  		if (pieceCode.equals(players.get(0).pieceCode)){
  			p1PiecesDown.set(p.pieceNumber, new Boolean(true));
  		}else if (pieceCode.equals(players.get(1).pieceCode)){
@@ -570,11 +568,6 @@ public class Board{
 			if (doesPlayerHaveRemainingMoves(players.get(1))) currentPlayer = players.get(1);
 		}else{
 			if (doesPlayerHaveRemainingMoves(players.get(0))) currentPlayer = players.get(0);
-		}
-		if (quit){
-			printValues();
-			Thread.dumpStack();
-			System.exit(1);
 		}
 	}
 	public void makeMove(Piece m, String pieceCode){

@@ -27,7 +27,7 @@ public class Blokus{
 		
 	}
 	public void setCompStrategy(String compStrategy){
-		System.out.println("setting comp strategy : " + compStrategy);
+		//System.out.println("setting comp strategy : " + compStrategy);
 		this.compStrategy = compStrategy;
 	}
 	public void setHumanP1(){
@@ -84,7 +84,7 @@ public class Blokus{
 		return players.get(1);
 	}
 	public void printBoard(){
-		board.print();
+		//board.print();
 	}
 	public String[][] getBoardArray(){
 		return board.getArray();
@@ -100,11 +100,11 @@ public class Blokus{
 			return new RandomPlayer(board,rand,pieces,pieceCode,players,corner);
 		}else if (strategy.equals("exploration_heuristic")){
 			return new HeuristicPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("value_net")){
-			return new ValueNetPlayer(board,rand,pieces,pieceCode,players,corner);
+		}else if (strategy.equals("policy_net") || strategy.equals("policy")){
+			return new PolicyNetPlayer(board,rand,pieces,pieceCode,players,corner);
 		}else if (strategy.startsWith("mcts")){
-			System.out.println("returning mcts player with a " + Integer.parseInt(strategy.split("_")[1]) + " millisecond limit, an exploration constant of " + strategy.split("_")[2] + ", " + strategy.split("_")[3] + " move weighting and " + strategy.split("_")[4] + " scoring.");
-			return new MCTSPlayer(board,rand,pieces,pieceCode,players,corner,Integer.parseInt(strategy.split("_")[1]),Double.parseDouble(strategy.split("_")[2]),strategy.split("_")[3],strategy.split("_")[4]);
+			//System.out.println("returning mcts player with a " + Integer.parseInt(strategy.split("_")[1]) + " millisecond limit, an exploration constant of " + strategy.split("_")[2] + ", " + strategy.split("_")[3] + " move weighting and " + strategy.split("_")[4] + " scoring.");
+			return new MCTSPlayer(board,rand,pieces,pieceCode,players,corner,strategy.split("_")[1].equals("playout"),Integer.parseInt(strategy.split("_")[2]),Double.parseDouble(strategy.split("_")[3]),strategy.split("_")[4],strategy.split("_")[5]);
 		}else if (strategy.equals("web")){
 			return new WebPlayer(board,rand,pieces,pieceCode,players,corner);
 		}

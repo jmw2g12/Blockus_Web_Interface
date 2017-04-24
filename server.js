@@ -154,7 +154,7 @@ class game {
 			var blokusConstructor = java.import("Blokus");
 			this.java_game = new blokusConstructor();
 			this.comp_strategy = this.get_random_strategy();
-			console.log('comp_strategy = ' + this.comp_strategy);
+			//console.log('comp_strategy = ' + this.comp_strategy);
 			this.java_game.setCompStrategySync(this.comp_strategy);
 			if (Math.random() < 0.5){
 				this.humanP1 = true;
@@ -184,34 +184,31 @@ class game {
 	get_random_strategy(){
 		var weights = [];
 		var strategies = [];
+		
 		weights[0] = 1;
 		strategies[0] = 'exploration_heuristic';
 		weights[1] = 1;
-		strategies[1] = 'value_net';
-		weights[2] = 1;
-		strategies[2] = 'mcts_50_binary_exploration';
-		weights[3] = 1;
-		strategies[3] = 'mcts_50_difference_exploration';
+		strategies[1] = 'policy_net';
+		
+		weights[2] = 3;
+		strategies[2] = 'mcts_playout_10000_1_exploration_binary';
+		weights[3] = 3;
+		strategies[3] = 'mcts_playout_10000_1_exploration_difference';
 		weights[4] = 3;
-		strategies[4] = 'mcts_50_binary_value';
+		strategies[4] = 'mcts_playout_10000_1_policy_binary';
 		weights[5] = 3;
-		strategies[5] = 'mcts_50_difference_value';
-		weights[6] = 1; 
-		strategies[6] = 'mcts_100_binary_exploration';
-		weights[7] = 1;
-		strategies[7] = 'mcts_100_difference_exploration';
+		strategies[5] = 'mcts_playout_10000_1_policy_difference';
+		
+		weights[6] = 3; 
+		strategies[6] = 'mcts_playout_100000_1_exploration_binary';
+		weights[7] = 3;
+		strategies[7] = 'mcts_playout_100000_1_exploration_difference';
 		weights[8] = 3;
-		strategies[8] = 'mcts_100_binary_value';
+		strategies[8] = 'mcts_playout_100000_1_policy_binary';
 		weights[9] = 3;
-		strategies[9] = 'mcts_100_difference_value';
-		weights[10] = 3;
-		strategies[10] = 'mcts_50_binary_uct';
-		weights[11] = 3;
-		strategies[11] = 'mcts_50_difference_uct';
-		weights[12] = 3;
-		strategies[12] = 'mcts_100_binary_uct';
-		weights[13] = 3;
-		strategies[13] = 'mcts_100_difference_uct';
+		strategies[9] = 'mcts_playout_100000_1_policy_difference';
+		
+		return strategies[9];
 		
 		var totalWeights = 0;
 		for (var i = 0; i < weights.length; i++){
@@ -384,7 +381,7 @@ class game {
 	
 	}
 	setBoardAfterJavaMove(newBoard){
-		this.print_java_board(newBoard);
+		//this.print_java_board(newBoard);
 		//console.log('new board : ' + newBoard);
 		var board = this.generate_empty_board();
 		for (var y = 0; y < newBoard.length; y++){
@@ -413,7 +410,7 @@ class game {
 			for (var j = 0; j < 14; j++){
 				line = line + (b[i][j] == null ? '0' : b[i][j]);
 			}
-			console.log(line);
+			//console.log(line);
 		}
 	}
 	transpose(board){
@@ -435,12 +432,12 @@ class game {
 			for (var x = 0; x < new_board.length; x++){
 				if (this.humanP1){
 					if (new_board[y][x] == 2 && old_board[y][x] != 2){
-						console.log('found thing at x=' + x + ' y=' + y);
+						//console.log('found thing at x=' + x + ' y=' + y);
 						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
 					}
 				}else{
 					if (new_board[y][x] == 1 && old_board[y][x] != 1){
-						console.log('found thing at x=' + x + ' y=' + y);
+						//console.log('found thing at x=' + x + ' y=' + y);
 						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
 					}
 				}
@@ -592,7 +589,7 @@ class game {
 			for (var x = 0; x < arr[y].length; x++){
 				line = line + ' ' + arr[y][x];
 			}
-			console.log(line);
+			//console.log(line);
 		}
 	}
 	process_corners(board,is_p1){
@@ -612,12 +609,12 @@ class game {
 			}
 		}
 		if (!started){
-			console.log('started = false');
+			//console.log('started = false');
 			if ((this.humanP1 && is_p1) || (!this.humanP1 && !is_p1)){
 				board[board_size-1][0] = 3;
 			}
 		}else{
-			console.log('started = true');
+			//console.log('started = true');
 		}
 		//console.log('res = ' + res);
 		return board;
