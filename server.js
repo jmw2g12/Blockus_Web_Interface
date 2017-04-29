@@ -197,8 +197,8 @@ class game {
 		weights[4] = 3;
 		strategies[4] = 'mcts_playout_10000_1_policy_binary';
 		weights[5] = 3;
-		strategies[5] = 'mcts_playout_10000_1_policy_difference';
-		
+		strategies[5] = 'mcts_playout_10000_1_policy_difference';		
+
 		weights[6] = 3; 
 		strategies[6] = 'mcts_playout_100000_1_exploration_binary';
 		weights[7] = 3;
@@ -207,6 +207,17 @@ class game {
 		strategies[8] = 'mcts_playout_100000_1_policy_binary';
 		weights[9] = 3;
 		strategies[9] = 'mcts_playout_100000_1_policy_difference';
+		
+		weights[10] = 3;
+		strategies[10] = 'mcts_playout_10000_1_size_binary';
+		weights[11] = 3;
+		strategies[11] = 'mcts_playout_10000_1_size_difference';
+		weights[12] = 3;
+		strategies[12] = 'mcts_playout_100000_1_size_binary';
+		weights[13] = 3;
+		strategies[13] = 'mcts_playout_100000_1_size_difference';
+		
+		//return strategies[12];
 		
 		var totalWeights = 0;
 		for (var i = 0; i < weights.length; i++){
