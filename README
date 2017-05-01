@@ -1,0 +1,37 @@
+Blokus Web Application
+----------------------
+
+The aim of Blokus is to get more of your blocks down than your opponent.
+Each piece has a different number of blocks ranging from one to five.
+You start in the bottom left corner.
+The two rules are that each new piece you place must be connected by a corner
+to another one of your pieces and that your pieces cannot touch each other
+along the edges.
+
+
+To start a local blokus server run "node server.js".
+Navigate to the url "localhost:3000" in order to access the web page.
+
+From here you can login using new information or use the username "user" and
+the password "pass" to access a current account.
+
+When you create a game, you will be given a "gamecode" in the title, if the
+game is against the computer then you can use this to come back to the game
+later. If the game is against another user then they can input this gamecode
+in order to join the same game.
+
+If you create or join a game, when you log back you will be given the option to
+rejoin the game using the hyperlink on the right.
+
+If you choose a one player game then you will be given a semi-random computer
+opponent to play against.
+
+
+When in the game, select a piece from your pieces on the left, this will load
+it into the piece viewer. From here you can change the piece's orientation so
+you can place in on the board how you'd like. By hovering over the board you
+get a preview of how it will look. Connect it to one of the green squares, a
+move is shown to be valid once the background changes colour to green.
+
+Once you can no longer move, click the "Can't move" button. Once both players
+are finished the players will be notified and the resultant game data stored.

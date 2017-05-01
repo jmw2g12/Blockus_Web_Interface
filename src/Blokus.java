@@ -18,16 +18,11 @@ public class Blokus{
 	public Blokus(){
 	
 		initPieces();
-		
 		rand = new Random(System.currentTimeMillis());
 
 		board.setPieces(pieces);
-		
-		//System.out.println("players.size() = " + players.size());
-		
 	}
 	public void setCompStrategy(String compStrategy){
-		//System.out.println("setting comp strategy : " + compStrategy);
 		this.compStrategy = compStrategy;
 	}
 	public void setHumanP1(){
@@ -71,10 +66,8 @@ public class Blokus{
 		return this;
 	}
 	public void compMove(){
-		//System.out.println("comp taking move from java");
 		board.setCurrentPlayer(players.get(humanP1 ? 1 : 0));
 		players.get(humanP1 ? 1 : 0).takeMove();
-		//System.out.println("finished move");
 		moveMade = true;
 	}
 	public Player getP1(){
@@ -84,31 +77,20 @@ public class Blokus{
 		return players.get(1);
 	}
 	public void printBoard(){
-		//board.print();
+		board.print();
 	}
 	public String[][] getBoardArray(){
 		return board.getArray();
 	}
-	public class InvalidPlayerException extends Exception{
-		public InvalidPlayerException (String msg){
-			super(msg);
-		}
-	}
 	public Player generatePlayer(String strategy, String pieceCode, int corner){
 		Player p;
-		if (strategy.equals("random")){
-			return new RandomPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("exploration_heuristic")){
-			return new HeuristicPlayer(board,rand,pieces,pieceCode,players,corner);
-		}else if (strategy.equals("policy_net") || strategy.equals("policy")){
-			return new PolicyNetPlayer(board,rand,pieces,pieceCode,players,corner);
+		if (strategy.equals("heuristic") || strategy.equals("exploration") || strategy.equals("heatmap")){
+			return new HeuristicPlayer(board,pieces,pieceCode,corner);
 		}else if (strategy.startsWith("mcts")){
-			//System.out.println("returning mcts player with a " + Integer.parseInt(strategy.split("_")[1]) + " millisecond limit, an exploration constant of " + strategy.split("_")[2] + ", " + strategy.split("_")[3] + " move weighting and " + strategy.split("_")[4] + " scoring.");
-			return new MCTSPlayer(board,rand,pieces,pieceCode,players,corner,strategy.split("_")[1].equals("playout"),Integer.parseInt(strategy.split("_")[2]),Double.parseDouble(strategy.split("_")[3]),strategy.split("_")[4],strategy.split("_")[5]);
+			return new MCTSPlayer(board,pieces,pieceCode,corner,strategy.split("_")[1].equals("playout"),Integer.parseInt(strategy.split("_")[2]),Double.parseDouble(strategy.split("_")[3]),strategy.split("_")[4],strategy.split("_")[5],strategy.split("_")[6]);
 		}else if (strategy.equals("web")){
-			return new WebPlayer(board,rand,pieces,pieceCode,players,corner);
+			return new WebPlayer(board,pieces,pieceCode,corner);
 		}
-		System.out.println("*** Invalid player strategy given! ***");
 		return null;
 	}
 	public void initPieces(){
@@ -439,7 +421,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2a
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b2.connectBottom(b4);
@@ -452,7 +434,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2a
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b3.connectBottom(b4);
@@ -465,7 +447,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2a
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectRight(b4);
@@ -478,7 +460,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2a
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b3.connectBottom(b4);
@@ -491,7 +473,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2b
+		
 		b1.connectBottom(b2);
 		b2.connectRight(b3);
 		b2.connectBottom(b4);
@@ -504,7 +486,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2b
+		
 		b1.connectTop(b2);
 		b2.connectLeft(b3);
 		b3.connectTop(b4);
@@ -517,7 +499,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2b
+		
 		b1.connectLeft(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -530,7 +512,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 2b
+		
 		b1.connectTop(b2);
 		b2.connectLeft(b3);
 		b3.connectTop(b4);
@@ -543,7 +525,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 3
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -557,7 +539,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 3
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -570,7 +552,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4a
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectBottom(b4);
@@ -583,7 +565,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4a
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -596,7 +578,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4a
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectTop(b4);
@@ -609,7 +591,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4a
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectRight(b4);
@@ -622,7 +604,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectBottom(b4);
@@ -635,7 +617,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectLeft(b4);
@@ -648,7 +630,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectTop(b4);
@@ -661,7 +643,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 4
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectRight(b4);
@@ -674,7 +656,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -687,7 +669,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -700,7 +682,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectLeft(b4);
@@ -713,7 +695,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectTop(b4);
@@ -726,7 +708,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -739,7 +721,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -752,7 +734,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectLeft(b4);
@@ -765,7 +747,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 5
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectTop(b4);
@@ -778,7 +760,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -792,7 +774,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -806,7 +788,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -820,7 +802,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -834,7 +816,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -848,7 +830,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -862,7 +844,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -876,7 +858,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 6
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -890,7 +872,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 7
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b2.connectBottom(b4);
@@ -903,7 +885,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 7
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b2.connectLeft(b4);
@@ -916,7 +898,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 7
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b2.connectTop(b4);
@@ -929,7 +911,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 7
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b2.connectRight(b4);
@@ -942,7 +924,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 8
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectRight(b4);
@@ -955,7 +937,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 8
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b3.connectBottom(b4);
@@ -968,7 +950,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 8
+		
 		b1.connectLeft(b2);
 		b2.connectTop(b3);
 		b3.connectLeft(b4);
@@ -981,7 +963,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 8
+		
 		b1.connectTop(b2);
 		b2.connectRight(b3);
 		b3.connectTop(b4);
@@ -994,7 +976,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 9
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectBottom(b4);
@@ -1007,7 +989,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 9
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectLeft(b4);
@@ -1020,7 +1002,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 9
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectTop(b4);
@@ -1033,7 +1015,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 9
+		
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectRight(b4);
@@ -1046,7 +1028,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 10
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -1059,7 +1041,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 10
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b3.connectLeft(b4);
@@ -1072,7 +1054,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 10
+		
 		b1.connectLeft(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -1085,7 +1067,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 10
+		
 		b1.connectBottom(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -1098,7 +1080,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 11
+		
 		b1.connectLeft(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -1111,7 +1093,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 11
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b3.connectLeft(b4);
@@ -1124,7 +1106,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 11
+		
 		b1.connectRight(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -1137,7 +1119,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 11
+		
 		b1.connectTop(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -1150,7 +1132,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 12a
+		
 		b1.connectRight(b2);
 		b2.connectRight(b3);
 		b3.connectRight(b4);
@@ -1163,7 +1145,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 12a
+		
 		b1.connectBottom(b2);
 		b2.connectBottom(b3);
 		b3.connectBottom(b4);
@@ -1176,7 +1158,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 12a
+		
 		b1.connectLeft(b2);
 		b2.connectLeft(b3);
 		b3.connectLeft(b4);
@@ -1189,62 +1171,62 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 12a
-		b1.connectTop(b2);
-		b2.connectTop(b3);
-		b3.connectTop(b4);
-		b4.connectRight(b5);
-		pieces.add(new Piece(b1,b2,b3,b4,b5));
-		pieces.get(pieces.size()-1).pieceNumber = 19;
 		
-		b1 = new Block();
-		b2 = new Block();
-		b3 = new Block();
-		b4 = new Block();
-		b5 = new Block();
-		//*** 12b
-		b1.connectRight(b2);
-		b2.connectRight(b3);
-		b3.connectRight(b4);
-		b4.connectTop(b5);
-		pieces.add(new Piece(b1,b2,b3,b4,b5));
-		pieces.get(pieces.size()-1).pieceNumber = 19;
-		
-		b1 = new Block();
-		b2 = new Block();
-		b3 = new Block();
-		b4 = new Block();
-		b5 = new Block();
-		//*** 12b
-		b1.connectBottom(b2);
-		b2.connectBottom(b3);
-		b3.connectBottom(b4);
-		b4.connectRight(b5);
-		pieces.add(new Piece(b1,b2,b3,b4,b5));
-		pieces.get(pieces.size()-1).pieceNumber = 19;
-		
-		b1 = new Block();
-		b2 = new Block();
-		b3 = new Block();
-		b4 = new Block();
-		b5 = new Block();
-		//*** 12b
-		b1.connectLeft(b2);
-		b2.connectLeft(b3);
-		b3.connectLeft(b4);
-		b4.connectBottom(b5);
-		pieces.add(new Piece(b1,b2,b3,b4,b5));
-		pieces.get(pieces.size()-1).pieceNumber = 19;
-		
-		b1 = new Block();
-		b2 = new Block();
-		b3 = new Block();
-		b4 = new Block();
-		b5 = new Block();
-		//*** 12b
 		b1.connectTop(b2);
 		b2.connectTop(b3);
 		b3.connectTop(b4);
+		b4.connectRight(b5);
+		pieces.add(new Piece(b1,b2,b3,b4,b5));
+		pieces.get(pieces.size()-1).pieceNumber = 19;
+		
+		b1 = new Block();
+		b2 = new Block();
+		b3 = new Block();
+		b4 = new Block();
+		b5 = new Block();
+		
+		b1.connectRight(b2);
+		b2.connectRight(b3);
+		b3.connectRight(b4);
+		b4.connectTop(b5);
+		pieces.add(new Piece(b1,b2,b3,b4,b5));
+		pieces.get(pieces.size()-1).pieceNumber = 19;
+		
+		b1 = new Block();
+		b2 = new Block();
+		b3 = new Block();
+		b4 = new Block();
+		b5 = new Block();
+		
+		b1.connectBottom(b2);
+		b2.connectBottom(b3);
+		b3.connectBottom(b4);
+		b4.connectRight(b5);
+		pieces.add(new Piece(b1,b2,b3,b4,b5));
+		pieces.get(pieces.size()-1).pieceNumber = 19;
+		
+		b1 = new Block();
+		b2 = new Block();
+		b3 = new Block();
+		b4 = new Block();
+		b5 = new Block();
+		
+		b1.connectLeft(b2);
+		b2.connectLeft(b3);
+		b3.connectLeft(b4);
+		b4.connectBottom(b5);
+		pieces.add(new Piece(b1,b2,b3,b4,b5));
+		pieces.get(pieces.size()-1).pieceNumber = 19;
+		
+		b1 = new Block();
+		b2 = new Block();
+		b3 = new Block();
+		b4 = new Block();
+		b5 = new Block();
+		
+		b1.connectTop(b2);
+		b2.connectTop(b3);
+		b3.connectTop(b4);
 		b4.connectLeft(b5);
 		pieces.add(new Piece(b1,b2,b3,b4,b5));
 		pieces.get(pieces.size()-1).pieceNumber = 19;
@@ -1254,7 +1236,7 @@ public class Blokus{
 		b3 = new Block();
 		b4 = new Block();
 		b5 = new Block();
-		//*** 13
+		
 		b1.connectBottom(b2);
 		b2.connectLeft(b3);
 		b2.connectRight(b4);
@@ -1262,12 +1244,4 @@ public class Blokus{
 		pieces.add(new Piece(b1,b2,b3,b4,b5));
 		pieces.get(pieces.size()-1).pieceNumber = 20;
 	}
-	public void printCharacters(int to){
-		System.out.println("----Start----");
-		for (int i = 0; i <= to; i++){
-			System.out.println(i + ":    " + ((char)i));
-		}
-		System.out.println("----End----");
-	}
-
 }

@@ -9,7 +9,7 @@ const SocketServer = require('ws').Server;
 const url = require("url");
 const gamecode_length = 4;
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 const http = require('http');
 const fs = require('fs');
@@ -23,10 +23,9 @@ const app = express().use(function(req, res){
   .use('/favicon.ico', express.static('images/favicon.ico'))
   .listen(port, () => console.log("Listening on " + port + ".."));
   
-/*process.on('uncaughtException', function (err) {
-	//data_to_dropbox('error_at_');
+process.on('uncaughtException', function (err) {
 	console.log('*** Error occurred *** : ' + util.inspect(err));
-})*/
+})
 
 var board_size = 14;
 var piece_count = 21;
@@ -55,6 +54,12 @@ var piece_reference = [
 [[0,0,0,0,0],[0,0,2,1,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,0,0,0]],
 [[0,0,0,0,0],[0,0,2,0,0],[0,1,1,1,0],[0,0,1,0,0],[0,0,0,0,0]]];
 
+
+/*
+ *	A user class is made for every user that logs in
+ *	Holds web sockets so they can be contacted without request when the game is updated
+*/
+
 class user {
 	constructor(username, password, ws){
 		this.username = username;
@@ -81,7 +86,6 @@ class user {
 		if (index > -1) {
 			this.games_played++;
 			this.game_codes.splice(index, 1);
-			//console.log('removing game : ' + gamecode + ' from user : ' + this.username);
 		}
 	}
 	get_games(){
@@ -95,26 +99,22 @@ class user {
 		this.ws_clients.push(ws);
 	}
 	message_user(from,text){
-		//console.log('in message_user function, list size is ' + this.ws_clients.length);
 		for (var i = 0; i < this.ws_clients.length; i++){
 			if (this.ws_clients[i].readyState === 1){
-				//console.log('messaging user');
 				this.ws_clients[i].send(JSON.stringify({
 					response: 'receive_message',
 					data: {
 						from_user: from,
 						text: text
 					}
-				}));
+				},replacer));
 				
 			}
 		}
 	}
 	update_user(game, msg){
-		//console.log('in message_user function, list size is ' + this.ws_clients.length);
 		for (var i = 0; i < this.ws_clients.length; i++){
 			if (this.ws_clients[i].readyState == 1){
-				//console.log('updating user');
 				this.ws_clients[i].send(JSON.stringify({
 					response: msg,
 					data: {
@@ -126,6 +126,9 @@ class user {
 	}
 }
 
+/*
+ *	Used as an encapsulation of piece position variables
+*/
 class piece_position {
 	constructor(piece_code, transform_code, coord){
 		this.piece_code = piece_code;
@@ -134,7 +137,15 @@ class piece_position {
 	}
 }
 
+/*
+ *	A game class is made for every game created, can be against computer or other user
+ *	2 player updates the board and sends back to both players
+ *  1 player has to update the java game object, solicit a move and replies to the user
+ *	To avoid a heavy blocking function, computer move done asynchronously. This requires
+ *	polling to check if complete
+*/
 class game {
+
 	constructor(gamecode, p1, single_player){
 		this.gamecode = gamecode;
 		this.p1_board = this.generate_empty_board();
@@ -154,7 +165,6 @@ class game {
 			var blokusConstructor = java.import("Blokus");
 			this.java_game = new blokusConstructor();
 			this.comp_strategy = this.get_random_strategy();
-			//console.log('comp_strategy = ' + this.comp_strategy);
 			this.java_game.setCompStrategySync(this.comp_strategy);
 			if (Math.random() < 0.5){
 				this.humanP1 = true;
@@ -181,64 +191,46 @@ class game {
 			this.p2 = null;
 		}
 	}
+	
+	//	Used to choose a weighted random computer opponent for 1 player games
 	get_random_strategy(){
 		var weights = [];
 		var strategies = [];
 		
 		weights[0] = 1;
-		strategies[0] = 'exploration_heuristic';
-		weights[1] = 1;
-		strategies[1] = 'policy_net';
+		strategies[0] = 'exploration';
+		
+		weights[1] = 3;
+		strategies[1] = 'mcts_playout_10000_1.0_heat_difference_max';
 		
 		weights[2] = 3;
-		strategies[2] = 'mcts_playout_10000_1_exploration_binary';
+		strategies[2] = 'mcts_playout_10000_1.0_policy_difference_max';
+		
 		weights[3] = 3;
-		strategies[3] = 'mcts_playout_10000_1_exploration_difference';
+		strategies[3] = 'mcts_playout_60000_1.0_heat_difference_max';
+		
 		weights[4] = 3;
-		strategies[4] = 'mcts_playout_10000_1_policy_binary';
-		weights[5] = 3;
-		strategies[5] = 'mcts_playout_10000_1_policy_difference';		
-
-		weights[6] = 3; 
-		strategies[6] = 'mcts_playout_100000_1_exploration_binary';
-		weights[7] = 3;
-		strategies[7] = 'mcts_playout_100000_1_exploration_difference';
-		weights[8] = 3;
-		strategies[8] = 'mcts_playout_100000_1_policy_binary';
-		weights[9] = 3;
-		strategies[9] = 'mcts_playout_100000_1_policy_difference';
-		
-		weights[10] = 3;
-		strategies[10] = 'mcts_playout_10000_1_size_binary';
-		weights[11] = 3;
-		strategies[11] = 'mcts_playout_10000_1_size_difference';
-		weights[12] = 3;
-		strategies[12] = 'mcts_playout_100000_1_size_binary';
-		weights[13] = 3;
-		strategies[13] = 'mcts_playout_100000_1_size_difference';
-		
-		//return strategies[12];
+		strategies[4] = 'mcts_playout_60000_1.0_policy_difference_max';
 		
 		var totalWeights = 0;
 		for (var i = 0; i < weights.length; i++){
 			totalWeights += weights[i];
 		}
-		for (var i = 0; i < weights.length; i++){
-			weights[i] = weights[i]/totalWeights;
-		}		
-		var rnd = Math.random();
+		
+		var rnd = Math.random() * totalWeights;
 		var idx = -1;
 		for (var i = 0; i < weights.length; i++){
 			if (rnd < weights[i]){
 				idx = i;
 				break;
 			}else{
-				rnd -= weights[i];
+				rnd = rnd - weights[i];
 			}
 		}
-		
 		return strategies[idx];
 	}
+	
+	// This function is used to load in games from backups
 	set_game_configuration(p2, p1_board, p2_board, turn, moves, p1_resigned, p2_resigned, p1_pieces, p2_pieces, game_over, move_record){
 		this.p2 = p2;
 		this.p1_board = p1_board;
@@ -252,6 +244,7 @@ class game {
 		this.game_over = game_over;
 		this.move_record = move_record;
 	}
+	
 	player_scores(board){
 		var p1_score = 0;
 		var p2_score = 0;
@@ -263,6 +256,7 @@ class game {
 		}
 		return [p1_score, p2_score];
 	}
+	
 	generate_empty_board(){
 		var res = [];
 		for (var y = 0; y < board_size; y++){
@@ -313,8 +307,9 @@ class game {
 		}
 		return res;
 	}
+	
+	//	Transform changes the orientation of a piece
 	transform(id, code){
-		//console.log(id + ', ' + code);
 		var res = piece_reference[id].slice();
 		switch (code){
 			case 1:
@@ -344,20 +339,20 @@ class game {
 		}
 		return res;
 	}
-	player_move(username, piece_code, transform_code, coord){ //, ws_client){
+	
+	//	Called when a move has been made by a user
+	player_move(username, piece_code, transform_code, coord){
 		
 		var player_no = this.which_player(username);
 		var player_resigned;
 		if (player_no === 1){
 			player_resigned = this.p1_resigned;
-			//console.log('player_no = 1, player_resigned = ' + player_resigned);
 		}
 		if (player_no === 2){
 			player_resigned = this.p2_resigned;
-			//console.log('player_no = 2, player_resigned = ' + player_resigned);
 		
 		}
-		if (this.turn == player_no && !player_resigned && this.is_piece_unused(player_no, piece_code) && this.is_placement_valid(piece_code, transform_code, coord)){
+		if (this.turn == player_no && !player_resigned && this.is_piece_unused(player_no, piece_code)){
 		
 			this.place_piece(player_no, piece_code, transform_code, coord);
 			this.moves++;
@@ -367,31 +362,21 @@ class game {
 				if (!this.p1_resigned) this.turn = 1;
 			}
 			
-			//update all linked socket clients
-			this.update_socket_clients('game_update');
-				
+			this.update_socket_clients('game_update');	
 				
 			if (this.single_player){
-				this.make_java_human_move();
+				this.make_web_player_move();
 				this.intervalFunc = setInterval(this.computer_move_check.bind(this),3000);
 			}
 			return true;
 		}else{
-			//reply with error
-			//console.log('');
-			//console.log('invalid placement checks:');
-			//console.log('player ' + player_no + ' attempted to go. it is player ' + this.turn + ' go.');
-			//console.log('have players resigned ?  p1_resigned = ' + this.p1_resigned + ',  p2_resigned = ' + this.p2_resigned);
-			//console.log('attempted to place piece ' + piece_code + '. is it unused ? ' + this.is_piece_unused(player_no, piece_code));
-			//console.log('is the placement valid ? ' + this.is_placement_valid(piece_code, transform_code, coord));
-			//console.log('');
 			return false;
 		}
 	
 	}
-	setBoardAfterJavaMove(newBoard){
-		//this.print_java_board(newBoard);
-		//console.log('new board : ' + newBoard);
+	
+	//	Obtains the new board after
+	set_board_after_computer_move(newBoard){
 		var board = this.generate_empty_board();
 		for (var y = 0; y < newBoard.length; y++){
 			for (var x = 0; x < newBoard.length; x++){
@@ -403,25 +388,16 @@ class game {
 			}
 		}
 		if (this.humanP1){
-			this.update_java_move_record(board,this.p2_board);
+			this.update_computer_move_record(board,this.p2_board);
 			this.p1_board = this.process_corners(JSON.parse(JSON.stringify(board)),true);
 			this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
 		}else{
-			this.update_java_move_record(board,this.p1_board);
+			this.update_computer_move_record(board,this.p1_board);
 			this.p1_board = this.transpose(this.process_corners(JSON.parse(JSON.stringify(board)),true));
 			this.p2_board = this.process_corners(JSON.parse(JSON.stringify(board)),false);
 		}
-		//console.log(this.p1_board);
 	}
-	print_java_board(b){
-		for (var i = 13; i >= 0; i--){
-			var line = '';
-			for (var j = 0; j < 14; j++){
-				line = line + (b[i][j] == null ? '0' : b[i][j]);
-			}
-			//console.log(line);
-		}
-	}
+	
 	transpose(board){
 		var transposed = this.generate_empty_board();
 		for (var y = 0; y < board.length; y++){
@@ -431,7 +407,8 @@ class game {
 		}
 		return transposed;
 	}
-	update_java_move_record(new_board,old_board){
+	
+	update_computer_move_record(new_board,old_board){
 		if (this.humanP1){
 			this.move_record = this.move_record.concat('2: ');
 		}else{
@@ -441,12 +418,10 @@ class game {
 			for (var x = 0; x < new_board.length; x++){
 				if (this.humanP1){
 					if (new_board[y][x] == 2 && old_board[y][x] != 2){
-						//console.log('found thing at x=' + x + ' y=' + y);
 						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
 					}
 				}else{
 					if (new_board[y][x] == 1 && old_board[y][x] != 1){
-						//console.log('found thing at x=' + x + ' y=' + y);
 						this.move_record = this.move_record.concat(String(x), ',', String(y), ';');
 					}
 				}
@@ -454,19 +429,18 @@ class game {
 		}			
 		this.move_record = this.move_record.concat('\n');
 	}
+	
+	//	Tests whether the computer has finished computing its move
 	computer_move_check(){
-		//console.log("checking if comp is finished : " + this.java_game);
 		if (this.java_game.hasCompFinishedSync()){
-			//console.log("is finished!");
 			this.moves++;
 			this.java_game.resetCompMoveFlagSync();
-			this.setBoardAfterJavaMove(this.java_game.getBoardArraySync());
+			this.set_board_after_computer_move(this.java_game.getBoardArraySync());
 			if (this.humanP1){
 				this.p2_resigned = this.java_game.hasCompResignedSync();
 				if (!this.p1_resigned) this.turn = 1;
 				this.update_socket_clients('game_update');
 				if (this.p1_resigned && !this.p2_resigned){
-					//console.log("computer moving again");
 					this.java_game.compMove(function(err,result){
 						if (err) console.log(err);
 					});
@@ -478,7 +452,6 @@ class game {
 				if (!this.p2_resigned) this.turn = 2;
 				this.update_socket_clients('game_update');
 				if (this.p2_resigned && !this.p1_resigned){
-					//console.log("computer moving again");
 					this.java_game.compMove(function(err,result){
 						if (err) console.log(err);
 					});
@@ -486,17 +459,14 @@ class game {
 					clearInterval(this.intervalFunc);
 				}
 			}
-			//console.log("has comp resigned? " + this.p2_resigned);
 			if (this.p1_resigned && this.p2_resigned){
 				clearInterval(this.intervalFunc);
 				this.finish_game();
 			}
-		}else{
-			//console.log("not finished.");
 		}
 	}
-	make_java_human_move(){
-		//console.log("is java_computer null ? " + this.java_computer);
+	
+	make_web_player_move(){
 		this.java_game.webMove(this.neutral_board(),function(err, result) {
 			if (err) console.log(err);
 			result.compMove(function(err, result){
@@ -504,6 +474,9 @@ class game {
 			});
 		});
 	}
+	
+	//	Player one and player two boards have the available corners on,
+	//	neutral board only has each players' blocks
 	neutral_board(){
 		var board = JSON.parse(JSON.stringify(this.p1_board));
 		for (var y = 0; y < board_size; y++){
@@ -515,8 +488,8 @@ class game {
 		}
 		return board;
 	}
+	
 	update_socket_clients(msg){
-		//console.log('sending update message : ' + JSON.stringify(game_list[this.gamecode]));
 		if (this.p1 != '* computer *'){
 			user_list[this.p1].update_user(game_list[this.gamecode],msg);
 		}
@@ -524,6 +497,7 @@ class game {
 			user_list[this.p2].update_user(game_list[this.gamecode],msg);
 		}
 	}
+	
 	is_piece_unused(player_no, piece_code){
 		if (player_no == 1){
 			return this.p1_pieces[piece_code] == null;
@@ -531,24 +505,20 @@ class game {
 			return this.p2_pieces[piece_code] == null;
 		}
 	}
-	is_placement_valid(piece_code, transform_code, coord){
-		//so far client makes appropriate checks. write this function if required later
-		return true;
-	}
+	
 	place_piece(player_no, piece_code, transform_code, coord){
 		if (piece_code === -1) return false;
 		if (player_no == 1){
 			this.p1_pieces[piece_code] = new piece_position(piece_code, transform_code, coord);
-			//add to board
+			
 			var piece = this.transform(piece_code,transform_code);
 			var piece_coords = this.set_coords_relative(coord,this.piece_relative_coords(piece));
-			//console.log(piece_coords);
 			for (var y = 0; y < board_size; y++){
 				for (var x = 0; x < board_size; x++){
 					if (this.p1_board[y][x] === 3) this.p1_board[y][x] = 0;
 				}
 			}
-			//add new piece
+			
 			this.move_record = this.move_record.concat('1: ');
 			for (var i = 0; i < piece_coords.length; i++){
 				this.p1_board[(piece_coords[i][1]-1)][(piece_coords[i][0]-1)] = 1;
@@ -557,24 +527,21 @@ class game {
 			}			
 			this.move_record = this.move_record.concat('\n');
 			
-			//process corners
+			
 			this.process_corners(this.p1_board,true);
-			//console.log('p1 board');
-			//this.print_array(this.p1_board);
-			//console.log('p2 board');
-			//this.print_array(this.p2_board);
+			
 		}else if (player_no == 2){
 			this.p2_pieces[piece_code] = new piece_position(piece_code, transform_code, coord);
-			//add to board
+			
 			var piece = this.transform(piece_code,transform_code);
 			var piece_coords = this.set_coords_relative(coord,this.piece_relative_coords(piece));
-			//console.log(piece_coords);
+			
 			for (var y = 0; y < board_size; y++){
 				for (var x = 0; x < board_size; x++){
 					if (this.p2_board[y][x] === 3) this.p2_board[y][x] = 0;
 				}
 			}
-			//add new piece
+			
 			this.move_record = this.move_record.concat('2: ');
 			for (var i = 0; i < piece_coords.length; i++){
 				this.p1_board[board_size-piece_coords[i][1]][board_size-piece_coords[i][0]] = 2;
@@ -583,32 +550,15 @@ class game {
 			}
 			this.move_record = this.move_record.concat('\n');
 			
-			//process corners
 			this.process_corners(this.p2_board,false);
-			//console.log('p1 board');
-			//this.print_array(this.p1_board);
-			//console.log('p2 board');
-			//this.print_array(this.p2_board);
 		}
 	}
-	print_array(arr){
-		var line;
-		for (var y = 0; y < arr.length; y++){
-			line = '';
-			for (var x = 0; x < arr[y].length; x++){
-				line = line + ' ' + arr[y][x];
-			}
-			//console.log(line);
-		}
-	}
+	
 	process_corners(board,is_p1){
-		//console.log('processing corners for ' + (is_p1 ? 'p1' : 'p2'));
 		var started = false;
 		for (var y = 0; y < board_size; y++){
 			for (var x = 0; x < board_size; x++){
-				//console.log('testing at ' + x + ', ' + y);
-				if (board[y][x] == 0 || board[y][x] == null){ //if idx isn't block of piece
-					//console.log('testing ' + x + ', ' + y);
+				if (board[y][x] == 0 || board[y][x] == null){
 					if (this.is_corner(board,x,y,is_p1)) board[y][x] = 3;
 				}else{
 					if ((board[y][x] == 1 && is_p1) || (board[y][x] == 2 && !is_p1)){
@@ -618,27 +568,21 @@ class game {
 			}
 		}
 		if (!started){
-			//console.log('started = false');
 			if ((this.humanP1 && is_p1) || (!this.humanP1 && !is_p1)){
 				board[board_size-1][0] = 3;
 			}
-		}else{
-			//console.log('started = true');
 		}
-		//console.log('res = ' + res);
 		return board;
 	}
+	
 	is_corner(board,x,y,is_p1){
-		//has corner
 		var block = (is_p1 ? 1 : 2);
 		if ((x > 0 && y > 0 && board[y-1][x-1] == block) || (x < (board_size-1) && y > 0 && board[y-1][x+1] == block) || (x < (board_size-1) && y < (board_size-1) && board[y+1][x+1] == block) || (x > 0 && y < (board_size-1) && board[y+1][x-1] == block)){
-			//console.log('found a corner');
-			//does not have face
 			if (!(x > 0 && board[y][x-1] == block) && !(x < (board_size-1) && board[y][x+1] == block) && !(y > 0 && board[y-1][x] == block) && !(y < (board_size-1) && board[y+1][x] == block)) return true;
-			//console.log('but has connecting face');
 		}
 		return false;
 	}
+	
 	set_coords_relative(origin,coords){
 		var result = [];
 		for (var i = 0; i < coords.length; i++){
@@ -646,6 +590,7 @@ class game {
 		}
 		return result;
 	}
+	
 	piece_relative_coords(piece){
 		var rel_x = -1;
 		var rel_y = -1;
@@ -668,6 +613,7 @@ class game {
 		}
 		return coords;
 	}
+	
 	resign_player(player_no){
 		if (player_no == 1){
 			this.p1_resigned = true;
@@ -686,13 +632,13 @@ class game {
 		}
 		this.update_socket_clients('game_update');
 	}
+	
 	finish_game(){
 		this.update_socket_clients('game_over');
 		this.game_over = true;
-		//console.log(this.move_record);
 		game_to_dropbox(this);
-		//remove game from array to improve server performance
 	}
+	
 	which_player(username){
 		if (this.p1 === username){
 			return 1;
@@ -702,6 +648,7 @@ class game {
 			return -1;
 		}
 	}
+	
 	add_p2(username){
 		if (this.is_joinable()){
 			this.p2 = username;
@@ -710,12 +657,15 @@ class game {
 			return false;
 		}
 	}
+	
 	is_joinable(){
 		return (!this.single_player && this.p2 == null);
 	}
+	
 	is_player_joined(username){
 		return (this.p1 == username || this.p2 == username);
 	}
+	
 	other_player(username){
 		if (this.p1 === username){
 			return this.p2;
@@ -723,13 +673,16 @@ class game {
 			return this.p1;
 		}
 	}
+	
 	get_players(){
 		return [this.p1, this.p2];
 	}
 }
 
 
-//---
+/*
+ *	Misc. utility functions
+*/
 function create_unique_code(length){
 	var code = '';
 	do{
@@ -747,30 +700,25 @@ function gen_random_string(length){
     return text;
 }
 function game_to_dropbox(game){
-	//console.log(game);
-	//console.log('sending file to dropbox');
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	
-	// need to find an appropriate data storage system
-	//var contents = JSON.stringify(game_list[gamecode]);
 	var contents = '';
 	if (game.p1 == '* computer *'){
-		contents = contents.concat('1: ', game.strategy, ';', '\n');
+		contents = contents.concat('1: ', game.comp_strategy, ';', '\n');
 	}else{
 		contents = contents.concat('1: ', game.p1, ';', '\n');
 	}
 	if (game.p2 == '* computer *'){
-		contents = contents.concat('2: ', game.strategy, ';', '\n');
+		contents = contents.concat('2: ', game.comp_strategy, ';', '\n');
 	}else{
 		contents = contents.concat('2: ', game.p2, ';', '\n');
 	}
 	contents = contents.concat(game.move_record);
-	//
 	
 	var d = new Date();
     var n = d.getTime();
 	var path = '/BlokusData/' + game.gamecode + '/' + n + '.txt';
-	//console.log("path = " + path);
+	
 	dbx.filesUpload({ path: path, contents: contents })
       .then(function (response) {
         //console.log(response);
@@ -778,10 +726,8 @@ function game_to_dropbox(game){
       .catch(function (err) {
         //console.log(err);
       });
-    //console.log("leaving send file to dropbox function");
 }
 function data_to_dropbox(name){
-	//console.log('sending all game and user data to dropbox');
 	var dbx = new dropbox({ accessToken: 'wOqCJGXuP6AAAAAAAAAAEyvlOLYxd9Tu4CJWwOcZzisddCY1MVyZtOAa2eJzE4zo' });
 	var d = new Date();
 	var n = '';
@@ -794,8 +740,7 @@ function data_to_dropbox(name){
 	var game_path = '/BlokusBackups/' + n + '_games.txt';
 	var user_contents = arrayToJSON(user_list);
 	var game_contents = arrayToJSON(game_list);
-	//console.log('user_contents : ' + user_contents);
-	//console.log('game_contents : ' + game_contents);
+	
 	dbx.filesUpload({ path: user_path, contents: user_contents })
       .then(function (response) {
         //console.log(response);
@@ -841,19 +786,20 @@ function replacer(key,value){
 }
 
 
-// -- request functions --
+
+/*
+ *	Request functions deal with client messages
+*/
+
 var request_functions = [];
 
 request_functions['place_piece'] = function (message){
-	//console.log('here');
 	if (game_list[message.gamecode] !== null){
 		if (game_list[message.gamecode].player_move(message.username, message.piece_id, message.transform_code, message.coordinates)){
 			
 			return JSON.stringify({
 				response: 'piece_placed',
-				data: {
-					//game: game_list[message.gamecode]
-				}
+				data: {}
 			});
 		}else{
 			return JSON.stringify({
@@ -874,11 +820,10 @@ request_functions['place_piece'] = function (message){
 		
 	}
 }
+
 request_functions['resign'] = function (message){
-	//console.log('resign message from player in gamecode ' + message.gamecode);
 	if (game_list[message.gamecode] !== null && game_list[message.gamecode].is_player_joined(message.username)){
 		var game = game_list[message.gamecode];
-		//var game = JSON.parse(JSON.stringify(game_list[message.gamecode]));
 		game_list[message.gamecode].resign_player(game_list[message.gamecode].which_player(message.username));
 		if (game.game_over){
 			user_list[message.username].remove_game(message.gamecode);
@@ -893,6 +838,7 @@ request_functions['resign'] = function (message){
 		},replacer);
 	}
 }
+
 request_functions['msg_user'] = function (message){
 	if (user_list[message.to_user] !== null){
 		user_list[message.to_user].message_user(message.from_user,message.text);
@@ -907,6 +853,7 @@ request_functions['msg_user'] = function (message){
 		});
 	}
 }
+
 request_functions['start_1p'] = function (message){
 	var gamecode = create_unique_code(4);
 	var one_player_game = new game(gamecode, message.username, true);
@@ -920,6 +867,7 @@ request_functions['start_1p'] = function (message){
 		}
 	},replacer);
 }
+
 request_functions['start_2p'] = function (message){
 	var gamecode = create_unique_code(gamecode_length);
 	var two_player_game = new game(gamecode, message.username, false);
@@ -931,8 +879,9 @@ request_functions['start_2p'] = function (message){
 			gamecode: gamecode,
 			game: game_list[gamecode]
 		}
-	});
+	},replacer);
 }
+
 request_functions['join_game'] = function (message){
 	var code = message.gamecode.toUpperCase();
 	if (game_list[code] == null){
@@ -942,7 +891,7 @@ request_functions['join_game'] = function (message){
 				reason: 'nonexistant',
 				gamecode: code
 			}
-		});
+		},replacer);
 	}
 	if (game_list[code].is_player_joined(message.username)){
 		return JSON.stringify({
@@ -951,7 +900,7 @@ request_functions['join_game'] = function (message){
 				gamecode: code,
 				game: game_list[code]
 			}
-		});
+		},replacer);
 	}
 	if (game_list[code].is_joinable()){
 		game_list[code].add_p2(message.username);
@@ -962,7 +911,7 @@ request_functions['join_game'] = function (message){
 				gamecode: code,
 				game: game_list[code]
 			}
-		});
+		},replacer);
 	}
 	return JSON.stringify({
 		response: 'failed_join_game',
@@ -972,6 +921,7 @@ request_functions['join_game'] = function (message){
 		}
 	});
 }
+
 request_functions['login'] = function (message, ws){	
 	if (user_list[message.username] == null){
 		user_list[message.username] = new user(message.username, message.password, ws);
@@ -1010,12 +960,14 @@ request_functions['login'] = function (message, ws){
 		}
 	}
 }
+
 request_functions['backup_data'] = function (message, ws){
 	data_to_dropbox();
 	return JSON.stringify({
 		response: 'backup_requested'
 	});
 }
+
 request_functions['print_users'] = function (message, ws){
 	console.log('request to print all users : ');
 	for (var username in user_list){
@@ -1027,6 +979,7 @@ request_functions['print_users'] = function (message, ws){
 		response: 'users_printed'
 	});
 }
+
 request_functions['print_user'] = function (message, ws){
 	console.log('request to print single user (' + message.username + ') : ');
 	if (user_list.hasOwnProperty(message.username)){
@@ -1040,6 +993,7 @@ request_functions['print_user'] = function (message, ws){
 		});
 	}
 }
+
 request_functions['print_game'] = function (message, ws){
 	console.log('request to print single game (' + message.gamecode + ') : ');
 	if (game_list.hasOwnProperty(message.gamecode)){
@@ -1053,6 +1007,7 @@ request_functions['print_game'] = function (message, ws){
 		});
 	}
 }
+
 request_functions['print_games'] = function (message, ws){
 	console.log('request to print all games');
 	for (var gamecode in game_list){
@@ -1067,25 +1022,25 @@ request_functions['print_games'] = function (message, ws){
 }
 
 
-// -- socket logic --
+
+
+/*
+ *	Socket logic to handle incoming connections
+*/
+
 const wss = new SocketServer({ server:app });
 
 wss.on('connection', (ws) => {
-  //console.log('Client connected : ' + Object.keys(ws));
-  //console.log(ws.hasOwnProperty('_closeTimer') + ', _closeTimer = ' + ws['_closeTimer']);
   ws['_closeTimer'] = -1;
   
   ws.on('message', function incoming(message) {
   	var parsed_message = JSON.parse(message);
   	ws.send(request_functions[parsed_message.request](parsed_message.data, ws));
   });
-  
-  //ws.on('close', () => console.log('Client disconnected'));
 });
 setInterval(function(){
 	wss.clients.forEach(function each(client) {
 		if (client.readyState === 1) {
-			//console.log('pinging client');
 			client.send(JSON.stringify({
 			response: 'ping',
 			data: {}
@@ -1098,9 +1053,13 @@ setInterval(function(){
 }, 12*60*60*1000);
 
 
-// -- load previous data --
-var backup_user_list = [{"username":"a","password":"a","game_codes":["SGOP"],"games_played":0,"ws_clients":[]},{"username":"b","password":"b","game_codes":["SGOP"],"games_played":0,"ws_clients":[]},{"username":"c","password":"a","game_codes":["OIRG"],"games_played":0,"ws_clients":[]},{"username":"jack","password":"Pass","game_codes":[],"games_played":0,"ws_clients":[]},{"username":"chickenmum","password":"Chicken1","game_codes":["FCEC"],"games_played":0,"ws_clients":[]},{"username":"asdjnas","password":"dksfndks","game_codes":[],"games_played":0,"ws_clients":[]},{"username":"jackw","password":"asdas","game_codes":["FCEC"],"games_played":0,"ws_clients":[]}];
-var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,2,2],[0,0,0,0,0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,0,0,0,2,2,0],[0,0,0,0,0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,0,2,2,2,2,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,3,0,0,0,0,3,0,0,0,0,0],[0,0,0,0,1,1,1,1,0,0,0,0,0,0],[0,3,0,0,0,1,0,0,3,0,0,0,0,0],[0,0,1,1,1,0,3,0,0,0,0,0,0,0],[0,3,0,1,0,3,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,3,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,3,0,0,0,0,3,0,0,0,0,0,0],[0,0,0,2,2,2,2,0,0,0,0,0,0,0],[3,0,0,2,0,0,0,3,0,0,0,0,0,0],[0,2,2,0,3,0,0,0,0,0,0,0,0,0],[0,2,0,3,0,0,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":2,"moves":5,"p1":"a","p2":"b","p1_resigned":true,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,{"piece_code":11,"transform_code":1,"coord":[5,8]},null,null,{"piece_code":14,"transform_code":1,"coord":[1,13]},{"piece_code":15,"transform_code":1,"coord":[3,10]},null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,{"piece_code":10,"transform_code":1,"coord":[4,10]},null,null,null,null,null,null,null,{"piece_code":18,"transform_code":1,"coord":[2,12]},null,null],"single_player":false,"game_over":false,"move_record":"1: 13,1;12,1;11,1;13,0;11,0;\n2: 12,2;11,2;12,1;13,0;12,0;\n1: 11,4;10,4;9,4;10,3;10,2;\n2: 10,4;9,4;8,4;7,4;10,3;\n1: 9,6;8,6;7,6;6,6;8,5;\n"},{"gamecode":"OIRG","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[3,0,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":1,"moves":0,"p1":"c","p2":null,"p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"single_player":false,"game_over":false,"move_record":""},{"gamecode":"FCEC","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,2,2],[0,3,0,0,0,3,0,0,0,0,0,0,2,0],[0,0,1,1,1,0,0,2,0,0,0,2,2,0],[0,0,1,1,2,2,2,2,0,0,2,0,0,0],[0,3,0,0,1,1,0,0,2,2,2,0,0,0],[0,0,3,0,1,0,0,0,3,0,2,0,0,0],[0,0,0,1,1,0,1,1,0,2,0,0,0,0],[0,0,3,0,0,1,1,0,3,2,2,0,0,0],[0,0,0,3,0,0,1,0,2,2,0,0,0,0],[0,0,3,0,1,1,0,3,0,0,0,0,0,0],[0,0,0,1,1,0,3,0,0,0,0,0,0,0],[0,3,0,1,0,3,0,0,0,0,0,0,0,0],[1,0,1,0,3,0,0,0,0,0,0,0,0,0],[1,1,1,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,0,0,0,0,0,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,0,0,0],[0,0,0,3,0,0,3,0,1,1,0,0,0,0],[0,0,3,0,2,2,0,1,0,0,0,0,0,0],[0,0,0,2,2,0,3,1,1,0,0,0,0,0],[0,0,3,0,2,0,1,1,0,1,1,0,0,0],[0,0,0,2,0,0,3,0,0,1,0,0,0,0],[0,0,0,2,2,2,0,0,1,1,3,0,0,0],[3,0,0,2,0,0,2,2,2,2,1,1,0,0],[0,2,2,0,3,0,2,0,0,1,1,1,0,0],[0,2,0,3,0,3,0,3,0,0,0,0,0,0],[2,2,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":2,"moves":9,"p1":"chickenmum","p2":"jackw","p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,null,null,{"piece_code":13,"transform_code":1,"coord":[3,3]},{"piece_code":14,"transform_code":3,"coord":[3,14]},null,null,{"piece_code":17,"transform_code":1,"coord":[5,10]},{"piece_code":18,"transform_code":1,"coord":[5,5]},{"piece_code":19,"transform_code":1,"coord":[7,7]},null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,{"piece_code":10,"transform_code":1,"coord":[7,11]},null,null,null,null,{"piece_code":15,"transform_code":4,"coord":[4,11]},null,null,{"piece_code":18,"transform_code":1,"coord":[2,12]},{"piece_code":19,"transform_code":1,"coord":[5,6]},null],"single_player":false,"game_over":false,"move_record":"1: 13,1;11,1;13,0;12,0;11,0;\n2: 12,2;11,2;12,1;13,0;12,0;\n1: 9,4;8,4;10,3;9,3;10,2;\n2: 10,5;10,4;9,4;8,4;10,3;\n1: 7,7;6,7;8,6;7,6;7,5;\n2: 7,3;6,3;5,3;4,3;7,2;\n1: 9,9;8,9;9,8;10,7;9,7;\n2: 9,8;8,8;10,7;9,7;9,6;\n1: 11,11;10,11;9,11;11,10;10,10;\n"}];
+
+/*
+ *	Handles reinstating backups that have been saved on dropbox
+*/
+
+var backup_user_list = [{"username":"user","password":"pass","game_codes":["SGOP"],"games_played":0,"ws_clients":[]},{"username":"guest","password":"pass","game_codes":["SGOP"],"games_played":0,"ws_clients":[]}];
+var backup_game_list = [{"gamecode":"SGOP","p1_board":[[0,0,0,0,0,0,0,0,0,0,0,0,2,2],[0,0,0,0,0,0,0,0,0,0,0,0,2,0],[0,0,0,0,0,0,0,0,0,0,0,2,2,0],[0,0,0,0,0,0,0,0,0,0,2,0,0,0],[0,0,0,0,0,0,0,2,2,2,2,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,3,0,0,0,0,3,0,0,0,0,0],[0,0,0,0,1,1,1,1,0,0,0,0,0,0],[0,3,0,0,0,1,0,0,3,0,0,0,0,0],[0,0,1,1,1,0,3,0,0,0,0,0,0,0],[0,3,0,1,0,3,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,0,0,0,0,0,0,0,0],[1,1,1,0,3,0,0,0,0,0,0,0,0,0],[1,0,1,0,0,0,0,0,0,0,0,0,0,0]],"p2_board":[[0,0,0,0,0,0,0,0,0,0,0,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,1,1,1],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,0,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,3,0,0,0,0,3,0,0,0,0,0,0],[0,0,0,2,2,2,2,0,0,0,0,0,0,0],[3,0,0,2,0,0,0,3,0,0,0,0,0,0],[0,2,2,0,3,0,0,0,0,0,0,0,0,0],[0,2,0,3,0,0,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,0,0,0,0,0,0,0,0]],"turn":2,"moves":5,"p1":"user","p2":"guest","p1_resigned":false,"p2_resigned":false,"p1_pieces":[null,null,null,null,null,null,null,null,null,null,null,{"piece_code":11,"transform_code":1,"coord":[5,8]},null,null,{"piece_code":14,"transform_code":1,"coord":[1,13]},{"piece_code":15,"transform_code":1,"coord":[3,10]},null,null,null,null,null],"p2_pieces":[null,null,null,null,null,null,null,null,null,null,{"piece_code":10,"transform_code":1,"coord":[4,10]},null,null,null,null,null,null,null,{"piece_code":18,"transform_code":1,"coord":[2,12]},null,null],"single_player":false,"game_over":false,"move_record":"1: 13,1;12,1;11,1;13,0;11,0;\n2: 12,2;11,2;12,1;13,0;12,0;\n1: 11,4;10,4;9,4;10,3;10,2;\n2: 10,4;9,4;8,4;7,4;10,3;\n1: 9,6;8,6;7,6;6,6;8,5;\n"}];
 
 backup_user_list.forEach(function(backup_user){
 	user_list[backup_user.username] = new user(backup_user.username, backup_user.password);
@@ -1113,7 +1072,12 @@ backup_game_list.forEach(function(backup_game){
 });
 
 
-// -- Java app interfacing --
+
+
+/*
+ *	Java interfacing
+*/
+
 java.classpath.push("commons-lang3-3.1.jar");
 java.classpath.push("commons-io.jar");
 java.classpath.push("src");

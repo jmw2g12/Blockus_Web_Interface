@@ -32,7 +32,7 @@ var transforms = [
 [5,7,2,4],
 ];
 var board = [];
-var turn = 1; // 1 or 2 denoting player
+var turn = 1;
 var is_p1;
 var transform_codes = ['cw','ccw','ver','hor'];
 var selected_piece_id = -1;
@@ -65,10 +65,7 @@ function loadGame(game){
 		var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 		$("#page-title").html('Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + gamecode + ' | ' + appendage);
 	
-		
-		//if not resigned:
 		setPieces(game,p1);
-		//console.log(game);
 	});
 }
 function setCoordsRelative(origin,coords){
@@ -185,9 +182,9 @@ function transform(id, code){
 	}
 }
 
-//following is done to load the UI, other functions load specific game
+// The following is done to load the generic interface, other functions load specific game
 function injectGameElements(){
-	//create piece table holders
+	// Create piece table holders for piece set on left
 	$('#piece-set').html(createDivGrid(4,6,'piece-table','board-row',true));
 	$('.piece-table').click(function(){
 		var id = $(this).attr('id').split('_')[1]-1;
@@ -199,16 +196,15 @@ function injectGameElements(){
 		}
 	});
 	
-	//create piece tables
-	//$('.piece-table').html('<div class="piece-table-container">' + createDivGrid(5,5,'piece-table-cell','board-row') + '</div>');
+	// Create piece tables
 	$('.piece-table').each(function(){
 		$(this).html('<div class="piece-table-container">' + createDivGrid(7,5,($(this).attr('id') + '-cell'),'board-row') + '</div>');
 	});
 		
-	//create piece viewer table
+	// Create main piece viewer table
 	$('#main-viewer').html('<div class="piece-table-container">' + createDivGrid(7,5,'main-piece-table-cell','board-row') + '</div>');
 	
-	//create board
+	// Create the game board
 	$('#board').html(createDivGrid(14,14,'board-cell','board-row'));
 	$('#board').mouseleave(function(){
 		resetAll();
@@ -222,15 +218,11 @@ function injectGameElements(){
 		if (moveValid()){
 			placePiece(selected_piece_id, piece_transform_code, cell_coords);
 		}else{
-			//console.log('here - invalid move');
 			$("#page-title").clearQueue();
 			$("#page-title").fadeOut('fast',function(){
-				//var prev = $("#page-title").html();
 				var is_turn = (is_p1 ? (turn === 1) : (turn === 2));
-				//console.log('invalid move : is_p1=' + is_p1 + ', turn=' + turn + ', is_turn=' + is_turn);
 				var appendage = (is_turn ? 'Its your go!' : 'Waiting for other player..');
 				var prev = 'Welcome to Blokus, ' + username[0].toUpperCase() + username.substring(1).toLowerCase() + ' | Gamecode: ' + gamecode + ' | ' + appendage;
-				//console.log('prev = ' + prev);
 				$("#page-title").html('Invalid move');
 				$("#page-title").fadeIn('fast',function(){
 					$("#page-title").delay(1500).fadeOut('fast',function(){
@@ -283,6 +275,7 @@ function setHoverCells(cell_coords){
 			}
 		}
 		if (moveValid(board)){
+			// Turns background green
 			$('body').addClass("good-move");
 			$('.piece-table-container').addClass("good-move");
 		}else{
@@ -301,15 +294,14 @@ function moveValid(){
 	if (selected_piece_id == -1) return false;
 	
 	var c;
-	//check if doesn't overlap
-	// for each coord in coordinates check if coord is a 0
+	
+	// Check it does not over lap others
 	for (var i = 0; i < coordinates.length; i++){
 		c = coordinates[i];
 		if (!(board[c[1]][c[0]] === 0 || board[c[1]][c[0]] === 3)) return false;
 	}
 	
-	//check if connected at a corner
-	// if one of the coordinates exists in corners array
+	// Check it's connected at a corner, if one of the coordinates exists in corners array
 	var connected = false;
 	for (var i = 0; i < coordinates.length; i++){
 		c = coordinates[i];
@@ -322,13 +314,10 @@ function moveValid(){
 	}
 	if (!connected) return false;
 	
-	//check if NOT connected at face
-	// for each coord in coordinates check if each face is not players' block
+	// Check it's NOT connected at face
 	var block = is_p1 ? 1 : 2;
 	var x,y;
-	//console.log('testing face connections');
 	for (var i = 0; i < coordinates.length; i++){
-		//console.log('testing coordinates[' + i + '] = ' + coordinates[i]);
 		x = coordinates[i][0];
 		y = coordinates[i][1];
 		if (x > 0 && board[y][x-1] === block) return false;
@@ -336,7 +325,6 @@ function moveValid(){
 		if (x < (board.length-1) && board[y][x+1] === block) return false;
 		if (y < (board.length-1) && board[y+1][x] === block) return false;
 	}
-	//console.log('face connections good');
 	return true;
 }
 function resetAll(){
@@ -383,8 +371,6 @@ function setPieces(game, p1){
 			return;
 		}
 	}
-	//console.log('piece list = ');
-	//console.log(piece_list);
 	for (var i = 0; i < piece_list.length; i++){
 		if (piece_list[i] == null){
 			populatePieceTable(i+1,piece_reference[i],false);
@@ -480,10 +466,8 @@ function setMoves(game, p1){
 				p = transform(opp_pieces[i].piece_code,opp_pieces[i].transform_code);
 				rel_p = pieceRelativeCoords(p);
 				to_paint = setCoordsRelative(opp_pieces[i].coord,rel_p);
-				//console.log(to_paint);
 				var twisted;
 				for (var j = 0; j < to_paint.length; j++){
-					//console.log(to_paint[j]);
 					twisted = twistCoord(to_paint[j]);
 					$('#board-cell_' + twisted[0] + '_' + twisted[1]).addClass("opp-block");
 				}
@@ -494,7 +478,6 @@ function setMoves(game, p1){
 	for (var y = 0; y < board.length; y++){
 		for (var x = 0; x < board.length; x++){
 			if (board[y][x] === 3){
-				//console.log('setting corner ' + x + ', ' + y + ' :   #board-cell_' + (x+1) + '_' + (y+1));
 				$('#board-cell_' + (x+1) + '_' + (y+1)).addClass("corner-block");
 				corners.push([x,y]);
 			}else{
@@ -502,7 +485,6 @@ function setMoves(game, p1){
 			}
 		}
 	}
-	//console.log('corners.length = ' + corners.length);
 }
 function twistCoord(coord){
 	return [15 - coord[0], 15 - coord[1]];

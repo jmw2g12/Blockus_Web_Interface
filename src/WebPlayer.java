@@ -9,34 +9,27 @@ import java.util.Random;
 import java.lang.Math;
 
 public class WebPlayer extends Player{
-	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-	final boolean orderedInput = true;
 	
-	public WebPlayer(Board board, Random rand, ArrayList<Piece> pieces, String pieceCode, ArrayList<Player> allPlayers, int startingCorner){
-		super(board,rand,pieces,pieceCode,allPlayers,startingCorner);
-		piecesRemaining = new ArrayList<Piece>(pieces);
-		piecesOnBoard = new ArrayList<Piece>();
+	BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		
+	public WebPlayer(Board board, ArrayList<Piece> pieces, String pieceCode,  int startingCorner){
+		super(board,pieces,pieceCode,startingCorner);
 		strategy = "web";
 	}
+	
 	public boolean takeMove(Object[] newBoard){	
 		if (firstMove) placeStarterBlock();
 		updatePieceIDs();
-		Piece p;
-		possibleMoves = board.getMoves(this);
+		ArrayList<Piece> possibleMoves = board.getMoves(this);
 		if (possibleMoves.size() == 0){
 			finished = true;
-			//System.out.println("There are no more moves available! Player in " + startingCorner + " is finished.");
 			return false;
 		}
-		//System.out.println("finding piece placed from board");
-		p = getPieceFromNewBoard(newBoard);
-		//System.out.println("found piece : " + p.pieceNumber);
-		//System.out.println("pieceCode = " + pieceCode);
+		Piece p = getPieceFromNewBoard(newBoard);
 		board.putPieceOnBoard(p,pieceCode);
-		removePiece(piecesRemaining.get(p.ID),true);
+		removePiece(piecesRemaining.get(p.ID));
 		piecesOnBoard.add(p);
 		
-		//board.print();
 		return true;
 	}
 	public Piece getPieceFromNewBoard(Object[] newBoard){
@@ -63,7 +56,7 @@ public class WebPlayer extends Player{
 			if (c.x < minX) minX = c.x;
 			if (c.y < minY) minY = c.y;
 		}
-		//System.out.println("returning " + minX + ", " + minY);
+		
 		return new Coord(minX,minY);
 	}
 	public Piece findPieceFromCoords(ArrayList<Coord> coords, ArrayList<Piece> pieces){
@@ -110,9 +103,6 @@ public class WebPlayer extends Player{
 	}
 	public ArrayList<Coord> getDifferences(String[][] b1, String[][] b2){
 		int boardSize = board.getBoardSize();
-		//print2DStringArray(b1,false);
-		//System.out.println("------");
-		//print2DStringArray(b2,false);
 		ArrayList<Coord> result = new ArrayList<Coord>();
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j < boardSize; j++){
@@ -121,9 +111,6 @@ public class WebPlayer extends Player{
 				}
 			}
 		}
-		/*for (Coord c : result){
-			System.out.println("c = " + c.x + ", " + c.y);
-		}*/
 		return result;
 	}
 	public boolean testCellEquality(String s1, String s2){
@@ -165,112 +152,10 @@ public class WebPlayer extends Player{
 		}
 		return result;
 	}
-	/*public void print2DStringArray(String[][] ar, boolean invertY){
-		int maxY = ar.length;
-		String line = "";
-		if (invertY){
-			for (int y = maxY-1; y >= 0; y--){
-				for (int x = 0; x < ar[y].length; x++){
-					line = line + (ar[y][x] == null ? "0" : ar[y][x]);
-				}
-				System.out.println(line);
-				line = "";
-			}
-		}else{
-			for (int y = 0; y < maxY; y++){
-				for (int x = 0; x < ar[y].length; x++){
-					line = line + (ar[y][x] == null ? "0" : ar[y][x]);
-				}
-				System.out.println(line);
-				line = "";
-			}
-		}
-	}*/
 	public String nodeBoardVal(Object[] nodeBoard, int x, int y){
 		Object[] rowobj = (Object[])nodeBoard[y];
 		return String.valueOf(rowobj[x]);
 	}
-	/*
-	public Piece getPieceFromNewBoard(Object[] newBoard){
-		ArrayList<Coord> differences = new ArrayList<Coord>();
-		ArrayList<Coord> pieceMatchingCoords = new ArrayList<Coord>();
-		int boardSize = board.getBoardSize();
-		System.out.println("java board");
-		board.print();
-		System.out.println("");
-		System.out.println("differences board");
-		int containingBoxTopLeftX = 0xFF;
-		int containingBoxTopLeftY = 0xFF;
-		for (int i = 0; i < board.boardSize; i++){
-			for (int j = 0; j < board.boardSize; j++){
-				System.out.print(nodeBoardVal(newBoard,j,i));
-				System.out.print(board.getFromCoordinate(j,boardSize-i-1));
-				if (compBoardVals(newBoard,board,j,i)){
-					System.out.print("t   ");
-				}else{
-					System.out.print("f   ");
-					differences.add(new Coord(j,i));
-					if (j < containingBoxTopLeftX) containingBoxTopLeftX = j;
-					if (i < containingBoxTopLeftY) containingBoxTopLeftY = i;
-				}
-			}
-			System.out.println("");
-		}
-		//System.out.println("differences.size() = " + differences.size());
-		ArrayList<Coord> normalCoords = normaliseCoords(differences);
-		int maxX = -0xFF;
-		int minX = 0xFF;
-		int maxY = -0xFF;
-		int minY = 0xFF;
-		for (int i = 0; i < normalCoords.size(); i++){
-			if (normalCoords.get(i).x > maxX) maxX = normalCoords.get(i).x;
-			if (normalCoords.get(i).y > maxY) maxY = normalCoords.get(i).y;
-			if (normalCoords.get(i).x < minX) minX = normalCoords.get(i).x;
-			if (normalCoords.get(i).y < minY) minY = normalCoords.get(i).y;
-		}
-		int width = maxX - minX + 1;
-		int height = maxY - minY + 1;
-		for (Coord c : normalCoords){
-			pieceMatchingCoords.add(new Coord(c.x,height-c.y-1));
-		}
-		String[] newPieceArray = new String[height];
-		String line = "";
-		for (int i = 0; i < height; i++){
-			for (int j = 0; j < width; j++){
-				line = line + ((normalCoords.contains(new Coord(j,i))) ? "X" : "-");
-			}
-			newPieceArray[i] = new String(line);
-			line = "";
-		}
-		for (Piece p : piecesRemaining){
-		System.out.println("--------------starting for piece---------------");
-		System.out.println("");
-			//System.out.println("# " + pieces.indexOf(p) + " :");
-			//p.print_piece();
-			String[] pieceArray = p.getPieceArray();
-			System.out.println("piece coords:");
-			p.print_coordinates();
-			System.out.println("new piece coords:");
-			printCoordArrayList(normalCoords);
-			System.out.println("");
-			System.out.println("piece array");
-			printStringArray(pieceArray);
-			System.out.println("new piece array");
-			printStringArray(newPieceArray);
-			if (pieceArraysEqual(pieceArray,newPieceArray)){
-			//if (coordArraysEqual
-				System.out.println("*** found match ***");
-				p.printPieceDiagram();
-				
-				p.placePiece(bl,c);
-				return p;
-			}
-			System.out.println("");
-			System.out.println("-------------------------------------------");
-		}
-		System.out.println("NO PIECE MATCHES!");
-		return null;
-	}*/
 	public void printStringArray(String[] ar){
 		for (int i = 0; i < ar.length; i++){
 			System.out.println(ar[i]);
@@ -289,28 +174,7 @@ public class WebPlayer extends Player{
 		}
 		return true;
 	}
-	/*
-	public Integer[][] nodeBoardArray(Object[] nodeBoard){
-		int boardSize = board.getBoardSize();
-		Integer[][] result = new Integer[boardSize][boardSize];
-		for (int y = 0; y < boardSize; y++){
-			Object[] rowojb = (Object[])nodeBoard[y];
-			for (int x = 0; x < boardSize; x++){
-				result[y][x] = Integer.parseInt(rowobj[x]);
-			}
-		}
-		return result;
-	}
-	public void printObjValues(Object[] board){
-		for (int i = 0; i < 14; i++){
-			Object[] row = (Object[])board[i];
-			for (int j = 0; j < 14; j++){
-				System.out.print(row[j] + ":" + row[j].getClass() + "      ");
-			}
-			System.out.println("");
-		}
-	}
-	*/
+	
 	public boolean compBoardVals(Object[] jsBoard, Board board, int x, int y){
 		int boardSize = board.getBoardSize();
 		String jsVal = nodeBoardVal(jsBoard,x,y);
@@ -323,14 +187,16 @@ public class WebPlayer extends Player{
 			return false;
 		}
 	}
-	public Piece choosePiece(){
+	
+	// Function not used but requires overriding. TakeMove is overriden instead
+	public Piece choosePiece(ArrayList<Piece> possibleMoves){
 		return null;
 	}
+	
 	public Piece getPieceFromArray(String[] piece){
 		for (Piece p : piecesRemaining){
 			if (p.comparePieceArray(piece)) return p;
 		}
-		System.out.println("*** did not find this piece ***");
 		return null;
 	}
 }

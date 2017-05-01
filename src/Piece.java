@@ -1,10 +1,8 @@
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-public class Piece{
-	int ID;
-	int pieceNumber = -1;
+
+public class Piece implements Comparable{
+	public int ID;
+	public int pieceNumber = -1;
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public Piece(Block... b){
 		int counter = 0;
@@ -27,11 +25,10 @@ public class Piece{
 			bl.coordinate.y -= min_y;
 		}			
 	}
-	public Piece(){
-	}
-	public int getSize(){
-		return blocks.size();
-	}
+	public Piece(){}
+	public int getPieceNumber(){ return pieceNumber; }
+	public int getID(){ return ID; }
+	public int getSize(){ return blocks.size(); }
 	public void placePiece(Block b, Coord c){
 		for (Block bl : blocks){
 			bl.coordinate = null;
@@ -55,7 +52,50 @@ public class Piece{
 			System.out.println("");
 		}
 	}
-
+	
+	public ArrayList<Coord> getCoordinates(){
+		ArrayList<Coord> result = new ArrayList<Coord>();
+		for (Block b : blocks){
+			result.add(b.coordinate);
+		}
+		return result;
+	}
+	
+	public boolean comparePieceArray(String[] otherArray){
+		//checks piece array with this piece, true if same
+		String[] thisArray = this.getPieceArray();
+		
+		if (otherArray.length != thisArray.length) return false;
+		for (int i = 0; i < thisArray.length; i++){
+			if (!thisArray[i].equals(otherArray[i])) return false;
+		}
+		return true;
+	}
+	public String[] getPieceArray(){
+		//bare minimum representation of a piece, just X and - for block and blank cells resp.
+		int max_x = -0xFF;
+		int max_y = -0xFF;
+		String line = new String("");
+		ArrayList<Coord> coordinates = new ArrayList<Coord>();
+		for (Block b : blocks){
+			if (b.coordinate.x > max_x) max_x = b.coordinate.x;
+			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
+			coordinates.add(b.coordinate);
+		}
+		//System.out.println("max_y = " + max_y);
+		String[] result = new String[max_y+1];
+		int counter = 0;
+		for (int j = max_y; j >= 0; j--){
+			for (int i = 0; i <= max_x; i++){
+				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "-");
+			}
+			result[counter] = line;
+			counter++;
+			line = new String("");
+		}
+		return result;
+	}
+	
 	public ArrayList<String> getPieceRepresentation(String blank, String nonBlank, boolean numberBlocks, int... number){
 		int max_x = -0xFF;
 		int max_y = -0xFF;
@@ -96,58 +136,6 @@ public class Piece{
 			}
 			return true;
 		}
-		return false;
-	}
-	public ArrayList<Coord> getCoordinates(){
-		ArrayList<Coord> result = new ArrayList<Coord>();
-		for (Block b : blocks){
-			result.add(b.coordinate);
-		}
-		return result;
-	}
-	public boolean comparePieceArray(String[] otherArray){
-		//checks piece array with this piece, true if same
-		String[] thisArray = this.getPieceArray();
-		
-		if (otherArray.length != thisArray.length) return false;
-		for (int i = 0; i < thisArray.length; i++){
-			if (!thisArray[i].equals(otherArray[i])) return false;
-		}
-		return true;
-	}
-	public String[] getPieceArray(){
-		//bare minimum representation of a piece, just X and - for block and blank cells resp.
-		int max_x = -0xFF;
-		int max_y = -0xFF;
-		String line = new String("");
-		ArrayList<Coord> coordinates = new ArrayList<Coord>();
-		for (Block b : blocks){
-			if (b.coordinate.x > max_x) max_x = b.coordinate.x;
-			if (b.coordinate.y > max_y) max_y = b.coordinate.y;
-			coordinates.add(b.coordinate);
-		}
-		//System.out.println("max_y = " + max_y);
-		String[] result = new String[max_y+1];
-		int counter = 0;
-		for (int j = max_y; j >= 0; j--){
-			for (int i = 0; i <= max_x; i++){
-				line = line + ((coordinates.contains(new Coord(i,j))) ? "X" : "-");
-			}
-			result[counter] = line;
-			counter++;
-			line = new String("");
-		}
-		return result;
-	}
-	public boolean isSamePiece(Piece p){
-		if (comparePieceRepresentations(p)) return true;
-		if (comparePieceRepresentations(p.rotateCW())) return true;
-		if (comparePieceRepresentations(p.rotateCW().rotateCW())) return true;
-		if (comparePieceRepresentations(p.rotateCCW())) return true;
-		if (comparePieceRepresentations(p.flipHorizontal())) return true;
-		if (comparePieceRepresentations(p.flipHorizontal().rotateCW())) return true;
-		if (comparePieceRepresentations(p.flipHorizontal().rotateCW().rotateCW())) return true;
-		if (comparePieceRepresentations(p.flipHorizontal().rotateCCW())) return true;
 		return false;
 	}
 	public void placePiece(Block placedBlock, Block connectorBlock, int direction){
@@ -304,5 +292,8 @@ public class Piece{
 		}
 		System.out.println("Piece does not exist in arraylist!   Piece.findPieceInArrayList(ArrayList<Piece>)");
 		return -1;
+	}
+	public int compareTo(Object p){
+    	return (ID - ((Piece)p).getID());
 	}
 }
