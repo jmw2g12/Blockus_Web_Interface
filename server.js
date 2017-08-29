@@ -197,6 +197,10 @@ class game {
 		var weights = [];
 		var strategies = [];
 		
+		//this line is for post-uni demoing
+		return 'exploration';
+		//delete for regular use
+		
 		weights[0] = 1;
 		strategies[0] = 'exploration';
 		
